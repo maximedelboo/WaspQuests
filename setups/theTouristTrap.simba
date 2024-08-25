@@ -1,0 +1,4 @@
+{$DEFINE WQ_THETOURISTTRAP_INCLUDED}
+{$IFNDEF WQ_OSR}
+	{$I WaspQuests/osr.simba}
+{$ENDIF}

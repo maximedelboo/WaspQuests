@@ -1,0 +1,331 @@
+{$IFNDEF SRL_OSR} {$I SRL-T/osr.simba}{$ENDIF}
+{$IFNDEF WL_OSR} {$I WaspLib/osr.simba}{$ENDIF}
+{$DEFINE WQ_OSR}
+
+{$IFNDEF WQ_BACKEND} {$I backend/questBackend.simba} {$ENDIF}
+
+
+
+{$IFNDEF WQ_BLACKKNIGHTSFORTRESS_INCLUDED}		{$I setups/blackKnightsFortress.simba.simba}
+{$IFNDEF WQ_COOKSASSISTANT_INCLUDED}		{$I setups/cooksAssistant.simba.simba}
+{$IFNDEF WQ_THECORSAIRCURSE_INCLUDED}		{$I setups/theCorsairCurse.simba.simba}
+{$IFNDEF WQ_DEMONSLAYER_INCLUDED}		{$I setups/demonSlayer.simba.simba}
+{$IFNDEF WQ_DORICSQUEST_INCLUDED}		{$I setups/doricsQuest.simba.simba}
+{$IFNDEF WQ_DRAGONSLAYER_INCLUDED}		{$I setups/dragonSlayer.simba.simba}
+{$IFNDEF WQ_ERNESTTHECHICKEN_INCLUDED}		{$I setups/ernestTheChicken.simba.simba}
+{$IFNDEF WQ_GOBLINDIPLOMACY_INCLUDED}		{$I setups/goblinDiplomacy.simba.simba}
+{$IFNDEF WQ_IMPCATCHER_INCLUDED}		{$I setups/impCatcher.simba.simba}
+{$IFNDEF WQ_THEKNIGHTSSWORD_INCLUDED}		{$I setups/theKnightsSword.simba.simba}
+{$IFNDEF WQ_MISTHALINMYSTERY_INCLUDED}		{$I setups/misthalinMystery.simba.simba}
+{$IFNDEF WQ_PIRATESTREASURE_INCLUDED}		{$I setups/piratesTreasure.simba.simba}
+{$IFNDEF WQ_PRINCEALIRESCUE_INCLUDED}		{$I setups/princeAliRescue.simba.simba}
+{$IFNDEF WQ_THERESTLESSGHOST_INCLUDED}		{$I setups/theRestlessGhost.simba.simba}
+{$IFNDEF WQ_ROMEOANDJULIET_INCLUDED}		{$I setups/romeoAndJuliet.simba.simba}
+{$IFNDEF WQ_RUNEMYSTERIES_INCLUDED}		{$I setups/runeMysteries.simba.simba}
+{$IFNDEF WQ_SHEEPSHEARER_INCLUDED}		{$I setups/sheepShearer.simba.simba}
+{$IFNDEF WQ_SHIELDOFARRAV_INCLUDED}		{$I setups/shieldOfArrav.simba.simba}
+{$IFNDEF WQ_VAMPIRESLAYER_INCLUDED}		{$I setups/vampireSlayer.simba.simba}
+{$IFNDEF WQ_WITCHSPOTION_INCLUDED}		{$I setups/witchsPotion.simba.simba}
+{$IFNDEF WQ_SOULSBANE_INCLUDED}		{$I setups/soulsBane.simba.simba}
+{$IFNDEF WQ_ANIMALMAGNETISM_INCLUDED}		{$I setups/animalMagnetism.simba.simba}
+{$IFNDEF WQ_ANOTHERSLICEOFHAM_INCLUDED}		{$I setups/anotherSliceOfHam.simba.simba}
+{$IFNDEF WQ_THEASCENTOFARCEUUS_INCLUDED}		{$I setups/theAscentOfArceuus.simba.simba}
+{$IFNDEF WQ_BETWEENAROCK_INCLUDED}		{$I setups/betweenARock.simba.simba}
+{$IFNDEF WQ_BIGCHOMPYBIRDHUNTING_INCLUDED}		{$I setups/bigChompyBirdHunting.simba.simba}
+{$IFNDEF WQ_BIOHAZARD_INCLUDED}		{$I setups/biohazard.simba.simba}
+{$IFNDEF WQ_BONEVOYAGE_INCLUDED}		{$I setups/boneVoyage.simba.simba}
+{$IFNDEF WQ_CABINFEVER_INCLUDED}		{$I setups/cabinFever.simba.simba}
+{$IFNDEF WQ_CLIENTOFKOUREND_INCLUDED}		{$I setups/clientOfKourend.simba.simba}
+{$IFNDEF WQ_CLOCKTOWER_INCLUDED}		{$I setups/clockTower.simba.simba}
+{$IFNDEF WQ_COLDWAR_INCLUDED}		{$I setups/coldWar.simba.simba}
+{$IFNDEF WQ_CONTACT_INCLUDED}		{$I setups/contact.simba.simba}
+{$IFNDEF WQ_CREATUREOFFENKENSTRAIN_INCLUDED}		{$I setups/creatureOfFenkenstrain.simba.simba}
+{$IFNDEF WQ_DARKNESSOFHALLOWVALE_INCLUDED}		{$I setups/darknessOfHallowvale.simba.simba}
+{$IFNDEF WQ_DEATHPLATEAU_INCLUDED}		{$I setups/deathPlateau.simba.simba}
+{$IFNDEF WQ_DEATHTOTHEDORGESHUUN_INCLUDED}		{$I setups/deathToTheDorgeshuun.simba.simba}
+{$IFNDEF WQ_DESERTTREASURE_INCLUDED}		{$I setups/desertTreasure.simba.simba}
+{$IFNDEF WQ_DEVIOUSMINDS_INCLUDED}		{$I setups/deviousMinds.simba.simba}
+{$IFNDEF WQ_DIGSITE_INCLUDED}		{$I setups/digSite.simba.simba}
+{$IFNDEF WQ_DRAGONSLAYERII_INCLUDED}		{$I setups/dragonSlayerIi.simba.simba}
+{$IFNDEF WQ_DREAMMENTOR_INCLUDED}		{$I setups/dreamMentor.simba.simba}
+{$IFNDEF WQ_DRUIDICRITUAL_INCLUDED}		{$I setups/druidicRitual.simba.simba}
+{$IFNDEF WQ_DWARFCANNON_INCLUDED}		{$I setups/dwarfCannon.simba.simba}
+{$IFNDEF WQ_EADGARSRUSE_INCLUDED}		{$I setups/eadgarsRuse.simba.simba}
+{$IFNDEF WQ_EAGLESPEAK_INCLUDED}		{$I setups/eaglesPeak.simba.simba}
+{$IFNDEF WQ_ELEMENTALWORKSHOPI_INCLUDED}		{$I setups/elementalWorkshopI.simba.simba}
+{$IFNDEF WQ_ELEMENTALWORKSHOPII_INCLUDED}		{$I setups/elementalWorkshopIi.simba.simba}
+{$IFNDEF WQ_ENAKHRASLAMENT_INCLUDED}		{$I setups/enakhrasLament.simba.simba}
+{$IFNDEF WQ_ENLIGHTENEDJOURNEY_INCLUDED}		{$I setups/enlightenedJourney.simba.simba}
+{$IFNDEF WQ_FAIRYTALEIIUPTOSTEP9_INCLUDED}		{$I setups/fairyTaleIiUpToStep9.simba.simba}
+{$IFNDEF WQ_FAIRYTALEII-CUREAQUEEN_INCLUDED}		{$I setups/fairyTaleIi-CureAQueen.simba.simba}
+{$IFNDEF WQ_FAMILYCREST_INCLUDED}		{$I setups/familyCrest.simba.simba}
+{$IFNDEF WQ_FAIRYTALEI-GROWINGPAINS_INCLUDED}		{$I setups/fairyTaleI-GrowingPains.simba.simba}
+{$IFNDEF WQ_FIGHTARENA_INCLUDED}		{$I setups/fightArena.simba.simba}
+{$IFNDEF WQ_FISHINGCONTEST_INCLUDED}		{$I setups/fishingContest.simba.simba}
+{$IFNDEF WQ_FORGETTABLETALE.._INCLUDED}		{$I setups/forgettableTale...simba.simba}
+{$IFNDEF WQ_THEFORSAKENTOWER_INCLUDED}		{$I setups/theForsakenTower.simba.simba}
+{$IFNDEF WQ_THEFREMENNIKISLES_INCLUDED}		{$I setups/theFremennikIsles.simba.simba}
+{$IFNDEF WQ_THEFREMENNIKTRIALS_INCLUDED}		{$I setups/theFremennikTrials.simba.simba}
+{$IFNDEF WQ_GARDENOFTRANQUILLITY_INCLUDED}		{$I setups/gardenOfTranquillity.simba.simba}
+{$IFNDEF WQ_GERTRUDESCAT_INCLUDED}		{$I setups/gertrudesCat.simba.simba}
+{$IFNDEF WQ_GHOSTSAHOY_INCLUDED}		{$I setups/ghostsAhoy.simba.simba}
+{$IFNDEF WQ_GIANTDWARF_INCLUDED}		{$I setups/giantDwarf.simba.simba}
+{$IFNDEF WQ_THEGOLEM_INCLUDED}		{$I setups/theGolem.simba.simba}
+{$IFNDEF WQ_THEGRANDTREE_INCLUDED}		{$I setups/theGrandTree.simba.simba}
+{$IFNDEF WQ_THEGREATBRAINROBBERY_INCLUDED}		{$I setups/theGreatBrainRobbery.simba.simba}
+{$IFNDEF WQ_GRIMTALES_INCLUDED}		{$I setups/grimTales.simba.simba}
+{$IFNDEF WQ_THEHANDINTHESAND_INCLUDED}		{$I setups/theHandInTheSand.simba.simba}
+{$IFNDEF WQ_HAUNTEDMINE_INCLUDED}		{$I setups/hauntedMine.simba.simba}
+{$IFNDEF WQ_HAZEELCULT_INCLUDED}		{$I setups/hazeelCult.simba.simba}
+{$IFNDEF WQ_HEROESQUEST_INCLUDED}		{$I setups/heroesQuest.simba.simba}
+{$IFNDEF WQ_HOLYGRAIL_INCLUDED}		{$I setups/holyGrail.simba.simba}
+{$IFNDEF WQ_HORRORFROMTHEDEEP_INCLUDED}		{$I setups/horrorFromTheDeep.simba.simba}
+{$IFNDEF WQ_INAIDOFTHEMYREQUE_INCLUDED}		{$I setups/inAidOfTheMyreque.simba.simba}
+{$IFNDEF WQ_INSEARCHOFTHEMYREQUE_INCLUDED}		{$I setups/inSearchOfTheMyreque.simba.simba}
+{$IFNDEF WQ_ICTHLARINSLITTLEHELPER_INCLUDED}		{$I setups/icthlarinsLittleHelper.simba.simba}
+{$IFNDEF WQ_JUNGLEPOTION_INCLUDED}		{$I setups/junglePotion.simba.simba}
+{$IFNDEF WQ_KINGSRANSOM_INCLUDED}		{$I setups/kingsRansom.simba.simba}
+{$IFNDEF WQ_LEGENDSQUEST_INCLUDED}		{$I setups/legendsQuest.simba.simba}
+{$IFNDEF WQ_LOSTCITY_INCLUDED}		{$I setups/lostCity.simba.simba}
+{$IFNDEF WQ_THELOSTTRIBE_INCLUDED}		{$I setups/theLostTribe.simba.simba}
+{$IFNDEF WQ_LUNARDIPLOMACY_INCLUDED}		{$I setups/lunarDiplomacy.simba.simba}
+{$IFNDEF WQ_MAKINGFRIENDSWITHMYARM_INCLUDED}		{$I setups/makingFriendsWithMyArm.simba.simba}
+{$IFNDEF WQ_MAKINGHISTORY_INCLUDED}		{$I setups/makingHistory.simba.simba}
+{$IFNDEF WQ_MERLINSCRYSTAL_INCLUDED}		{$I setups/merlinsCrystal.simba.simba}
+{$IFNDEF WQ_MOGREMINIQUEST_INCLUDED}		{$I setups/mogreMiniquest.simba.simba}
+{$IFNDEF WQ_MONKEYMADNESSI_INCLUDED}		{$I setups/monkeyMadnessI.simba.simba}
+{$IFNDEF WQ_MONKEYMADNESSII_INCLUDED}		{$I setups/monkeyMadnessIi.simba.simba}
+{$IFNDEF WQ_MONKSFRIEND_INCLUDED}		{$I setups/monksFriend.simba.simba}
+{$IFNDEF WQ_MOUNTAINDAUGHTER_INCLUDED}		{$I setups/mountainDaughter.simba.simba}
+{$IFNDEF WQ_MOURNINGSENDPARTI_INCLUDED}		{$I setups/mourningsEndPartI.simba.simba}
+{$IFNDEF WQ_MOURNINGSENDPARTII_INCLUDED}		{$I setups/mourningsEndPartIi.simba.simba}
+{$IFNDEF WQ_MURDERMYSTERY_INCLUDED}		{$I setups/murderMystery.simba.simba}
+{$IFNDEF WQ_MYARMSBIGADVENTURE_INCLUDED}		{$I setups/myArmsBigAdventure.simba.simba}
+{$IFNDEF WQ_NATURESPIRIT_INCLUDED}		{$I setups/natureSpirit.simba.simba}
+{$IFNDEF WQ_OBSERVATORY_INCLUDED}		{$I setups/observatory.simba.simba}
+{$IFNDEF WQ_OLAFSQUEST_INCLUDED}		{$I setups/olafsQuest.simba.simba}
+{$IFNDEF WQ_ONESMALLFAVOUR_INCLUDED}		{$I setups/oneSmallFavour.simba.simba}
+{$IFNDEF WQ_PLAGUECITY_INCLUDED}		{$I setups/plagueCity.simba.simba}
+{$IFNDEF WQ_PRIESTINPERIL_INCLUDED}		{$I setups/priestInPeril.simba.simba}
+{$IFNDEF WQ_RAGANDBONEMAN_INCLUDED}		{$I setups/ragAndBoneMan.simba.simba}
+{$IFNDEF WQ_RAGANDBONEMANII_INCLUDED}		{$I setups/ragAndBoneManIi.simba.simba}
+{$IFNDEF WQ_RATCATCHERS_INCLUDED}		{$I setups/ratcatchers.simba.simba}
+{$IFNDEF WQ_RECIPEFORDISASTER(UPTOGOBLINS)_INCLUDED}		{$I setups/recipeForDisaster(upToGoblins).simba.simba}
+{$IFNDEF WQ_RECIPEFORDISASTER(UPTOSKRACH)_INCLUDED}		{$I setups/recipeForDisaster(upToSkrach).simba.simba}
+{$IFNDEF WQ_RECIPEFORDISASTER_INCLUDED}		{$I setups/recipeForDisaster.simba.simba}
+{$IFNDEF WQ_RECRUITMENTDRIVE_INCLUDED}		{$I setups/recruitmentDrive.simba.simba}
+{$IFNDEF WQ_REGICIDE_INCLUDED}		{$I setups/regicide.simba.simba}
+{$IFNDEF WQ_ROVINGELVES_INCLUDED}		{$I setups/rovingElves.simba.simba}
+{$IFNDEF WQ_ROYALTROUBLE_INCLUDED}		{$I setups/royalTrouble.simba.simba}
+{$IFNDEF WQ_RUMDEAL_INCLUDED}		{$I setups/rumDeal.simba.simba}
+{$IFNDEF WQ_SCORPIONCATCHER_INCLUDED}		{$I setups/scorpionCatcher.simba.simba}
+{$IFNDEF WQ_SEASLUG_INCLUDED}		{$I setups/seaSlug.simba.simba}
+{$IFNDEF WQ_SHADESOFMORTTON_INCLUDED}		{$I setups/shadesOfMortton.simba.simba}
+{$IFNDEF WQ_SHADOWOFTHESTORM_INCLUDED}		{$I setups/shadowOfTheStorm.simba.simba}
+{$IFNDEF WQ_SHEEPHERDER_INCLUDED}		{$I setups/sheepHerder.simba.simba}
+{$IFNDEF WQ_SHILOVILLAGE_INCLUDED}		{$I setups/shiloVillage.simba.simba}
+{$IFNDEF WQ_SONGOFTHEELVES_INCLUDED}		{$I setups/songOfTheElves.simba.simba}
+{$IFNDEF WQ_SPIRITOFTHEELID_INCLUDED}		{$I setups/spiritOfTheElid.simba.simba}
+{$IFNDEF WQ_SWANSONG_INCLUDED}		{$I setups/swanSong.simba.simba}
+{$IFNDEF WQ_TAIBWOWANNAITRIO_INCLUDED}		{$I setups/taiBwoWannaiTrio.simba.simba}
+{$IFNDEF WQ_TEARSOFGUTHIX_INCLUDED}		{$I setups/tearsOfGuthix.simba.simba}
+{$IFNDEF WQ_TEMPLEOFIKOV_INCLUDED}		{$I setups/templeOfIkov.simba.simba}
+{$IFNDEF WQ_THEDEPTHSOFDESPAIR_INCLUDED}		{$I setups/theDepthsOfDespair.simba.simba}
+{$IFNDEF WQ_THEEYESOFGLOUPHRIE_INCLUDED}		{$I setups/theEyesOfGlouphrie.simba.simba}
+{$IFNDEF WQ_THEFEUD_INCLUDED}		{$I setups/theFeud.simba.simba}
+{$IFNDEF WQ_THEQUEENOFTHIEVES_INCLUDED}		{$I setups/theQueenOfThieves.simba.simba}
+{$IFNDEF WQ_THESLUGMENACE_INCLUDED}		{$I setups/theSlugMenace.simba.simba}
+{$IFNDEF WQ_TAILOFTWOCATS_INCLUDED}		{$I setups/tailOfTwoCats.simba.simba}
+{$IFNDEF WQ_TALEOFTHERIGHTEOUS_INCLUDED}		{$I setups/taleOfTheRighteous.simba.simba}
+{$IFNDEF WQ_ATASTEOFHOPE_INCLUDED}		{$I setups/aTasteOfHope.simba.simba}
+{$IFNDEF WQ_THRONEOFMISCELLANIA_INCLUDED}		{$I setups/throneOfMiscellania.simba.simba}
+{$IFNDEF WQ_THETOURISTTRAP_INCLUDED}		{$I setups/theTouristTrap.simba.simba}
+{$IFNDEF WQ_TOWEROFLIFE_INCLUDED}		{$I setups/towerOfLife.simba.simba}
+{$IFNDEF WQ_TREEGNOMEVILLAGE_INCLUDED}		{$I setups/treeGnomeVillage.simba.simba}
+{$IFNDEF WQ_TRIBALTOTEM_INCLUDED}		{$I setups/tribalTotem.simba.simba}
+{$IFNDEF WQ_TROLLROMANCE_INCLUDED}		{$I setups/trollRomance.simba.simba}
+{$IFNDEF WQ_TROLLSTRONGHOLD_INCLUDED}		{$I setups/trollStronghold.simba.simba}
+{$IFNDEF WQ_UNDERGROUNDPASS_INCLUDED}		{$I setups/undergroundPass.simba.simba}
+{$IFNDEF WQ_WANTED!_INCLUDED}		{$I setups/wanted!.simba.simba}
+{$IFNDEF WQ_WATCHTOWER_INCLUDED}		{$I setups/watchtower.simba.simba}
+{$IFNDEF WQ_WATERFALLQUEST_INCLUDED}		{$I setups/waterfallQuest.simba.simba}
+{$IFNDEF WQ_WHATLIESBELOW_INCLUDED}		{$I setups/whatLiesBelow.simba.simba}
+{$IFNDEF WQ_WITCHSHOUSE_INCLUDED}		{$I setups/witchsHouse.simba.simba}
+{$IFNDEF WQ_ZOGREFLESHEATERS_INCLUDED}		{$I setups/zogreFleshEaters.simba.simba}
+{$IFNDEF WQ_ALFREDGRIMHANDSBARCRAWL(M)_INCLUDED}		{$I setups/alfredGrimhandsBarcrawl(m).simba.simba}
+{$IFNDEF WQ_ARCHITECTURALALLIANCE(M)_INCLUDED}		{$I setups/architecturalAlliance(m).simba.simba}
+{$IFNDEF WQ_BEARYOURSOUL(M)_INCLUDED}		{$I setups/bearYourSoul(m).simba.simba}
+{$IFNDEF WQ_CURSEOFTHEEMPTYLORD(M)_INCLUDED}		{$I setups/curseOfTheEmptyLord(m).simba.simba}
+{$IFNDEF WQ_ENCHANTEDKEY(M)_INCLUDED}		{$I setups/enchantedKey(m).simba.simba}
+{$IFNDEF WQ_ENTERTHEABYSS(M)_INCLUDED}		{$I setups/enterTheAbyss(m).simba.simba}
+{$IFNDEF WQ_FAMILYPEST(M)_INCLUDED}		{$I setups/familyPest(m).simba.simba}
+{$IFNDEF WQ_THEGENERALSSHADOW(M)_INCLUDED}		{$I setups/theGeneralsShadow(m).simba.simba}
+{$IFNDEF WQ_LAIROFTARNRAZORLOR(M)_INCLUDED}		{$I setups/lairOfTarnRazorlor(m).simba.simba}
+{$IFNDEF WQ_THEMAGEARENA(M)_INCLUDED}		{$I setups/theMageArena(m).simba.simba}
+{$IFNDEF WQ_THEMAGEARENAII(M)_INCLUDED}		{$I setups/theMageArenaIi(m).simba.simba}
+{$IFNDEF WQ_SKIPPYANDTHEMOGRES(M)_INCLUDED}		{$I setups/skippyAndTheMogres(m).simba.simba}
+{$IFNDEF WQ_BARBARIANTRAINING(U)_INCLUDED}		{$I setups/barbarianTraining(u).simba.simba}
+{$IFNDEF WQ_CHAMPIONSCHALLENGE(U)_INCLUDED}		{$I setups/championsChallenge(u).simba.simba}
+{$IFNDEF WQ_NATURALHISTORYQUIZ(U)_INCLUDED}		{$I setups/naturalHistoryQuiz(u).simba.simba}
+
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}

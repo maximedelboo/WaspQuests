@@ -1,0 +1,4 @@
+{$DEFINE WQ_CHAMPIONSCHALLENGE(U)_INCLUDED}
+{$IFNDEF WQ_OSR}
+	{$I WaspQuests/osr.simba}
+{$ENDIF}

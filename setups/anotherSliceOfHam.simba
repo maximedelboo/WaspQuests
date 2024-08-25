@@ -1,0 +1,4 @@
+{$DEFINE WQ_ANOTHERSLICEOFHAM_INCLUDED}
+{$IFNDEF WQ_OSR}
+	{$I WaspQuests/osr.simba}
+{$ENDIF}
