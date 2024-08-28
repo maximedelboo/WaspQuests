@@ -5,7 +5,7 @@
 {$SCOPEDENUMS ON}
 
 type
-  STEP_TYPE = (INTERACT_NPC, KILL, INTERACT_OBJECT, INTERACT_INVENTORY, CONVERSATION, COMBINE, LOOT, WALK, WAIT, BANK, CLICK_TILE, CUSTOM);
+  STEP_TYPE = (INTERACT_NPC, KILL, INTERACT_OBJECT, INTERACT_INVENTORY, CONVERSATION, QUERY, COMBINE, LOOT, WALK, WAIT, BANK, CLICK_TILE, CUSTOM);
 
   PStep = ^TStep;
   PQuest = ^TQuest;
@@ -17,7 +17,7 @@ type
     step_type: STEP_TYPE;
     NPC_target: TRSNPCV2;
     objectTarget: TRSObjectV2;
-    action, name, NPC_name, objName: String;
+    action, name, answer, NPC_name, objName: String;
     item1, item2: TRSItem;
     coordinate: TPoint;
     time: Integer;

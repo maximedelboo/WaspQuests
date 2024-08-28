@@ -124,6 +124,37 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
+procedure SolveQueryStep(var step: TStep);
+var
+  i: Integer;
+begin
+  step.actionSucceeded := False;
+  WaitUntil(chat.HasContinue,10,2000);
+  Writeln('Starting conversation');
+  for i in step.conversationIndices do
+    if Chat.ChatToNumberOrQuery(i-1, step.action, step.answer) then Chat.ChatToNumber(i-1);
+  while chat.HasContinue() do
+  begin
+    chat.ClickContinue(False);
+    Wait(0,700,wdLeft);
+  end;
+
+  if step.action in Chat.GetQuery then
+  begin
+    Chat.AnswerQuery(step.action, step.answer, 1500);
+    while chat.HasContinue() do
+    begin
+      chat.ClickContinue(False);
+      Wait(0,700,wdLeft);
+    end;
+  end;
+
+  step.actionSucceeded := True;
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
 procedure SolveCombineStep(var step: TStep);
 begin
   step.actionSucceeded := False;

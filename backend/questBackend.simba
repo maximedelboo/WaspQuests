@@ -76,6 +76,7 @@ begin
       STEP_TYPE.INTERACT_OBJECT: SolveInteractObjectStep(currentStep);
       STEP_TYPE.INTERACT_INVENTORY: SolveInteractInventoryStep(currentStep);
       STEP_TYPE.CONVERSATION: SolveConversationStep(currentStep);
+      STEP_TYPE.QUERY: SolveQueryStep(currentStep);
       STEP_TYPE.COMBINE: SolveCombineStep(currentStep);
       STEP_TYPE.LOOT: SolveLootStep(currentStep);
       STEP_TYPE.BANK: SolveBankStep(currentStep);

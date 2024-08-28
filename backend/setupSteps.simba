@@ -51,6 +51,20 @@ begin
   Result.SpecialEvent := @SpecialEvent;
 end;
 
+function SetupQueryStep(stepName: String; conversationIndices: TIntegerArray; query, answer: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.QUERY;
+  Result.name := stepName;
+  Result.action := query;
+  Result.answer := answer;
+  Result.conversationIndices := conversationIndices;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
 function SetupInteractInventoryStep(stepName: String; item: TRSItem; action: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
 begin
   Result.step_type := STEP_TYPE.INTERACT_INVENTORY;

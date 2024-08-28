@@ -32,6 +32,24 @@ begin
   Result := True;
 end;
 
+function TRSChat.ChatToNumberOrQuery(Number: Integer; query, answer: String): Boolean;
+var
+  Timeout: TCountdown;
+begin
+  Timeout.Init(15000);
+  while (not Timeout.IsFinished) and self.HasContinue and Self.ClickContinue(False) do
+    Wait(0, 2500, wdLeft);
+
+  if query in Self.GetQuery then
+  begin
+    Self.AnswerQuery(query,answer,1500);
+    Exit(True);
+  end;
+  Keyboard.PressKey(VK_1 + Number);
+  Wait(600,800);
+  Result := False;
+end;
+
 function TRSInventory.ContainsAll(bankitems: TRSBankItemArray): Boolean; overload;
 var
   bankitem: TRSBankItem;
