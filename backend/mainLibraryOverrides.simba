@@ -1,0 +1,378 @@
+{$DEFINE WQ_OVERRIDES}
+{$IFNDEF WL_OSR}
+  {$I WaspLib/osr.simba}
+{$ENDIF}
+
+
+function TRSChat.HasContinue(): Boolean; override;
+begin
+  Result := Self.FindOption('continue', [CHAT_COLOR_BLUE, CHAT_COLOR_WHITE]) or
+            Self.FindOption('Please wait', [CHAT_COLOR_BLUE, CHAT_COLOR_WHITE]);
+end;
+
+function TRSChat.ClickContinue(UseKeyboard: Boolean = True): Boolean; override;
+begin
+  if Self.ClickOption('continue', UseKeyboard, [CHAT_COLOR_BLUE, CHAT_COLOR_WHITE]) then
+  begin
+    Result := WaitUntil(Self.FindOption('Please wait', [CHAT_COLOR_BLUE, CHAT_COLOR_WHITE]), SRL.TruncatedGauss(50, 1500), 3000) and
+              WaitUntil(not Self.FindOption('Please wait', [CHAT_COLOR_BLUE, CHAT_COLOR_WHITE]), SRL.TruncatedGauss(50, 1500), 3000);
+  end;
+end;
+
+function TRSChat.ChatToNumber(Number: Integer): Boolean;
+var
+  Timeout: TCountdown;
+begin
+  Timeout.Init(15000);
+  while (not Timeout.IsFinished) and self.HasContinue and Self.ClickContinue(False) do
+    Wait(0, 2500, wdLeft);
+
+  Keyboard.PressKey(VK_1 + Number);
+  Wait(600,800);
+  Result := True;
+end;
+
+function TRSInventory.ContainsAll(bankitems: TRSBankItemArray): Boolean; overload;
+var
+  bankitem: TRSBankItem;
+  items: TRSItemArray;
+  quantities: TIntegerArray;
+  noted: TBoolArray;
+  i: Integer;
+begin
+  for bankitem in bankitems do
+  begin
+    items += bankitem.Item;
+    quantities += bankitem.Quantity;
+    noted += bankitem.Noted;
+  end;
+
+  for i := 0 to high(items) do
+  begin
+    if noted[i] then
+      result := self.CountItemStack(items[i]) >= quantities[i]
+    else
+      result := self.CountItem(items[i]) >= quantities[i];
+    if not result then Exit(False);
+  end;
+end;
+
+function TRSObjectV2Array.findNearest(point:TPoint): TRSObjectV2;
+var
+  obj: TRSObjectV2;
+  dist: Double;
+begin
+  dist := $FFFFFF;
+  for obj in self do
+    if obj.Coordinates[0].DistanceTo(point) < dist then
+    begin
+      Result := obj;
+      dist := obj.Coordinates[0].DistanceTo(point);
+    end;
+end;
+
+function TRSNPCV2Array.findNearest(point:TPoint): TRSNPCV2;
+var
+  NPC: TRSNPCV2;
+  dist: Double;
+begin
+  dist := $FFFFFF;
+  for NPC in self do
+    if NPC.Coordinates[0].DistanceTo(point) < dist then
+    begin
+      Result := NPC;
+      dist := NPC.Coordinates[0].DistanceTo(point);
+    end;
+end;
+
+function TRSMainscreen.IsInCombat(): Boolean;
+var
+  timer: TCountdown;
+  hits: Integer;
+begin
+  timer.Init(5500);
+  while not timer.IsFinished do
+  begin
+    hits := Length(Mainscreen.FindHitsplats(Mainscreen.GetPlayerBox.Expand(15)));
+    if hits > 0 then Exit(True);
+    if XPBar.EarnedXP then Exit(True);
+  end;
+  Result := False;
+  WriteLn('Currently not in combat');
+end;
+
+function TRSGameTabs.Open(Tab: ERSGameTab; force: Boolean): Boolean; overload;
+var
+  i: Int32;
+begin
+  if not force and (Self.GetCurrentTab() = Tab) then
+    Exit(True);
+
+  for i := 1 to 3 do
+  begin
+    Mouse.Click(GetTabBox(Tab), MOUSE_LEFT, SRL.Dice(50));
+
+    Result := WaitUntil(Self.GetCurrentTab() = Tab, SRL.TruncatedGauss(50, 2000), SRL.TruncatedGauss(2000, 3000));
+    if Result then
+      Exit;
+  end;
+end;
+
+procedure TRSMap.ClickTile(coord: TPoint; Action: String = '');
+var
+  rect: TRectangle;
+begin
+  rect := self.GetTileMS(coord);
+  Mouse.Move(rect.Mean);
+  if Action <> '' then
+    ChooseOption.Select(Action)
+  else
+    Mouse.Click(MOUSE_LEFT);
+end;
+
+function TRSMinimap.GetItemDots(): TPointArray;
+  function GetMinimapGrid(angle: Single): Vector3Array;
+  var x, y: Integer;
+  begin
+    for x := Minimap.Center().X - 20 * 4 to Minimap.Center().X + 20 * 4 with 4 do
+      for y := Minimap.Center().Y - 20 * 4 to Minimap.Center().Y + 20 * 4 with 4 do
+        Result += Vec3(x, y).RotateXY(angle, Minimap.Center().X, Minimap.Center.Y);
+  end;
+
+  function DotsToTile(dots: TPointArray; angle: Single): TPointArray;
+  var
+    dotVecs, mmGrid: Vector3Array;
+    i: Integer;
+  begin
+    dotVecs.FromTPA(dots);
+    dotVecs := dotVecs.Offset([2,1]); //This can be either 2,1 or 2,2
+
+    mmGrid := GetMinimapGrid(angle);
+    for i := 0 to High(dotVecs) do
+      dotVecs[i] := mmGrid.NearestVec(dotVecs[i]);
+
+    Result := dotVecs.ToTPA();
+  end;
+var
+  mmGrid: Vector3Array;
+  dots: TPointArray;
+  dot: TPoint;
+  angle: Single;
+begin
+  angle := Minimap.GetCompassAngle(False);
+  mmGrid := GetMinimapGrid(angle);
+  dots := Minimap.GetDots(ERSMinimapDot.ITEM);
+  if dots = [] then Exit();
+  dots := dotsToTile(dots, angle);
+  for dot in dots do
+  begin
+    dot := Map.MM2Map(dot, angle);
+    dot := RSTranslator.NormalizeNearestTile(dot);
+    Result += dot;
+  end;
+end;
+
+{$IFNDEF WQ_OSR}
+  {$I WaspQuests/osr.simba}
+{$ENDIF}
+
+procedure TRSMap.SetupChunks(chunks: array of TRSMapChunk; downscale: UInt32; addLadders: Boolean); overload;
+begin
+  Self.Loader.Load(chunks, downscale);
+  Self.InternalSetup();
+  if addLadders then
+    Self.AddLadders();
+  Self.InternalSetup();
+end;
+
+procedure TRSMap.SetupChunksEx(chunks: TBoxArray; planes: TIntegerArray = [0]; downscale: UInt32; addLadders: Boolean); overload;
+begin
+  Self.Loader.Load(chunks, planes, downscale);
+  Self.InternalSetup();
+  if addLadders then
+    Self.AddLadders();
+  Self.InternalSetup();
+end;
+
+procedure TRSMap.SetupChunk(chunk: TRSMapChunk; downscale: UInt32; addLadders: Boolean); overload;
+begin
+  Self.SetupChunksEx([chunk.Chunk], chunk.Planes, downscale, addLadders);
+end;
+
+procedure TRSMap.SetupChunks(echunks: set of ERSChunk; downscale: UInt32; addLadders: Boolean); overload;
+var
+  chunks: array of TRSMapChunk;
+  echunk: ERSChunk;
+begin
+  for echunk in echunks do
+    chunks += echunk.Get();
+  Self.SetupChunks(chunks, downscale, addLadders);
+end;
+
+procedure TRSMap.SetupChunk(echunk: ERSChunk; downscale: UInt32; addLadders: Boolean); overload;
+var
+  chunk: TRSMapChunk;
+begin
+  chunk := echunk.Get();
+  Self.SetupChunk(chunk, downscale, addLadders);
+end;
+
+function TWebGraph.FindPath(Start, Goal: Int32; Rnd:Double=0): TIntegerArray; constref; override;
+type
+  TNode = record
+    Indices: TIntegerArray;
+    Score: Double;
+  end;
+var
+  queue: array of TNode;
+  visited: TBoolArray;
+  cIdx, pathIdx, i: Int32;
+  current, node: TNode;
+  p, q: TPoint;
+  hyp: Double;
+
+  function GetNextShortest(): TNode;
+  var i, node: Int32;
+  begin
+    Result := queue[0];
+    for i := 1 to High(queue) do
+      if queue[i].Score < Result.Score then
+      begin
+        node   := i;
+        Result := queue[i];
+      end;
+    Delete(queue, node, 1);
+  end;
+begin
+  queue   := [[[start],0]];
+  SetLength(visited, Length(Self.Nodes));
+
+  // block certain paths by marking them as visited
+  for i:=0 to High(Blocking) do Visited[Blocking[i]] := True;
+
+  // ...
+  while Length(queue) <> 0 do
+  begin
+    current := GetNextShortest();
+    cIdx := current.Indices[High(current.Indices)];
+    if Visited[cIdx] then Continue; //skip overwrapping paths..
+    Visited[cIdx] := True;
+
+    if (cIdx = Goal) then
+      Exit(current.Indices);
+
+    p := Self.Nodes[cIdx];
+    for pathIdx in Self.Paths[cIdx] do
+    begin
+      if not Visited[pathIdx] then
+      begin
+        q := Self.Nodes[pathIdx];
+        node.Indices := current.Indices + pathIdx;
+
+        hyp := Hypot(p.x-q.x, p.y-q.y);
+        if hyp > 1000 then hyp := 10;
+        node.Score   := current.Score + hyp + (hyp*Random()*Rnd-Rnd/2);
+        queue += node;
+      end;
+    end;
+  end;
+end;
+
+function TWebGraph.FindNearestNodes(p: TPoint; amount: Int32): TIntegerArray; override;
+var
+  i: Int32;
+  weights: TIntegerArray;
+  tpa: TPointArray;
+  timer: Double;
+begin
+  if Self.Tree.Size = 0 then
+  begin
+    Self.Tree.Init(System.Copy(Self.Nodes));
+    AddOnTerminate(@Self.Tree.Free);
+  end;
+
+  tpa := Self.Tree.KNearest(p, amount);
+  SetLength(Result, Length(tpa));
+  SetLength(weights, Length(tpa));
+
+  for i :=0 to High(tpa) do
+    Result[i] := Self.Nodes.find(tpa[i]);
+
+  for i := 0 to High(Result) do
+    weights[i] := Round(p.DistanceTo(Self.Nodes[Result[I]]));
+
+  for i := 0 to High(Result) do
+    if not Self.WalkableClusters.InSameTPA(p, Self.Nodes[Result[I]]) then weights[i] := $FFFFFF;
+
+  //for i := 0 to High(Result) do
+  //begin
+  //  if weights[i] = $FFFFFF then continue;
+  //  if not Self.WalkableSpace.ContainsAll(p.lineTo(Self.Nodes[Result[I]])) then weights[i] += 50;
+  //end;
+
+  Result.SortWeighted(weights, 0, High(Result), True);
+  if weights[0] = $FFFFFF then
+    RaiseException('No near nodes were found around point ' + p.ToString());
+
+  for i := 0 to High(weights.findAll($FFFFFF)) do
+    Result.Pop();
+end;
+
+function TRSWalkerV2.LadderWalk(dest: TPoint): Boolean;
+var
+  path: TPointArray;
+  me, prev, p, ladderPoint: TPoint;
+  obj: TRSObjectV2;
+  ladderAttempt: Integer;
+begin
+  ladderAttempt := 0;
+  while True do
+  begin
+    me := Self.Position();
+    path := self.WebGraph^.PathBetweenEx(me, dest);
+    WriteLn(path);
+
+    if path.TotalDistance() > RSTranslator.MapWidth() then
+    begin
+      prev := path[0];
+      WriteLn('Ladder found on path!');
+      for p in path do
+      begin
+        if p.DistanceTo(prev) > 1000 then
+        begin
+          ladderPoint := prev;
+          break;
+        end;
+        prev := p;
+      end;
+
+      obj := Ladders.FindNearestSingle(ladderPoint);
+      Debug(obj);
+      obj.Finder.Colors := [CTS2(3504679, 17, 2.17, 2.93)];
+      WriteLn('colors: ', obj.finder.Colors);
+      if obj.Coordinates[0].InRange(Self.Position, 8) then
+      begin
+        if p.X - ladderPoint.X > 0 then
+          obj.SelectOption(['-up'])
+        else
+          obj.SelectOption(['-down']);
+      end else
+      begin
+        if p.X - ladderPoint.X > 0 then
+          obj.WalkSelectOption(['-up'])
+        else
+          obj.WalkSelectOption(['-down']);
+      end;
+
+
+      WriteLn('Done clicking ladder');
+      Wait(600);
+      WaitUntil(not Minimap.IsPlayerMoving,10,5000);
+      Wait(1000);
+      if p.DistanceTo(Self.Position) > 1000 then ladderAttempt += 1 else ladderAttempt := 0;
+      if ladderAttempt > 5 then RaiseException('Failed to walk up ladder');
+    end else Break;
+  end;
+  Result := Self.WebWalk(dest);
+end;
+

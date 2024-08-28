@@ -1,0 +1,225 @@
+{$DEFINE WQ_SOLVESTEPS}
+{$IFNDEF WQ_OSR}
+  {$I WaspQuests/osr.simba}
+{$ENDIF}
+
+procedure TQuest.SolveInteractNpcStep(var step: TStep);
+var
+  npcArr: TRSNPCV2Array;
+begin
+  step.actionSucceeded := False;
+
+  if step.coordinate = [0,0] then step.coordinate := Map.Walker.Position();
+
+  npcArr := NPCs.GetAll(step.NPC_name);
+  step.NPC_target := npcArr.findNearest(step.coordinate);
+  Debug(step.NPC_target);
+
+  if step.webwalk then
+    step.actionSucceeded := step.NPC_target.WalkSelectOption([step.action],5)
+  else
+    step.actionSucceeded := step.NPC_target.SelectOption([step.action],5);
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveKillStep(var step: TStep);
+var
+  npcArr: TRSNPCV2Array;
+begin
+  step.actionSucceeded := False;
+
+  if step.coordinate = [0,0] then step.coordinate := Map.Walker.Position();
+
+  npcArr := NPCs.GetAll(step.NPC_name);
+  step.NPC_target := npcArr.findNearest(step.coordinate);
+  Debug(step.NPC_target);
+
+  xpbar.EarnedXP();
+
+  if step.webwalk then
+    step.NPC_target.WalkSelectOption(['Attack'],5)
+  else
+    step.NPC_target.SelectOption(['Attack'],5);
+
+  if not Mainscreen.IsInCombat then
+  begin
+    step.actionSucceeded := False;
+    Exit();
+  end;
+  WriteLn('Detected in combat');
+  step.actionSucceeded := True;
+  WaitUntil(not Mainscreen.IsInCombat, 50, step.time);
+
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveInteractObjectStep(var step: TStep);
+var
+  objArr: TRSObjectV2Array;
+begin
+  step.actionSucceeded := False;
+
+  if step.coordinate = [0,0] then step.coordinate := Map.Walker.Position();
+
+  objArr := Objects.GetAll(step.objName);
+  step.objectTarget := objArr.findNearest(step.coordinate);
+  Debug(step.objectTarget);
+
+  if step.webwalk then
+    step.actionSucceeded := step.objectTarget.WalkSelectOption([step.action],5)
+  else
+    step.actionSucceeded := step.objectTarget.SelectOption([step.action],5);
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveInteractInventoryStep(var step: TStep);
+var
+  slots: TIntegerArray;
+begin
+  step.actionSucceeded := False;
+  if not Inventory.IsOpen() then Inventory.Open();
+  if not Inventory.ContainsItem(step.item1) then Exit;
+
+  Inventory.FindItem(step.item1, slots);
+  step.actionSucceeded := Inventory.ClickSlot(slots[0], [step.action]);
+
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveConversationStep(var step: TStep);
+var
+  i: Integer;
+begin
+  step.actionSucceeded := False;
+  WaitUntil(chat.HasContinue,10,2000);
+  Writeln('Starting conversation');
+  for i in step.conversationIndices do
+    Chat.ChatToNumber(i-1);
+  while chat.HasContinue() do
+  begin
+    chat.ClickContinue(False);
+    Wait(0,700,wdLeft);
+  end;
+
+  step.actionSucceeded := True;
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveCombineStep(var step: TStep);
+begin
+  step.actionSucceeded := False;
+  if not Inventory.IsOpen() then Inventory.Open();
+  if not Inventory.ContainsItem(step.item1) then Exit;
+  if not Inventory.ContainsItem(step.item2) then Exit;
+
+  step.actionSucceeded := Inventory.Use(step.item1,step.item2);
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveLootStep(var step: TStep);
+var
+  dots: TPointArray;
+  dot: TPoint;
+  rect: TRectangle;
+  clicked: Boolean;
+begin
+  dots := Minimap.GetItemDots();
+  dots.Sort(map.Position);
+  for dot in dots do
+  begin
+    rect := Map.GetTileMS(dot);
+    Mouse.Move(rect.mean, 3, True);
+    Wait(100,200);
+    Mouse.Click(MOUSE_RIGHT);
+    Wait(100,200);
+    clicked := ChooseOption.Select(ToString(step.item1));
+    if clicked then Break;
+    ChooseOption.Close();
+  end;
+
+  if clicked then
+    step.actionSucceeded := WaitUntil(Inventory.ContainsItem(step.item1), 50, 5000)
+  else
+    step.actionSucceeded := False;
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveBankStep(var step: TStep);
+var
+  bankItem: TRSBankItem;
+begin
+  step.actionSucceeded := False;
+  if inventory.ContainsAll(step.bankItems) then
+  begin
+    step.actionSucceeded := True;
+    Exit();
+  end;
+
+  banks.WalkOpen();
+  if not WaitUntil(Bank.IsOpen,100,10000) then Exit();
+
+  Bank.DepositItems(Step.bankItems, True);
+  for bankItem in step.withdrawItems do
+    Bank.WithdrawItem(bankItem, False);
+
+  bank.Close;
+
+  step.actionSucceeded := Inventory.ContainsAll(step.withdrawItems);
+
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveWalkStep(var step: TStep);
+begin
+  if Map.Walker.Position = step.coordinate then
+  begin
+    step.actionSucceeded := True;
+  end else
+    Step.actionSucceeded := Map.Walker.WebWalk(step.coordinate);
+  WaitUntil(not Minimap.IsPlayerMoving, 50,5000);
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveWaitStep(var step: TStep);
+begin
+  Wait(step.time, step.time + 600);
+  step.actionSucceeded := True;
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveClickTileStep(var step: TStep);
+begin
+  step.actionSucceeded := True;
+  Map.ClickTile(step.coordinate, step.action);
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;
+
+procedure TQuest.SolveCustomStep(var step: TStep);
+begin
+  step.actionSucceeded := True;
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  step.completed := step.CompletionCondition();
+end;

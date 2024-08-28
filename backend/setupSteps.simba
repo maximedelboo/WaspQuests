@@ -1,0 +1,166 @@
+{$DEFINE WQ_SETUPSTEPS}
+{$IFNDEF WQ_OSR}
+  {$I WaspQuests/osr.simba}
+{$ENDIF}
+
+function StandardCompletion(): Boolean;
+  begin
+    if Quest.currentStep.actionSucceeded then Exit(True);
+    Result := False;
+  end;
+
+function TQuest.SetupInteractNpcStep(stepName, NPC_name, action: String; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.INTERACT_NPC;
+  Result.name := stepName;
+  Result.NPC_name := NPC_name;
+  Result.action := action;
+  Result.coordinate := coordinate;
+  Result.webWalk := WebWalk;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupInteractObjectStep(stepName, objectName, action: String; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.INTERACT_OBJECT;
+  Result.name := stepName;
+  Result.objName := objectName;
+  Result.action := action;
+  Result.coordinate := coordinate;
+  Result.webWalk := WebWalk;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupConversationStep(stepName: String; conversationIndices: TIntegerArray; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.CONVERSATION;
+  Result.name := stepName;
+  Result.conversationIndices := conversationIndices;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupInteractInventoryStep(stepName: String; item: TRSItem; action: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.INTERACT_INVENTORY;
+  Result.name := stepName;
+  Result.item1 := item;
+  Result.action := action;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupLootStep(stepName: String; item: TRSItem; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.LOOT;
+  Result.name := stepName;
+  Result.item1 := item;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupCombineStep(stepName: String; item1, item2: TRSItem; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.COMBINE;
+  Result.name := stepName;
+  Result.item1 := item1;
+  Result.item2 := item2;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupBankStep(stepName: String; bankItems: TRSItemArray; withdrawItems: TRSBankItemArray; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.BANK;
+  Result.name := stepName;
+  Result.bankItems := bankItems;
+  Result.withdrawItems := withdrawItems;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupKillStep(stepName, NPC_name: String; time: Integer = 7000; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.KILL;
+  Result.name := stepName;
+  Result.NPC_name := NPC_name;
+  Result.time := time;
+  Result.coordinate := coordinate;
+  Result.webWalk := WebWalk;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupWalkStep(stepName: String; Coordinate: TPoint; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.WALK;
+  Result.name := stepName;
+  Result.coordinate := coordinate;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupWaitStep(stepName: String; time: Integer; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.WAIT;
+  Result.name := stepName;
+  Result.time := time;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupClickTileStep(stepName: String; Coordinate: TPoint; Action: String = ''; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.CLICK_TILE;
+  Result.name := stepName;
+  Result.coordinate := coordinate;
+  Result.action := Action;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function TQuest.SetupCustomStep(stepName: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.CUSTOM;
+  Result.name := stepName;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;

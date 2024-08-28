@@ -1,0 +1,59 @@
+{$IFNDEF WL_OSR}
+  {$I WaspLib/osr.simba}
+{$ENDIF}
+
+{$SCOPEDENUMS ON}
+
+type
+  EState = (CHECK_INVENTORY, SOLVE_QUEST);
+  STEP_TYPE = (INTERACT_NPC, KILL, INTERACT_OBJECT, INTERACT_INVENTORY, CONVERSATION, COMBINE, LOOT, WALK, WAIT, BANK, CLICK_TILE, CUSTOM);
+
+  PStep = ^TStep;
+  PQuest = ^TQuest;
+
+  TStepEvent = procedure() of object;
+  TStepCompletion = function(): Boolean of object;
+
+  TStep = record
+    step_type: STEP_TYPE;
+    NPC_target: TRSNPCV2;
+    objectTarget: TRSObjectV2;
+    action, name, NPC_name, objName: String;
+    item1, item2: TRSItem;
+    coordinate: TPoint;
+    time: Integer;
+    bankItems: TRSItemArray;
+    withdrawItems: TRSBankItemArray;
+    conversationIndices: TIntegerArray;
+    exceptions, actionSucceeded, completed, webWalk: Boolean;
+    SpecialEvent: TStepEvent;
+    CompletionCondition: TStepCompletion;
+  end;
+
+  TStepArray = array of TStep;
+
+  TQuest = record(TBaseBankScript)
+    steps: TStepArray;
+    currentStep: TStep;
+    index: Integer;
+
+    questName, quitMessage: String;
+    totalSteps: Integer;
+    SetupProcedure: procedure() of object;
+    region: array of TRSMapChunk;
+    StartingConditions: function(quest: PQuest): boolean of object;
+    completed, forceQuit: Boolean;
+  end;
+
+  TQuestArray = array of TQuest;
+
+var
+  {$H-}QuestArray: TQuestArray;{$H+}
+  {$H-}Quest: TQuest;{$H+}
+
+{$SCOPEDENUMS OFF}
+
+{$DEFINE WQ_QUEST}
+{$IFNDEF WQ_OSR}
+  {$I WaspQuests/osr.simba}
+{$ENDIF}
