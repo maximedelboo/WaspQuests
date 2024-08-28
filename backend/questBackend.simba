@@ -64,7 +64,6 @@ var
   attempts: Integer;
 begin
   attempts := 0;
-  if not self.StartingConditions(@self) then TerminateScript('Starting conditions not satisfied');
   while self.index <= high(self.steps) do
   begin
     currentIndex := self.index;
@@ -72,18 +71,18 @@ begin
     self.DebugLn('Executing step ' + IntToStr(currentIndex + 1) + ': ' + self.currentStep.name);
     WriteLn(currentStep.step_type);
     case currentStep.step_type of
-      STEP_TYPE.INTERACT_NPC: Self.SolveInteractNPCStep(currentStep);
-      STEP_TYPE.KILL: Self.SolveKillStep(currentStep);
-      STEP_TYPE.INTERACT_OBJECT: Self.SolveInteractObjectStep(currentStep);
-      STEP_TYPE.INTERACT_INVENTORY: Self.SolveInteractInventoryStep(currentStep);
-      STEP_TYPE.CONVERSATION: Self.SolveConversationStep(currentStep);
-      STEP_TYPE.COMBINE: Self.SolveCombineStep(currentStep);
-      STEP_TYPE.LOOT: Self.SolveLootStep(currentStep);
-      STEP_TYPE.BANK: Self.SolveBankStep(currentStep);
-      STEP_TYPE.WALK: Self.SolveWalkStep(currentStep);
-      STEP_TYPE.WAIT: Self.SolveWaitStep(currentStep);
-      STEP_TYPE.CLICK_TILE: Self.SolveClickTileStep(currentStep);
-      STEP_TYPE.CUSTOM: Self.SolveCustomStep(currentStep);
+      STEP_TYPE.INTERACT_NPC: SolveInteractNPCStep(currentStep);
+      STEP_TYPE.KILL: SolveKillStep(currentStep);
+      STEP_TYPE.INTERACT_OBJECT: SolveInteractObjectStep(currentStep);
+      STEP_TYPE.INTERACT_INVENTORY: SolveInteractInventoryStep(currentStep);
+      STEP_TYPE.CONVERSATION: SolveConversationStep(currentStep);
+      STEP_TYPE.COMBINE: SolveCombineStep(currentStep);
+      STEP_TYPE.LOOT: SolveLootStep(currentStep);
+      STEP_TYPE.BANK: SolveBankStep(currentStep);
+      STEP_TYPE.WALK: SolveWalkStep(currentStep);
+      STEP_TYPE.WAIT: SolveWaitStep(currentStep);
+      STEP_TYPE.CLICK_TILE: SolveClickTileStep(currentStep);
+      STEP_TYPE.CUSTOM: SolveCustomStep(currentStep);
     end;
 
     if self.forceQuit then TerminateScript(self.Quitmessage);
@@ -108,5 +107,6 @@ procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);
 
 begin
   Self.Init(MaxActions, MaxTime);
+  if not self.StartingConditions(@self) then TerminateScript('Starting conditions not satisfied');
   Self.Solve();
 end;

@@ -3,7 +3,7 @@
   {$I WaspQuests/osr.simba}
 {$ENDIF}
 
-procedure TQuest.SolveInteractNpcStep(var step: TStep);
+procedure SolveInteractNpcStep(var step: TStep);
 var
   npcArr: TRSNPCV2Array;
 begin
@@ -11,9 +11,12 @@ begin
 
   if step.coordinate = [0,0] then step.coordinate := Map.Walker.Position();
 
-  npcArr := NPCs.GetAll(step.NPC_name);
-  step.NPC_target := npcArr.findNearest(step.coordinate);
-  Debug(step.NPC_target);
+  if step.NPC_target.Coordinates = [] then
+  begin
+    npcArr := NPCs.GetAll(step.NPC_name);
+    step.NPC_target := npcArr.findNearest(step.coordinate);
+    //Debug(step.NPC_target);
+  end;
 
   if step.webwalk then
     step.actionSucceeded := step.NPC_target.WalkSelectOption([step.action],5)
@@ -24,7 +27,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveKillStep(var step: TStep);
+procedure SolveKillStep(var step: TStep);
 var
   npcArr: TRSNPCV2Array;
 begin
@@ -32,9 +35,12 @@ begin
 
   if step.coordinate = [0,0] then step.coordinate := Map.Walker.Position();
 
-  npcArr := NPCs.GetAll(step.NPC_name);
-  step.NPC_target := npcArr.findNearest(step.coordinate);
-  Debug(step.NPC_target);
+  if step.NPC_target.Coordinates = [] then
+  begin
+    npcArr := NPCs.GetAll(step.NPC_name);
+    step.NPC_target := npcArr.findNearest(step.coordinate);
+    //Debug(step.NPC_target);
+  end;
 
   xpbar.EarnedXP();
 
@@ -57,7 +63,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveInteractObjectStep(var step: TStep);
+procedure SolveInteractObjectStep(var step: TStep);
 var
   objArr: TRSObjectV2Array;
 begin
@@ -65,9 +71,12 @@ begin
 
   if step.coordinate = [0,0] then step.coordinate := Map.Walker.Position();
 
-  objArr := Objects.GetAll(step.objName);
-  step.objectTarget := objArr.findNearest(step.coordinate);
-  Debug(step.objectTarget);
+  if step.objectTarget.Coordinates = [] then
+  begin
+    objArr := Objects.GetAll(step.objName);
+    step.objectTarget := objArr.findNearest(step.coordinate);
+    //Debug(step.objectTarget);
+  end;
 
   if step.webwalk then
     step.actionSucceeded := step.objectTarget.WalkSelectOption([step.action],5)
@@ -78,7 +87,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveInteractInventoryStep(var step: TStep);
+procedure SolveInteractInventoryStep(var step: TStep);
 var
   slots: TIntegerArray;
 begin
@@ -94,7 +103,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveConversationStep(var step: TStep);
+procedure SolveConversationStep(var step: TStep);
 var
   i: Integer;
 begin
@@ -115,7 +124,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveCombineStep(var step: TStep);
+procedure SolveCombineStep(var step: TStep);
 begin
   step.actionSucceeded := False;
   if not Inventory.IsOpen() then Inventory.Open();
@@ -128,7 +137,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveLootStep(var step: TStep);
+procedure SolveLootStep(var step: TStep);
 var
   dots: TPointArray;
   dot: TPoint;
@@ -158,12 +167,12 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveBankStep(var step: TStep);
+procedure SolveBankStep(var step: TStep);
 var
   bankItem: TRSBankItem;
 begin
   step.actionSucceeded := False;
-  if inventory.ContainsAll(step.bankItems) then
+  if inventory.ContainsAll(step.bankItems) and (step.withdrawItems = []) then
   begin
     step.actionSucceeded := True;
     Exit();
@@ -185,7 +194,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveWalkStep(var step: TStep);
+procedure SolveWalkStep(var step: TStep);
 begin
   if Map.Walker.Position = step.coordinate then
   begin
@@ -198,7 +207,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveWaitStep(var step: TStep);
+procedure SolveWaitStep(var step: TStep);
 begin
   Wait(step.time, step.time + 600);
   step.actionSucceeded := True;
@@ -207,7 +216,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveClickTileStep(var step: TStep);
+procedure SolveClickTileStep(var step: TStep);
 begin
   step.actionSucceeded := True;
   Map.ClickTile(step.coordinate, step.action);
@@ -216,7 +225,7 @@ begin
   step.completed := step.CompletionCondition();
 end;
 
-procedure TQuest.SolveCustomStep(var step: TStep);
+procedure SolveCustomStep(var step: TStep);
 begin
   step.actionSucceeded := True;
   if @step.SpecialEvent <> nil then

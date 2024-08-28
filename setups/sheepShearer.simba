@@ -13,8 +13,8 @@ begin
   Quest.region := [[[49,51,50,50],[0]]];
   Quest.StartingConditions := @SheepStart;
 
-  Quest.steps += Quest.SetupInteractNpcStep('Talk to Fred', 'Fred the Farmer', 'Talk-to');
-  Quest.steps += Quest.SetupConversationStep('Finish Fred conversation', [1]);
+  Quest.steps += SetupInteractNpcStep('Talk to Fred', 'Fred the Farmer', 'Talk-to');
+  Quest.steps += SetupConversationStep('Finish Fred conversation', [1]);
 end;
 
 begin

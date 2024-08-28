@@ -14,8 +14,8 @@ begin
   Quest.region := [[[50,50,50,50],[0]]];
   Quest.StartingConditions := @CooksStart;
 
-  Quest.steps += Quest.SetupInteractNpcStep('Talk to cook', 'Cook', 'Talk-to');
-  Quest.steps += Quest.SetupConversationStep('Finish cook conversation', [1,1]);
+  Quest.steps += SetupInteractNpcStep('Talk to cook', 'Cook', 'Talk-to');
+  Quest.steps += SetupConversationStep('Finish cook conversation', [1,1]);
 end;
 
 begin

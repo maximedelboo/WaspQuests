@@ -13,8 +13,8 @@ begin
   Quest.region := [[[46,54,46,52],[0]]];
   Quest.StartingConditions := @DoricStart;
 
-  Quest.steps += Quest.SetupInteractNpcStep('Talk to Doric', 'Doric', 'Talk-to');
-  Quest.steps += Quest.SetupConversationStep('Finish Doric conversation', [1,1]);
+  Quest.steps += SetupInteractNpcStep('Talk to Doric', 'Doric', 'Talk-to');
+  Quest.steps += SetupConversationStep('Finish Doric conversation', [1,1]);
 end;
 
 begin
