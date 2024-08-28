@@ -105,9 +105,8 @@ begin
 end;
 
 procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);
-
 begin
   Self.Init(MaxActions, MaxTime);
-  if not self.StartingConditions(@self) then TerminateScript('Starting conditions not satisfied');
+  if (self.index = 0) and self.StartingConditions(@self) then TerminateScript('Starting conditions not satisfied');
   Self.Solve();
 end;

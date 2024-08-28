@@ -78,11 +78,12 @@ begin
   Result.SpecialEvent := @SpecialEvent;
 end;
 
-function SetupLootStep(stepName: String; item: TRSItem; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+function SetupLootStep(stepName: String; item: TRSItem; height: Double = 0; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
 begin
   Result.step_type := STEP_TYPE.LOOT;
   Result.name := stepName;
   Result.item1 := item;
+  Result.height := height;
   if @CompletionCondition = nil then
     Result.CompletionCondition := @StandardCompletion
   else

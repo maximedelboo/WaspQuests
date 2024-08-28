@@ -20,3 +20,68 @@ end;
 begin
   QuestArray.AddQuest('Sheep Shearer', @SetupSheepShearer);
 end;
+
+function SheepStartIron(quest: PQuest): Boolean;
+begin
+  WriteLn('sdfsdf');
+  Exit(Inventory.Count() <= 5);
+end;
+
+procedure SetupSheepShearerIron();
+
+  function CustomCompletion1(): Boolean;
+  var prevCount: Integer;
+  begin
+    prevCount := Inventory.CountItem('Wool');
+    Result := Waituntil(Inventory.CountItem('Wool') > prevCount, 500, 5000);
+    if Inventory.CountItem('Wool') >= 20 then Result := True;
+  end;
+
+  function CustomCompletion2(): Boolean;
+  var prevCount: Integer;
+  begin
+    Waituntil(make.IsOpen, 50,3000);
+    Make.Select('Ball of Wool', 20);
+    Result := WaitUntil(Inventory.CountItem('Ball of wool') = 20, 500, 60000);
+  end;
+
+begin
+  Quest.region := [[[49,51,51,49],[0,1]]];
+  Quest.StartingConditions := @SheepStartIron;
+
+  Quest.steps += SetupInteractNpcStep('Talk to Fred', 'Fred the Farmer', 'Talk-to');
+  Quest.steps += SetupConversationStep('Finish Fred conversation', [1,1]);
+  Quest.steps += SetupWalkStep('Walk to shears', [8668, 37338]);
+  Quest.steps += SetupLootStep('Get shears', 'Shears', 4);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 1', 'Sheep', 'Shear', True, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 2', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 3', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 4', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 5', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 6', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 7', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 8', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 9', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 10', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 11', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 12', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 13', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 14', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 15', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 16', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 17', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 18', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 19', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractNPCStep('Shear sheep 20', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
+  Quest.steps += SetupInteractObjectStep('Walk to stairs', 'Staircase', 'Climb-up', True, [8724, 37594]);
+  Quest.steps += SetupWaitStep('Wait upstairs', 5000);
+  Quest.steps += SetupInteractObjectStep('Click spinning wheel', 'Spinning wheel', 'Spin', True, [0,0], @CustomCompletion2);
+  Quest.steps += SetupInteractObjectStep('Walk to stairs', 'Staircase', 'Climb-down', True, [21780, 37594]);
+  Quest.steps += SetupWaitStep('Wait downstairs', 5000);
+  Quest.steps += SetupInteractNPCStep('Talk to Fred', 'Fred the Farmer', 'Talk-to');
+  Quest.steps += SetupConversationStep('Finish Fred conversation', [1]);
+end;
+
+begin
+  QuestArray.AddQuest('Sheep Shearer Iron', @SetupSheepShearerIron);
+end;

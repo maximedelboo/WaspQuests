@@ -20,6 +20,7 @@ type
     action, name, answer, NPC_name, objName: String;
     item1, item2: TRSItem;
     coordinate: TPoint;
+    height: Double;
     time: Integer;
     bankItems: TRSItemArray;
     withdrawItems: TRSBankItemArray;

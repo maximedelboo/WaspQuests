@@ -179,14 +179,17 @@ begin
   dots.Sort(map.Position);
   for dot in dots do
   begin
-    rect := Map.GetTileMS(dot);
-    Mouse.Move(rect.mean, 3, True);
-    Wait(100,200);
-    Mouse.Click(MOUSE_RIGHT);
-    Wait(100,200);
-    clicked := ChooseOption.Select(ToString(step.item1));
-    if clicked then Break;
-    ChooseOption.Close();
+    rect := Map.GetTileMS(dot, step.height);
+    if Mainscreen.IsVisible(rect.mean) then
+    begin
+      Mouse.Move(rect.mean, 3, True);
+      Wait(100,200);
+      Mouse.Click(MOUSE_RIGHT);
+      Wait(100,200);
+      clicked := ChooseOption.Select(ToString(step.item1));
+      if clicked then Break;
+      ChooseOption.Close();
+    end;
   end;
 
   if clicked then
