@@ -2,3 +2,22 @@
 {$IFNDEF WQ_OSR}
 	{$I WaspQuests/osr.simba}
 {$ENDIF}
+
+function CooksStart(quest: PQuest): Boolean;
+begin
+  quest^.DebugLn('Starting condition: ' + BoolToStr(Inventory.ContainsAll(['Egg','Bucket of milk','Pot of flour'])));
+  Exit(Inventory.ContainsAll(['Egg','Bucket of milk','Pot of flour']));
+end;
+
+procedure SetupCooksAssistant();
+begin
+  Quest.region := [[[50,50,50,50],[0]]];
+  Quest.StartingConditions := @CooksStart;
+
+  Quest.steps += Quest.SetupInteractNpcStep('Talk to cook', 'Cook', 'Talk-to');
+  Quest.steps += Quest.SetupConversationStep('Finish cook conversation', [1,1]);
+end;
+
+begin
+  QuestArray.AddQuest('Cook''s Assistant', @SetupCooksAssistant);
+end;

@@ -2,3 +2,21 @@
 {$IFNDEF WQ_OSR}
 	{$I WaspQuests/osr.simba}
 {$ENDIF}
+
+function SheepStart(quest: PQuest): Boolean;
+begin
+  Exit(Inventory.CountItem('Ball of wool') >= 20);
+end;
+
+procedure SetupSheepShearer();
+begin
+  Quest.region := [[[49,51,50,50],[0]]];
+  Quest.StartingConditions := @SheepStart;
+
+  Quest.steps += Quest.SetupInteractNpcStep('Talk to Fred', 'Fred the Farmer', 'Talk-to');
+  Quest.steps += Quest.SetupConversationStep('Finish Fred conversation', [1]);
+end;
+
+begin
+  QuestArray.AddQuest('Sheep Shearer', @SetupSheepShearer);
+end;
