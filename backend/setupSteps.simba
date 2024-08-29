@@ -190,5 +190,16 @@ begin
   self.objectTarget := obj;
 end;
 
+procedure TStep.CustomizeColor(colorarray: TCTS2ColorArray);
+begin
+  self.colors := colorarray;
+end;
+
+procedure TStep.CustomWaitTile(coord: TPoint; waitRange: Integer = 5);
+begin
+  self.waitCoord := coord;
+  self.waitRange := waitRange;
+end;
+
 
 

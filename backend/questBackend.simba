@@ -39,6 +39,8 @@ begin
 end;
 
 procedure TQuest.Init(MaxActions: UInt32; MaxTime: UInt64); override;
+var
+  box: TBox;
 begin
   inherited;
   WLSettings.RemoteInput.HUDReport  := False;
@@ -51,9 +53,12 @@ begin
   Self.SetupProcedure();
 
   Self.DebugLn('Setting up map, this can take a second');
-  Map.SetupChunks(Quest.region);
+  Map.SetupChunks(Quest.region, 8, True);
   NPCs.Setup(Map.NPCs(), @Map.Walker);
   Objects.Setup(Map.Objects(), @Map.Walker);
+
+  for box in Quest.blockingAreas do
+    Map.Walker.WebGraph^.BlockInside(box);
 
   Self.index := QuestStartIndex;
 end;
@@ -70,6 +75,9 @@ begin
     Self.currentStep := self.steps[currentIndex];
     self.DebugLn('Executing step ' + IntToStr(currentIndex + 1) + ': ' + self.currentStep.name);
     WriteLn(currentStep.step_type);
+
+    WaitUntil(not Minimap.IsPlayerMoving,50,5000);
+
     case currentStep.step_type of
       STEP_TYPE.INTERACT_NPC: SolveInteractNPCStep(currentStep);
       STEP_TYPE.KILL: SolveKillStep(currentStep);
@@ -107,6 +115,7 @@ end;
 procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);
 begin
   Self.Init(MaxActions, MaxTime);
-  if (self.index = 0) and self.StartingConditions(@self) then TerminateScript('Starting conditions not satisfied');
+  WriteLn('index starting: ', self.Index);
+  if (self.index = 0) and not self.StartingConditions(@self) then TerminateScript('Starting conditions not satisfied');
   Self.Solve();
 end;

@@ -19,9 +19,10 @@ type
     objectTarget: TRSObjectV2;
     action, name, answer, NPC_name, objName: String;
     item1, item2: TRSItem;
-    coordinate: TPoint;
+    coordinate, waitCoord: TPoint;
     height: Double;
-    time: Integer;
+    colors: TCTS2ColorArray;
+    time, waitRange: Integer;
     bankItems: TRSItemArray;
     withdrawItems: TRSBankItemArray;
     conversationIndices: TIntegerArray;
@@ -43,6 +44,7 @@ type
     region: array of TRSMapChunk;
     StartingConditions: function(quest: PQuest): boolean of object;
     completed, forceQuit: Boolean;
+    blockingAreas: TBoxArray;
   end;
 
   TQuestArray = array of TQuest;

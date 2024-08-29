@@ -2,3 +2,328 @@
 {$IFNDEF WQ_OSR}
 	{$I WaspQuests/osr.simba}
 {$ENDIF}
+
+
+procedure SetupErnestTCIron();
+  function customCompletion1(): Boolean;
+  begin
+    Result := WaitUntil(Inventory.containsItem('Poisoned fish food'),50,2000);
+  end;
+
+  function customCompletion2(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8288, 36990], 5),50,5000);
+  end;
+  
+  function customCompletion3(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8372, 11418], 5),50,5000);
+  end;
+
+  function customCompletion4(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8336, 11394], 5),50,5000);
+  end;
+
+  function customCompletion5(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8336, 11402], 5),50,5000);
+  end;
+
+  function customCompletion6(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8312, 11394], 5),50,5000);
+  end;
+
+  function customCompletion7(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8300, 11390], 5),50,5000);
+  end;
+
+  function customCompletion8(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8292, 11374], 5),50,5000);
+  end;
+
+  function customCompletion9(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8308, 11370], 5),50,5000);
+  end;
+
+  function customCompletion10(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8328, 11370], 5),50,5000);
+  end;
+
+  function customCompletion11(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8320, 11370], 5),50,5000);
+  end;
+
+  function customCompletion12(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8300, 11370], 5),50,5000);
+  end;
+
+  function customCompletion13(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8312, 11382], 5),50,5000);
+  end;
+
+  function customCompletion14(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8312, 11402], 5),50,5000);
+  end;
+
+  function customCompletion15(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8300, 11410], 5),50,5000);
+  end;
+
+  function customCompletion16(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8308, 11410], 5),50,5000);
+  end;
+
+  function customCompletion17(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8272, 36986], 5),50,5000);
+  end;
+
+  function customCompletion18(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8296, 36998], 5),50,5000);
+  end;
+
+  function customCompletion19(): Boolean;
+  begin
+    Result := WaitUntil(Map.Position.InRange([8396, 36986], 5),50,5000);
+  end;
+
+  procedure customAction1();
+  begin
+    Minimap.SetCompassAngle(90);
+  end;
+
+var
+  leverA,leverB,leverC,leverD,leverE,leverF,leverG, door1, door2, door3, door4, door5, door6, door7, door8, door9: TRSObjectV2;
+begin
+  Quest.region := [[[47,53,49,51],[0,1,2]], [[48,152,48,152],[0]]]; // sample region
+  Quest.StartingConditions := @EmptyStart; // use @emptyStart for always true starting condition
+
+  LeverA.size := Vec3(0.4,0.4,2);
+  LeverA.SetupCoordinates([[8336, 11450]]);
+  LeverA.setupuptext('Pull');
+  LeverA.finder.colors := [CTS2(1848006, 9, 0.04, 0.56)];
+  LeverA.Rotations := [0];
+  LeverA.offset := [0,1.2, 6];
+  LeverA.walker:=@Map.Walker;
+
+  LeverB.size := Vec3(0.4,0.4,2);
+  LeverB.SetupCoordinates([[8376, 11422]]);
+  LeverB.setupuptext('Pull');
+  LeverB.finder.colors := [CTS2(1848006, 9, 0.04, 0.56)];
+  LeverB.Rotations := [0];
+  LeverB.offset := [1.2,0, 6];
+  LeverB.walker:=@Map.Walker;
+
+  LeverC.size := Vec3(0.4,0.4,2);
+  LeverC.SetupCoordinates([[8352, 11390]]);
+  LeverC.setupuptext('Pull');
+  LeverC.finder.colors := [CTS2(1848006, 9, 0.04, 0.56)];
+  LeverC.Rotations := [0];
+  LeverC.offset := [1.2,0, 6];
+  LeverC.walker:=@Map.Walker;
+
+  LeverD.size := Vec3(0.4,0.4,2);
+  LeverD.SetupCoordinates([[8336, 11362]]);
+  LeverD.setupuptext('Pull');
+  LeverD.finder.colors := [CTS2(1848006, 9, 0.04, 0.56)];
+  LeverD.Rotations := [0];
+  LeverD.offset := [0,-1.2, 6];
+  LeverD.walker:=@Map.Walker;
+
+  LeverE.size := Vec3(0.4,0.4,2);
+  LeverE.SetupCoordinates([[8292, 11362]]);
+  LeverE.setupuptext('Pull');
+  LeverE.finder.colors := [CTS2(1848006, 9, 0.04, 0.56)];
+  LeverE.Rotations := [0];
+  LeverE.offset := [0,-1.2, 6];
+  LeverE.walker:=@Map.Walker;
+
+  LeverF.size := Vec3(0.4,0.4,2);
+  LeverF.SetupCoordinates([[8288, 11370]]);
+  LeverF.setupuptext('Pull');
+  LeverF.finder.colors := [CTS2(1848006, 9, 0.04, 0.56)];
+  LeverF.Rotations := [0];
+  LeverF.offset := [-1.2,0, 6];
+  LeverF.walker:=@Map.Walker;
+
+  LeverG.size := Vec3(0.4,0.4,2);
+  LeverG.SetupCoordinates([[8288, 37002]]);
+  LeverG.setupuptext('Pull');
+  LeverG.finder.colors := [CTS2(1848006, 9, 0.04, 0.56)];
+  LeverG.Rotations := [0];
+  LeverG.offset := [1.2,0, 6];
+  LeverG.walker:=@Map.Walker;
+
+  door1.size := Vec3(0.9,0.2,5);
+  door1.SetupCoordinates([[8336, 11402]]);
+  door1.setupuptext('Open');
+  door1.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
+  door1.Rotations := [0];
+  door1.offset := [0,-2, 6];
+  door1.walker:=@Map.Walker;
+
+  door2.size := Vec3(0.2,0.9,5);
+  door2.SetupCoordinates([[8320, 11390]]);
+  door2.setupuptext('Open');
+  door2.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
+  door2.Rotations := [0];
+  door2.offset := [2,0, 6];
+  door2.walker:=@Map.Walker;
+
+  door3.size := Vec3(0.9,0.2,5);
+  door3.SetupCoordinates([[8312, 11402]]);
+  door3.setupuptext('Open');
+  door3.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
+  door3.Rotations := [0];
+  door3.offset := [0,-2, 6];
+  door3.walker:=@Map.Walker;
+
+  door4.size := Vec3(0.2,0.9,5);
+  door4.SetupCoordinates([[8300, 11390]]);
+  door4.setupuptext('Open');
+  door4.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
+  door4.Rotations := [0];
+  door4.offset := [2,0, 6];
+  door4.walker:=@Map.Walker;
+
+  door5.size := Vec3(0.9,0.2,5);
+  door5.SetupCoordinates([[8292, 11382]]);
+  door5.setupuptext('Open');
+  door5.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
+  door5.Rotations := [0];
+  door5.offset := [0,-2, 6];
+  door5.walker:=@Map.Walker;
+
+  door6.size := Vec3(0.2,0.9,5);
+  door6.SetupCoordinates([[8300, 11370]]);
+  door6.setupuptext('Open');
+  door6.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
+  door6.Rotations := [0];
+  door6.offset := [2,0, 6];
+  door6.walker:=@Map.Walker;
+
+  door7.size := Vec3(0.2,0.9,5);
+  door7.SetupCoordinates([[8320, 11370]]);
+  door7.setupuptext('Open');
+  door7.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
+  door7.Rotations := [0];
+  door7.offset := [2,0, 6];
+  door7.walker:=@Map.Walker;
+
+  door8.size := Vec3(0.9,0.2,5);
+  door8.SetupCoordinates([[8312, 11382]]);
+  door8.setupuptext('Open');
+  door8.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
+  door8.Rotations := [0];
+  door8.offset := [0,-2, 6];
+  door8.walker:=@Map.Walker;
+
+  door9.size := Vec3(0.2,0.9,5);
+  door9.SetupCoordinates([[8300, 11410]]);
+  door9.setupuptext('Open');
+  door9.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
+  door9.Rotations := [0];
+  door9.offset := [2,0, 6];
+  door9.walker:=@Map.Walker;
+
+  //Setup steps (mockup of dorics quest)
+  Quest.steps += SetupInteractNpcStep('Talk to Veronica', 'Veronica', 'Talk-to');
+  Quest.steps += SetupConversationStep('Finish Veronica conversation', [1]);
+  Quest.steps += SetupWalkStep('Walk to poison', [8296, 36970]);
+  Quest.steps += SetupLootStep('loot poison', 'Poison');
+  Quest.steps += SetupInteractObjectStep('Click stairs', 'Staircase', 'Climb-up', True, [8340, 36986]);
+  Quest.steps[High(Quest.steps)].CustomWaitTile([21396, 36966], 9);
+  Quest.steps += SetupWalkStep('Walk to fish food', [21392, 36998]);
+  Quest.steps += SetupLootStep('loot fish food', 'Fish food');
+  Quest.steps += SetupInteractObjectStep('Click stairs', 'Staircase', 'Climb-down', True, [21396, 36966]);
+  Quest.steps[High(Quest.steps)].CustomWaitTile([8340, 36986], 9);
+  Quest.steps += SetupCombineStep('add poison to fish food', 'Fish food', 'Poison', @customCompletion1);
+  Quest.steps += SetupWalkStep('Walk to bookcases', [8296, 36994], nil, @customAction1);
+  Quest.steps += SetupClickTileStep('Click bookcase', [8288, 36994], 'Search');
+  Quest.steps[High(Quest.steps)].CustomWaitTile([8288, 36990], 5);
+  Quest.steps += SetupInteractObjectStep('Climb down ladder', 'Ladder', 'Climb-down', False, [8276, 36982], @customCompletion3); //[8360, 11418]
+  Quest.steps += SetupInteractObjectStep('Pull leverB', 'Lever B', 'Pull'); //8372, 11422
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverB);
+  Quest.steps += SetupWalkStep('Walk to lever A', [8332, 11446]);
+  Quest.steps += SetupInteractObjectStep('Pull leverA', 'Lever A', 'Pull'); //
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverA);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8336, 11406], @customCompletion4); //waituntil 8336, 11394
+  Quest.steps += SetupWalkStep('Walk to lever D', [8336, 11366]);
+  Quest.steps += SetupInteractObjectStep('Pull leverD', 'Lever D', 'Pull'); //
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverD);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8336, 11406], @customCompletion5); //waituntil 8336, 11402
+  Quest.steps += SetupWalkStep('Walk to lever A', [8332, 11446]);
+  Quest.steps += SetupInteractObjectStep('Pull leverA', 'Lever A', 'Pull'); //
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverA);
+  Quest.steps += SetupWalkStep('Walk to lever B', [8372, 11422 ]);
+  Quest.steps += SetupInteractObjectStep('Pull leverB', 'Lever B', 'Pull'); //
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverB);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8312, 11394], @customCompletion6);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8300, 11390], @customCompletion7);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8292, 11374], @customCompletion8);
+  Quest.steps += SetupWalkStep('Walk to lever E', [8292, 11370]);
+  Quest.steps += SetupInteractObjectStep('Pull leverE', 'Lever E', 'Pull'); //
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverE);
+  Quest.steps += SetupWalkStep('Walk to lever F', [8292, 11370]);
+  Quest.steps += SetupInteractObjectStep('Pull leverF', 'Lever F', 'Pull'); //
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverF);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8308, 11370], @customCompletion9);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8328, 11370], @customCompletion10);
+  Quest.steps += SetupWalkStep('Walk to lever C', [8348, 11390]);
+  Quest.steps += SetupInteractObjectStep('Pull leverC', 'Lever C', 'Pull'); //
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverC);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8320, 11370], @customCompletion11);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8300, 11370], @customCompletion12);
+  Quest.steps += SetupWalkStep('Walk to lever E', [8292, 11370]);
+  Quest.steps += SetupInteractObjectStep('Pull leverE', 'Lever E', 'Pull'); //
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverE);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8308, 11370], @customCompletion9);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8312, 11382], @customCompletion13);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8312, 11402], @customCompletion14);
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8300, 11410], @customCompletion15);
+  Quest.steps += SetupWalkStep('Walk to oil can', [8276, 11410]);
+  Quest.steps += SetupLootStep('Loot oil can', 'Oil can');
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8308, 11410], @customCompletion16);
+  Quest.steps += SetupInteractObjectStep('Climb up ladder', 'Ladder', 'Climb-up', True, [8368, 11414], @customCompletion17); //8272, 36986
+  Quest.steps += SetupWalkStep('Walk to lever G', [8284, 37002]);
+  Quest.steps += SetupInteractObjectStep('Pull leverG', 'Lever', 'Pull', False, [0,0], @customCompletion18); //8296, 36998
+  Quest.steps[High(Quest.steps)].CustomizeObject(LeverG);
+  Quest.steps += SetupWalkStep('Walk to spade', [8388, 36998]);
+  Quest.steps += SetupLootStep('Loot spade', 'Spade');
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Door', 'Open', True, [8396, 36986], @customCompletion19); //8396, 36986
+  Quest.steps += SetupInteractObjectStep('Go through door', 'Compost heap', 'Search', True, [8248, 36990]);
+  Quest.steps += SetupWaitStep('Wait a sec', 3000);
+  Quest.steps += SetupWalkStep('Walk to fountain', [8256, 37086]);
+  Quest.steps += SetupInteractInventoryStep('Click fish food', 'Poisoned fish food', 'Use');
+  Quest.steps += SetupClickTileStep('Click fountain', [8256, 37090], '-> Fountain');
+  Quest.steps += SetupWaitStep('Wait a sec', 3000);
+  Quest.steps += SetupClickTileStep('Click fountain', [8256, 37090], 'Search');
+  Quest.steps += SetupWalkStep('Walk to spade', [8338, 36962]);
+  Quest.steps += SetupLootStep('Loot rubber tube', 'Rubber tube');
+  Quest.steps += SetupWalkStep('Run from skele', [8328, 36978]);
+  Quest.steps += SetupInteractObjectStep('Click stairs', 'Staircase', 'Climb-up', True, [8340, 36986]);
+  Quest.steps[High(Quest.steps)].CustomWaitTile([21396, 36966], 9);
+  Quest.steps += SetupInteractObjectStep('Click stairs', 'Staircase', 'Climb-up', True, [21376, 36974]);
+  Quest.steps[High(Quest.steps)].CustomWaitTile([34436, 36974], 9);
+  Quest.steps += SetupInteractNPCStep('Talk to Oddenstein', 'Professor Oddenstein', 'Talk-to', True, [34456, 36966]);
+  Quest.steps += SetupConversationStep('Conversation Oddenstein', [1,2]);
+  Quest.steps += SetupInteractNPCStep('Talk to Oddenstein', 'Professor Oddenstein', 'Talk-to', False);
+  Quest.steps += SetupConversationStep('Conversation Oddenstein', []);
+end;
+
+begin
+  QuestArray.AddQuest('Ernest the Chicken', @SetupErnestTCIron); // in order to actually make this quest appear, you should include it in the main QuestSolver script with {$I WaspQuests/QuestTemplate.simba}
+end;

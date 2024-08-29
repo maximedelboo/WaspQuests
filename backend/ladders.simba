@@ -33,30 +33,6 @@ end;
 Record responsible for positioning.
 *)
 
-var
-  Ladders: TRSObjectV2Array;
-
-
-function TRSObjectV2Array.Split(): TRSObjectV2Array;
-var
-  obj: TRSObjectV2;
-  i, j, len: Integer;
-begin
-  len := 0;
-  j := 0;
-  for obj in self do
-  begin
-    len += length(obj.Coordinates);
-    SetLength(Result, len);
-    for i := 0 to high(obj.Coordinates) do
-    begin
-      Result[j] := obj;
-      Result[j].Coordinates := [obj.Coordinates[i]];
-      Result[j].Rotations := [obj.Rotations[i]];
-      j += 1;
-    end;
-  end;
-end;
 
 function TRSObjectV2Array.FindNearestSingle(point:TPoint; actions: TStringArray = []; maxDist: Integer = $FFFFFF): TRSObjectV2;
 var
@@ -92,6 +68,31 @@ begin
   end;
   Result.Coordinates := [coordinate];
   Result.Rotations := [angle];
+end;
+
+var
+  Ladders: TRSObjectV2Array;
+
+
+function TRSObjectV2Array.Split(): TRSObjectV2Array;
+var
+  obj: TRSObjectV2;
+  i, j, len: Integer;
+begin
+  len := 0;
+  j := 0;
+  for obj in self do
+  begin
+    len += length(obj.Coordinates);
+    SetLength(Result, len);
+    for i := 0 to high(obj.Coordinates) do
+    begin
+      Result[j] := obj;
+      Result[j].Coordinates := [obj.Coordinates[i]];
+      Result[j].Rotations := [obj.Rotations[i]];
+      j += 1;
+    end;
+  end;
 end;
 
 procedure TRSMap.AddLadders();
@@ -183,6 +184,8 @@ begin
   end;
   WriteLn('part 1: ', Timerr.ElapsedTime);
   Timerr.Reset();
+
+  if length(Ladderpoints) = 0 then Exit();
 
   ladderTree.Init(System.Copy(ladderPoints));
 
@@ -305,6 +308,5 @@ begin
 
   Ladders := usedLadders;
 end;
-
 
 

@@ -14,8 +14,8 @@ begin
   Quest.StartingConditions := @TemplateStart; // use @emptyStart for always true starting condition
 
   //Setup steps (mockup of dorics quest)
-  Quest.steps += Quest.SetupInteractNpcStep('Talk to Doric', 'Doric', 'Talk-to');
-  Quest.steps += Quest.SetupConversationStep('Finish Doric conversation', [1,1]);
+  Quest.steps += SetupInteractNpcStep('Talk to Doric', 'Doric', 'Talk-to');
+  Quest.steps += SetupConversationStep('Finish Doric conversation', [1,1]);
 end;
 
 begin
