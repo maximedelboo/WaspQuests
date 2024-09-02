@@ -51,6 +51,7 @@ begin
     Options.SetMaxBrightness;
   Self.PrintTimer.Init(5 * ONE_SECOND);
   Self.SetupProcedure();
+  options.SetNPCAttackOption(ERSAttackOption.ALWAYS_LEFT_CLICK);
 
   Self.DebugLn('Setting up map, this can take a second');
   Map.SetupChunks(Quest.region, 8, True);
@@ -76,7 +77,7 @@ begin
     self.DebugLn('Executing step ' + IntToStr(currentIndex + 1) + ': ' + self.currentStep.name);
     WriteLn(currentStep.step_type);
 
-    WaitUntil(not Minimap.IsPlayerMoving,50,5000);
+    WaitUntil(not Minimap.IsPlayerMoving(250),50,5000);
 
     case currentStep.step_type of
       STEP_TYPE.INTERACT_NPC: SolveInteractNPCStep(currentStep);
@@ -90,7 +91,9 @@ begin
       STEP_TYPE.BANK: SolveBankStep(currentStep);
       STEP_TYPE.WALK: SolveWalkStep(currentStep);
       STEP_TYPE.WAIT: SolveWaitStep(currentStep);
+      STEP_TYPE.CUTSCENE: SolveCutsceneStep(currentStep);
       STEP_TYPE.CLICK_TILE: SolveClickTileStep(currentStep);
+      STEP_TYPE.USE_ON_NPC: SolveUseOnNPCStep(currentStep);
       STEP_TYPE.CUSTOM: SolveCustomStep(currentStep);
     end;
 

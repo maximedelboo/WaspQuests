@@ -5,7 +5,9 @@
 {$SCOPEDENUMS ON}
 
 type
-  STEP_TYPE = (INTERACT_NPC, KILL, INTERACT_OBJECT, INTERACT_INVENTORY, CONVERSATION, QUERY, COMBINE, LOOT, WALK, WAIT, BANK, CLICK_TILE, CUSTOM);
+  STEP_TYPE = (INTERACT_NPC, KILL, INTERACT_OBJECT, INTERACT_INVENTORY, CONVERSATION,
+               QUERY, COMBINE, LOOT, WALK, WAIT, CUTSCENE, BANK, CLICK_TILE,
+               USE_ON_NPC, CUSTOM);
 
   PStep = ^TStep;
   PQuest = ^TQuest;
@@ -18,7 +20,7 @@ type
     NPC_target: TRSNPCV2;
     objectTarget: TRSObjectV2;
     action, name, answer, NPC_name, objName: String;
-    item1, item2: TRSItem;
+    item1, item2, waitItem: TRSItem;
     coordinate, waitCoord: TPoint;
     height: Double;
     colors: TCTS2ColorArray;
@@ -26,7 +28,7 @@ type
     bankItems: TRSItemArray;
     withdrawItems: TRSBankItemArray;
     conversationIndices: TIntegerArray;
-    exceptions, actionSucceeded, completed, webWalk: Boolean;
+    exceptions, actionSucceeded, completed, webWalk, depositAll: Boolean;
     SpecialEvent: TStepEvent;
     CompletionCondition: TStepCompletion;
   end;

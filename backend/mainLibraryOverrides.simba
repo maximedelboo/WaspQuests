@@ -60,14 +60,15 @@ var
 begin
   for bankitem in bankitems do
   begin
-    items += bankitem.Item;
     quantities += bankitem.Quantity;
     noted += bankitem.Noted;
+    if bankitem.Noted then
+      items += 'noted ' + bankitem.Item;
   end;
 
   for i := 0 to high(items) do
   begin
-    if noted[i] then
+    if Inventory.ItemIsStackable(items[i]) or noted[i] then
       result := self.CountItemStack(items[i]) >= quantities[i]
     else
       result := self.CountItem(items[i]) >= quantities[i];
@@ -401,8 +402,8 @@ begin
       Wait(600);
       WaitUntil(not Minimap.IsPlayerMoving,10,5000);
       Wait(1000);
-      if p.DistanceTo(Self.Position) > 1000 then ladderAttempt += 1 else ladderAttempt := 0;
-      if ladderAttempt > 5 then RaiseException('Failed to walk up ladder');
+      if ladderpoint.DistanceTo(Self.Position) < 1000 then ladderAttempt += 1 else ladderAttempt := 0;
+      if ladderAttempt > 5 then Exit(False);
     end else Break;
   end;
   Result := Self.WebWalk(dest);
@@ -509,6 +510,98 @@ begin
       end;
 
       Minimap.SetCompassAngle(Minimap.GetCompassAngle(), 50);
+    end;
+  end;
+end;
+
+function TPointArray.PathDistance(): Double;
+var
+  i: Int32;
+  dist: double;
+begin
+  for i := 0 to High(Self) do
+    if i < High(Self) then
+    begin
+      dist := Self[i].DistanceTo(Self[i+1]);
+      if dist > 10000 then
+        dist := 10;
+      Result += dist;
+    end;
+end;
+
+function TRSWalkerV2.GetClosestPointEx(me: TPoint; destinations: TPointArray; out dist: Integer): TPoint; overload;
+var
+  shortPaths: T2DPointArray;
+  shortest: Int32;
+  destination: TPoint;
+  path: TPointArray;
+begin
+  me := Self.Position();
+  shortest := $FFFFFF;
+
+  for destination in destinations do
+  begin
+    try
+      path := Self.WebGraph^.PathBetweenEx(me, destination, 0, 4);
+    except
+      Continue;
+    end;
+
+    if path = [] then Continue;
+
+    dist := Floor(path.PathDistance());
+    if dist < shortest then
+    begin
+      shortPaths := [path];
+      shortest := dist;
+    end
+    else if dist = shortest then
+      shortPaths += path;
+
+    path := [];
+  end;
+
+  if shortPaths = [] then
+    Exit(destinations.NearestPoint(me));
+
+  path := shortPaths.RandomValue();
+  dist := shortest;
+
+  Result := shortPaths.RandomValue().Last();
+end;
+
+function PRSMapObjectArray.GetClosest(): PRSMapObject; override
+var
+  meObj, meNPC: TPoint = [0,0];
+  tmp: PRSMapObject;
+  i: Int32;
+  closest: Integer;
+  current: Integer;
+begin
+  closest := $FFFFFF;
+
+  for i := High(Self) downto 0 do
+  begin
+    tmp := Self[i];
+
+    case tmp^.MapObjectType of
+      ERSMapObjectType.OBJ:
+      begin
+        if meObj = [0,0] then meObj := tmp^.Walker^.Position();
+        tmp^.Walker^.GetClosestPointEx(meObj,tmp^.Coordinates,current);
+      end;
+
+      ERSMapObjectType.NPC:
+      begin
+        if meNPC = [0,0] then meNPC := tmp^.Walker^.Position();
+        tmp^.Walker^.GetClosestPointEx(meNPC,tmp^.Coordinates,current);
+      end;
+    end;
+
+    if current < closest then
+    begin
+      closest := current;
+      Result := tmp;
     end;
   end;
 end;

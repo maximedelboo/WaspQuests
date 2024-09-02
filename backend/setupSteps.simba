@@ -104,12 +104,13 @@ begin
   Result.SpecialEvent := @SpecialEvent;
 end;
 
-function SetupBankStep(stepName: String; bankItems: TRSItemArray; withdrawItems: TRSBankItemArray; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+function SetupBankStep(stepName: String; withdrawItems: TRSBankItemArray; depositAll: Boolean = False; bankItems: TRSItemArray = []; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
 begin
   Result.step_type := STEP_TYPE.BANK;
   Result.name := stepName;
   Result.bankItems := bankItems;
   Result.withdrawItems := withdrawItems;
+  Result.depositAll := depositAll;
   if @CompletionCondition = nil then
     Result.CompletionCondition := @StandardCompletion
   else
@@ -156,12 +157,39 @@ begin
   Result.SpecialEvent := @SpecialEvent;
 end;
 
+function SetupCutsceneStep(stepName: String; maxTime: Integer; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.CUTSCENE;
+  Result.name := stepName;
+  Result.time := maxTime;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
 function SetupClickTileStep(stepName: String; Coordinate: TPoint; Action: String = ''; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
 begin
   Result.step_type := STEP_TYPE.CLICK_TILE;
   Result.name := stepName;
   Result.coordinate := coordinate;
   Result.action := Action;
+  if @CompletionCondition = nil then
+    Result.CompletionCondition := @StandardCompletion
+  else
+    Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function SetupUseOnNPCStep(stepName: String; item: TRSItem; npcName: String; WebWalk: Boolean = False; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.USE_ON_NPC;
+  Result.name := stepName;
+  Result.item1 := item;
+  Result.NPC_name := npcName;
+  Result.webWalk := WebWalk;
+  Result.coordinate := Coordinate;
   if @CompletionCondition = nil then
     Result.CompletionCondition := @StandardCompletion
   else
@@ -199,6 +227,12 @@ procedure TStep.CustomWaitTile(coord: TPoint; waitRange: Integer = 5);
 begin
   self.waitCoord := coord;
   self.waitRange := waitRange;
+end;
+
+procedure TStep.CustomWaitItem(item: TRSItem; maxTime: Integer = 5000);
+begin
+  self.waitItem := item;
+  self.time := maxTime;
 end;
 
 
