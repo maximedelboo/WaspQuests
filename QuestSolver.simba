@@ -1,0 +1,99 @@
+{$DEFINE DEBUG_WALKERV2}
+{$I WaspQuests/osr.simba}
+{$I WaspQuests/loadQuests.simba}
+
+begin // Set default account
+  Login.PlayerIndex := 0;
+end;
+
+type
+  TQuestConfig = record(TScriptForm)
+    StepSelector, questSelector: TLabeledCombobox;
+  end;
+
+function TQuestArray.GetQuestNames(): TStringArray;
+var
+  quest: TQuest;
+begin
+  for quest in self do
+    Result += quest.questName;
+end;
+
+function TQuest.GetStepsArray(): TStringArray;
+var
+  i: Integer;
+begin
+  Quest.Free();
+  self.SetupProcedure();
+  self.totalSteps := Length(Quest.Steps);
+  Quest.Free();
+  for i := 1 to self.totalSteps do
+    Result += IntToStr(i);
+end;
+
+procedure TQuestConfig.changeSteps(sender: TObject);
+begin
+  Self.StepSelector.Clear();
+  Self.StepSelector.AddItemArray(QuestArray[self.questSelector.GetItemIndex].GetStepsArray);
+  self.StepSelector.SetItemIndex(0);
+end;
+
+procedure TQuestConfig.StartScript(sender: TObject); override;
+begin
+  Quest := QuestArray[self.QuestSelector.getItemIndex];
+  QuestStartIndex := self.StepSelector.GetItemIndex;
+  inherited;
+end;
+
+procedure TQuestConfig.Run(); override;
+var
+  tab: TTabSheet;
+  i: integer;
+  OptionsArray: TStringArray;
+begin
+  Self.Setup('QuestSolver Config');
+  Self.Start.SetOnClick(@Self.StartScript);
+
+  Self.AddTab('Script Settings');
+  tab := Self.Tabs[High(Self.Tabs)];
+  Self.CreateAccountManager(tab);
+
+  with Self.questSelector do
+  begin
+    Create(tab);
+    SetCaption('Quest:');
+    SetLeft(TControl.AdjustToDPI(50));
+    SetTop(200);
+    SetStyle(csDropDownList);
+    AddItemArray(QuestArray.GetQuestNames);
+    SetItemIndex(0);
+    Combobox.setOnChange(@Self.changeSteps);
+  end;
+
+  with Self.StepSelector do
+  begin
+    Create(tab);
+    SetCaption('Step at which to start:');
+    SetLeft(TControl.AdjustToDPI(50));
+    SetTop(250);
+    SetStyle(csDropDownList);
+    AddItemArray(QuestArray[self.questSelector.GetItemIndex].GetStepsArray);
+    SetItemIndex(0);
+  end;
+
+
+  Self.CreateVersionPanel(tab);
+  Self.CreateAntibanManager();
+  Self.CreateWaspLibSettings();
+  Self.CreateAPISettings();
+
+  inherited;
+end;
+
+var
+  QuestConfig: TQuestConfig;
+
+begin
+  QuestConfig.Run();
+  Quest.Run(WLSettings.MaxActions, WLSettings.MaxTime);
+end.
