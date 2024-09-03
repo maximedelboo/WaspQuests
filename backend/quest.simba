@@ -35,11 +35,20 @@ type
 
   TStepArray = array of TStep;
 
+  TStatCheck = record
+    combat, attack, strength, defence, ranged: Int32;
+    prayer, magic, runecraft, construction, hitpoints: Int32;
+    agility, herblore, thieving, crafting, fletching: Int32;
+    slayer, hunter, mining, smithing, fishing, cooking: Int32;
+    firemaking, woodcutting, farming: Int32;
+  end;
+
   TQuest = record(TBaseBankScript)
     steps: TStepArray;
     currentStep: TStep;
     index: Integer;
 
+    reqStats: TStatCheck;
     questName, quitMessage: String;
     totalSteps: Integer;
     SetupProcedure: procedure() of object;

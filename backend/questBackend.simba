@@ -17,6 +17,42 @@ begin
   inherited;
 end;
 
+function TStatCheck.Check(combatLvl: Int32): Boolean;
+begin
+  Result := True;
+  if combatLvl < self.combat then Exit(False);
+  if stats.GetLevel(ERSSkill.ATTACK) < self.attack then Exit(False);
+  if stats.GetLevel(ERSSkill.STRENGTH) < self.strength then Exit(False);
+  if stats.GetLevel(ERSSkill.DEFENCE) < self.defence then Exit(False);
+  if stats.GetLevel(ERSSkill.RANGE) < self.ranged then Exit(False);
+  if stats.GetLevel(ERSSkill.PRAYER) < self.prayer then Exit(False);
+  if stats.GetLevel(ERSSkill.MAGIC) < self.magic then Exit(False);
+  if stats.GetLevel(ERSSkill.RUNECRAFTING) < self.runecraft then Exit(False);
+  if stats.GetLevel(ERSSkill.CONSTRUCTION) < self.construction then Exit(False);
+  if stats.GetLevel(ERSSkill.HITPOINTS) < self.hitpoints then Exit(False);
+  if stats.GetLevel(ERSSkill.AGILITY) < self.agility then Exit(False);
+  if stats.GetLevel(ERSSkill.HERBLORE) < self.herblore then Exit(False);
+  if stats.GetLevel(ERSSkill.THIEVING) < self.thieving then Exit(False);
+  if stats.GetLevel(ERSSkill.CRAFTING) < self.crafting then Exit(False);
+  if stats.GetLevel(ERSSkill.FLETCHING) < self.fletching then Exit(False);
+  if stats.GetLevel(ERSSkill.SLAYER) < self.slayer then Exit(False);
+  if stats.GetLevel(ERSSkill.HUNTER) < self.hunter then Exit(False);
+  if stats.GetLevel(ERSSkill.MINING) < self.mining then Exit(False);
+  if stats.GetLevel(ERSSkill.SMITHING) < self.smithing then Exit(False);
+  if stats.GetLevel(ERSSkill.FISHING) < self.fishing then Exit(False);
+  if stats.GetLevel(ERSSkill.COOKING) < self.cooking then Exit(False);
+  if stats.GetLevel(ERSSkill.FIREMAKING) < self.firemaking then Exit(False);
+  if stats.GetLevel(ERSSkill.WOODCUTTING) < self.woodcutting then Exit(False);
+  if stats.GetLevel(ERSSkill.FARMING) < self.farming then Exit(False);
+end;
+
+procedure TRSWalkerV2.WalkerTasks(Walker: PRSWalkerV2; Position: TPoint; Destination: TPoint);
+begin
+  if (Minimap.GetRunEnergy < Random(40,60)) and not Minimap.HasStamina then Inventory.Consume(ERSConsumable.ENERGY);
+  if Minimap.GetHPPercent < 80 then Inventory.Consume(ERSConsumable.FOOD);
+  Antiban.DoAntiban(False, False);
+end;
+
 function EmptyStart(quest: PQuest): Boolean;
 begin
   Exit(True);
@@ -41,6 +77,7 @@ end;
 procedure TQuest.Init(MaxActions: UInt32; MaxTime: UInt64); override;
 var
   box: TBox;
+  combatLvl: Int32;
 begin
   inherited;
   WLSettings.RemoteInput.HUDReport  := False;
@@ -50,13 +87,20 @@ begin
   if Options.GetBrightnessLevel < 100 then
     Options.SetMaxBrightness;
   Self.PrintTimer.Init(5 * ONE_SECOND);
+  Stats.CacheAll();
+  combatLvl := combat.GetCombatLevel;
   Self.SetupProcedure();
+  if not quest.reqStats.Check(combatLvl) then RaiseException('Required stats are not met');
+
+
   options.SetNPCAttackOption(ERSAttackOption.ALWAYS_LEFT_CLICK);
 
   Self.DebugLn('Setting up map, this can take a second');
   Map.SetupChunks(Quest.region, 8, True);
   NPCs.Setup(Map.NPCs(), @Map.Walker);
   Objects.Setup(Map.Objects(), @Map.Walker);
+
+  map.Walker.OnWaitMovingEvent := @Map.Walker.WalkerTasks;
 
   for box in Quest.blockingAreas do
     Map.Walker.WebGraph^.BlockInside(box);
