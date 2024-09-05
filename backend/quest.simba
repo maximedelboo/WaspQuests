@@ -53,7 +53,7 @@ type
     totalSteps: Integer;
     SetupProcedure: procedure() of object;
     region: array of TRSMapChunk;
-    StartingConditions: function(quest: PQuest): boolean of object;
+    StartingConditions: function(): boolean of object;
     completed, forceQuit: Boolean;
     blockingAreas: TBoxArray;
   end;

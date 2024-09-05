@@ -3,7 +3,7 @@
 	{$I WaspQuests/osr.simba}
 {$ENDIF}
 
-function SheepStart(quest: PQuest): Boolean;
+function SheepStart(): Boolean;
 begin
   Exit(Inventory.CountItem('Ball of wool') >= 20);
 end;
@@ -21,7 +21,7 @@ begin
   QuestArray.AddQuest('Sheep Shearer', @SetupSheepShearer);
 end;
 
-function SheepStartIron(quest: PQuest): Boolean;
+function SheepStartIron(): Boolean;
 begin
   WriteLn('Inventory count: ', Inventory.Count());
   Exit(Inventory.Count() <= 5);

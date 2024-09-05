@@ -153,6 +153,11 @@ begin
   end;
 
   step.actionSucceeded := True;
+  if step.actionSucceeded and (step.waitCoord <> [0,0]) then
+  begin
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,7000);
+    Wait(1200);
+  end;
   if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
 
   if @step.SpecialEvent <> nil then
@@ -333,8 +338,19 @@ begin
 
   step.actionSucceeded := inventory.ContainsItem(step.item1);
   if step.actionSucceeded then step.actionSucceeded := Inventory.ClickItem(step.item1, 'Use');
-  npcArr := NPCs.getAll(step.NPC_name);
-  step.NPC_target := npcArr.findNearest(map.Position);
+
+  if step.coordinate = [0,0] then step.coordinate := Map.Walker.Position();
+
+  if step.NPC_target.Coordinates = [] then
+  begin
+    npcArr := NPCs.GetAll(step.NPC_name);
+    step.NPC_target := npcArr.findNearest(step.coordinate);
+    if step.colors = [] then
+      step.NPC_target.Finder.Colors := [CTS2(3504679, 17, 2.17, 2.93)]
+    else
+      step.NPC_target.Finder.Colors := step.colors;
+  end;
+
   if step.actionSucceeded then step.actionSucceeded := step.NPC_target.find(atpa);
 
   tpa := atpa.merge();

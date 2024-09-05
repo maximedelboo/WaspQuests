@@ -53,7 +53,7 @@ begin
   Antiban.DoAntiban(False, False);
 end;
 
-function EmptyStart(quest: PQuest): Boolean;
+function EmptyStart(): Boolean;
 begin
   Exit(True);
 end;
@@ -91,7 +91,6 @@ begin
   combatLvl := combat.GetCombatLevel;
   Self.SetupProcedure();
   if not quest.reqStats.Check(combatLvl) then RaiseException('Required stats are not met');
-
 
   options.SetNPCAttackOption(ERSAttackOption.ALWAYS_LEFT_CLICK);
 
@@ -163,6 +162,6 @@ procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);
 begin
   Self.Init(MaxActions, MaxTime);
   WriteLn('index starting: ', self.Index);
-  if (self.index = 0) and not self.StartingConditions(@self) then TerminateScript('Starting conditions not satisfied');
+  if (self.index = 0) and not self.StartingConditions() then TerminateScript('Starting conditions not satisfied');
   Self.Solve();
 end;

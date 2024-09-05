@@ -3,7 +3,7 @@
 	{$I WaspQuests/osr.simba}
 {$ENDIF}
 
-function DoricStart(quest: PQuest): Boolean;
+function DoricStart(): Boolean;
 begin
   Exit((Inventory.CountItem('Clay') >= 6) and (Inventory.CountItem('Copper ore') >= 4) and (Inventory.CountItem('Iron ore') >= 2));
 end;

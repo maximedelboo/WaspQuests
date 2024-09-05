@@ -3,9 +3,8 @@
 	{$I WaspQuests/osr.simba}
 {$ENDIF}
 
-function CooksStart(quest: PQuest): Boolean;
+function CooksStart(): Boolean;
 begin
-  quest^.DebugLn('Starting condition: ' + BoolToStr(Inventory.ContainsAll(['Egg','Bucket of milk','Pot of flour'])));
   Exit(Inventory.ContainsAll(['Egg','Bucket of milk','Pot of flour']));
 end;
 
@@ -22,7 +21,7 @@ begin
   QuestArray.AddQuest('Cook''s Assistant', @SetupCooksAssistant);
 end;
 
-function CooksStartIron(quest: PQuest): Boolean;
+function CooksStartIron(): Boolean;
 begin
   Exit(Inventory.Count < 22);
 end;
