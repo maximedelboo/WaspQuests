@@ -29,14 +29,17 @@ begin
 
   if step.actionSucceeded and (step.waitCoord <> [0,0]) then
   begin
-    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,7000);
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
     Wait(1200);
   end;
   if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveKillStep(var step: TStep);
@@ -61,23 +64,36 @@ begin
   xpbar.EarnedXP();
 
   if step.webwalk then
-    step.NPC_target.WalkSelectOption(['Attack'],5)
+  begin
+    step.NPC_target.WalkSelectOption(['Attack'],5);
+    if not (step.prayers = []) then Prayer.ActivatePrayer(step.prayers);
+  end
   else
+  begin
+    if not (step.prayers = []) then Prayer.ActivatePrayer(step.prayers);
     step.NPC_target.SelectOption(['Attack'],5);
+  end;
+
+  Inventory.open();
 
   if not Mainscreen.IsInCombat then
   begin
     step.actionSucceeded := False;
     Exit();
   end;
-  WriteLn('Detected in combat');
+
   step.actionSucceeded := True;
   WaitUntil(not Mainscreen.IsInCombat, 50, step.time);
+  if not (step.prayers = []) then Prayer.DisablePrayer(step.prayers);
+
   if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveInteractObjectStep(var step: TStep);
@@ -110,14 +126,17 @@ begin
 
   if step.waitCoord <> [0,0] then
   begin
-    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,7000);
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
     Wait(1200);
   end;
   if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveInteractInventoryStep(var step: TStep);
@@ -130,11 +149,19 @@ begin
 
   Inventory.FindItem(step.item1, slots);
   step.actionSucceeded := Inventory.ClickSlot(slots[0], [step.action]);
+  if step.actionSucceeded and (step.waitCoord <> [0,0]) then
+  begin
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
+    Wait(1200);
+  end;
   if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveConversationStep(var step: TStep);
@@ -155,14 +182,17 @@ begin
   step.actionSucceeded := True;
   if step.actionSucceeded and (step.waitCoord <> [0,0]) then
   begin
-    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,7000);
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
     Wait(1200);
   end;
   if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveQueryStep(var step: TStep);
@@ -194,7 +224,10 @@ begin
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveCombineStep(var step: TStep);
@@ -209,7 +242,10 @@ begin
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveLootStep(var step: TStep);
@@ -242,7 +278,10 @@ begin
     step.actionSucceeded := False;
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveBankStep(var step: TStep);
@@ -271,7 +310,10 @@ begin
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveWalkStep(var step: TStep);
@@ -282,15 +324,21 @@ begin
   end else
     Map.Walker.Ladderwalk(step.coordinate);
   WaitUntil(not Minimap.IsPlayerMoving, 50,5000);
+  if step.time = 0 then step.time := 5000;
 
   if (step.waitCoord <> [0,0]) then
-    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,2000)
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time)
   else
-    step.actionSucceeded := WaitUntil(map.Position.InRange(step.coordinate,5),50,2000);
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.coordinate,5),50,step.time);
+
+  WriteLn('Actionsucc1: ', step.actionSucceeded);
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveWaitStep(var step: TStep);
@@ -300,7 +348,10 @@ begin
   if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveCutsceneStep(var step: TStep);
@@ -309,7 +360,10 @@ begin
   WaitUntil(Chat.HasContinue, 50,step.time);
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveClickTileStep(var step: TStep);
@@ -317,13 +371,16 @@ begin
   step.actionSucceeded := Map.ClickTile(step.coordinate, step.action);
   if step.actionSucceeded and (step.waitCoord <> [0,0]) then
   begin
-    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,7000);
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
     Wait(1200);
   end;
   if step.actionSucceeded and not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveUseOnNPCStep(var step: TStep);
@@ -334,7 +391,8 @@ var
   p: TPoint;
 begin
   if step.webWalk and (step.coordinate <> [0,0]) then
-    Map.Walker.LadderWalk(step.coordinate);
+    Map.Walker.LadderWalk(step.coordinate,10);
+  WaitUntil(not Minimap.IsPlayerMoving, 50,5000);
 
   step.actionSucceeded := inventory.ContainsItem(step.item1);
   if step.actionSucceeded then step.actionSucceeded := Inventory.ClickItem(step.item1, 'Use');
@@ -369,13 +427,72 @@ begin
 
   if step.actionSucceeded and (step.waitCoord <> [0,0]) then
   begin
-    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,7000);
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
     Wait(1200);
   end;
   if step.actionSucceeded and not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
+end;
+
+procedure SolveUseOnObjectStep(var step: TStep);
+var
+  atpa: T2DPointArray;
+  objArr: TRSObjectV2Array;
+  tpa: TPointArray;
+  p: TPoint;
+begin
+  if step.webWalk and (step.coordinate <> [0,0]) then
+    Map.Walker.LadderWalk(step.coordinate, 10);
+  WaitUntil(not Minimap.IsPlayerMoving, 50,5000);
+
+  step.actionSucceeded := inventory.ContainsItem(step.item1);
+  if step.actionSucceeded then step.actionSucceeded := Inventory.ClickItem(step.item1, 'Use');
+
+  if step.coordinate = [0,0] then step.coordinate := Map.Walker.Position();
+
+  if step.objectTarget.Coordinates = [] then
+  begin
+    objArr := Objects.GetAll(step.objName);
+    step.objectTarget := objArr.findNearestSingle(step.coordinate);
+    if step.colors = [] then
+      step.objectTarget.Finder.Colors := [CTS2(3504679, 17, 2.17, 2.93)]
+    else
+      step.objectTarget.Finder.Colors := step.colors;
+  end;
+
+  if step.actionSucceeded then step.actionSucceeded := step.objectTarget.find(atpa);
+
+  tpa := atpa.merge();
+  tpa := tpa.grow(5);
+  atpa := tpa.Cluster(1);
+  tpa := atpa.means();
+  for p in tpa do
+  begin
+    Mouse.Move(p);
+    if Mainscreen.IsUpText('-> ' + step.objName) then
+    begin
+      mouse.click(MOUSE_LEFT);
+      step.actionSucceeded := Mainscreen.DidRedClick(600);
+    end;
+  end;
+
+  if step.actionSucceeded and (step.waitCoord <> [0,0]) then
+  begin
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
+    Wait(1200);
+  end;
+  if step.actionSucceeded and not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
 
 procedure SolveCustomStep(var step: TStep);
@@ -384,5 +501,8 @@ begin
   if step.actionSucceeded and not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
-  step.completed := step.CompletionCondition();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;

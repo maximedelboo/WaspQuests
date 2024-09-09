@@ -10,7 +10,7 @@ end;
 
 procedure SetupDorics();
 begin
-  Quest.region := [[[46,54,46,52],[0]]];
+  Quest.region := [[[45,54,46,52],[0]]];
   Quest.StartingConditions := @DoricStart;
 
   Quest.steps += SetupInteractNpcStep('Talk to Doric', 'Doric', 'Talk-to');

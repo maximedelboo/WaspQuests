@@ -17,9 +17,9 @@ begin
   Quest.steps += SetupConversationStep('Finish Fred conversation', [1]);
 end;
 
-begin
-  QuestArray.AddQuest('Sheep Shearer', @SetupSheepShearer);
-end;
+//begin
+//  QuestArray.AddQuest('Sheep Shearer', @SetupSheepShearer);
+//end;
 
 function SheepStartIron(): Boolean;
 begin

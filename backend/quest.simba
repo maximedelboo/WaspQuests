@@ -7,7 +7,7 @@
 type
   STEP_TYPE = (INTERACT_NPC, KILL, INTERACT_OBJECT, INTERACT_INVENTORY, CONVERSATION,
                QUERY, COMBINE, LOOT, WALK, WAIT, CUTSCENE, BANK, CLICK_TILE,
-               USE_ON_NPC, CUSTOM);
+               USE_ON_NPC, USE_ON_OBJECT, CUSTOM);
 
   PStep = ^TStep;
   PQuest = ^TQuest;
@@ -24,6 +24,7 @@ type
     coordinate, waitCoord: TPoint;
     height: Double;
     colors: TCTS2ColorArray;
+    prayers: ERSPrayerArray;
     time, waitRange: Integer;
     bankItems: TRSItemArray;
     withdrawItems: TRSBankItemArray;

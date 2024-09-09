@@ -3,10 +3,10 @@
   {$I WaspQuests/osr.simba}
 {$ENDIF}
 
-function StandardCompletion(): Boolean;
+function TStep.StandardCompletion(): Boolean;
   begin
-    if Quest.currentStep.actionSucceeded then Exit(True);
-    Result := False;
+    WriteLn('Actionsucc2: ', Self.actionSucceeded);
+    Result := Self.actionSucceeded;
   end;
 
 function SetupInteractNpcStep(stepName, NPC_name, action: String; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
@@ -17,10 +17,7 @@ begin
   Result.action := action;
   Result.coordinate := coordinate;
   Result.webWalk := WebWalk;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -32,10 +29,7 @@ begin
   Result.action := action;
   Result.coordinate := coordinate;
   Result.webWalk := WebWalk;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -44,10 +38,7 @@ begin
   Result.step_type := STEP_TYPE.CONVERSATION;
   Result.name := stepName;
   Result.conversationIndices := conversationIndices;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -58,10 +49,7 @@ begin
   Result.action := query;
   Result.answer := answer;
   Result.conversationIndices := conversationIndices;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -71,10 +59,7 @@ begin
   Result.name := stepName;
   Result.item1 := item;
   Result.action := action;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -84,10 +69,7 @@ begin
   Result.name := stepName;
   Result.item1 := item;
   Result.height := height;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -97,10 +79,7 @@ begin
   Result.name := stepName;
   Result.item1 := item1;
   Result.item2 := item2;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -111,10 +90,7 @@ begin
   Result.bankItems := bankItems;
   Result.withdrawItems := withdrawItems;
   Result.depositAll := depositAll;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -126,10 +102,7 @@ begin
   Result.time := time;
   Result.coordinate := coordinate;
   Result.webWalk := WebWalk;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -138,10 +111,7 @@ begin
   Result.step_type := STEP_TYPE.WALK;
   Result.name := stepName;
   Result.coordinate := coordinate;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -150,10 +120,7 @@ begin
   Result.step_type := STEP_TYPE.WAIT;
   Result.name := stepName;
   Result.time := time;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -162,10 +129,7 @@ begin
   Result.step_type := STEP_TYPE.CUTSCENE;
   Result.name := stepName;
   Result.time := maxTime;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -175,10 +139,7 @@ begin
   Result.name := stepName;
   Result.coordinate := coordinate;
   Result.action := Action;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -190,10 +151,19 @@ begin
   Result.NPC_name := npcName;
   Result.webWalk := WebWalk;
   Result.coordinate := Coordinate;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
+  Result.SpecialEvent := @SpecialEvent;
+end;
+
+function SetupUseOnObjectStep(stepName: String; item: TRSItem; objectName: String; WebWalk: Boolean = False; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+begin
+  Result.step_type := STEP_TYPE.USE_ON_OBJECT;
+  Result.name := stepName;
+  Result.item1 := item;
+  Result.objName := objectName;
+  Result.webWalk := WebWalk;
+  Result.coordinate := Coordinate;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -201,10 +171,7 @@ function SetupCustomStep(stepName: String; CompletionCondition: TStepCompletion 
 begin
   Result.step_type := STEP_TYPE.CUSTOM;
   Result.name := stepName;
-  if @CompletionCondition = nil then
-    Result.CompletionCondition := @StandardCompletion
-  else
-    Result.CompletionCondition := @CompletionCondition;
+  Result.CompletionCondition := @CompletionCondition;
   Result.SpecialEvent := @SpecialEvent;
 end;
 
@@ -223,16 +190,22 @@ begin
   self.colors := colorarray;
 end;
 
-procedure TStep.CustomWaitTile(coord: TPoint; waitRange: Integer = 5);
+procedure TStep.CustomWaitTile(coord: TPoint; waitRange: Integer = 5; waitTime: Integer = 10000);
 begin
   self.waitCoord := coord;
   self.waitRange := waitRange;
+  self.time := WaitTime;
 end;
 
 procedure TStep.CustomWaitItem(item: TRSItem; maxTime: Integer = 5000);
 begin
   self.waitItem := item;
   self.time := maxTime;
+end;
+
+procedure TStep.CustomPrayerArray(prayerArray: ERSPrayerArray);
+begin
+  self.prayers := prayerArray;
 end;
 
 

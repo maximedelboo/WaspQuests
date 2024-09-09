@@ -2,7 +2,7 @@
 	{$I WaspQuests/osr.simba}
 {$ENDIF}
 
-function TemplateStart(quest: PQuest): Boolean;
+function TemplateStart(): Boolean;
 begin
   //if condition then Result := True;
   Result := True;

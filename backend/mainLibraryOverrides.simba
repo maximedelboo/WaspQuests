@@ -205,6 +205,48 @@ begin
   end;
 end;
 
+function TRSMinimap.GetNPCDots(): TPointArray;
+  function GetMinimapGrid(angle: Single): Vector3Array;
+  var x, y: Integer;
+  begin
+    for x := Minimap.Center().X - 20 * 4 to Minimap.Center().X + 20 * 4 with 4 do
+      for y := Minimap.Center().Y - 20 * 4 to Minimap.Center().Y + 20 * 4 with 4 do
+        Result += Vec3(x, y).RotateXY(angle, Minimap.Center().X, Minimap.Center.Y);
+  end;
+
+  function DotsToTile(dots: TPointArray; angle: Single): TPointArray;
+  var
+    dotVecs, mmGrid: Vector3Array;
+    i: Integer;
+  begin
+    dotVecs.FromTPA(dots);
+    dotVecs := dotVecs.Offset([2,1]); //This can be either 2,1 or 2,2
+
+    mmGrid := GetMinimapGrid(angle);
+    for i := 0 to High(dotVecs) do
+      dotVecs[i] := mmGrid.NearestVec(dotVecs[i]);
+
+    Result := dotVecs.ToTPA();
+  end;
+var
+  mmGrid: Vector3Array;
+  dots: TPointArray;
+  dot: TPoint;
+  angle: Single;
+begin
+  angle := Minimap.GetCompassAngle(False);
+  mmGrid := GetMinimapGrid(angle);
+  dots := Minimap.GetDots(ERSMinimapDot.NPC);
+  if dots = [] then Exit();
+  dots := dotsToTile(dots, angle);
+  for dot in dots do
+  begin
+    dot := Map.MM2Map(dot, angle);
+    dot := RSTranslator.NormalizeNearestTile(dot);
+    Result += dot;
+  end;
+end;
+
 {$IFNDEF WQ_OSR}
   {$I WaspQuests/osr.simba}
 {$ENDIF}
@@ -351,7 +393,7 @@ end;
 //    Result.Pop();
 //end;
 
-function TRSWalkerV2.LadderWalk(dest: TPoint): Boolean;
+function TRSWalkerV2.LadderWalk(dest: TPoint; waitUntilDistance: Integer = 0): Boolean;
 var
   path: TPointArray;
   me, prev, p, ladderPoint: TPoint;
@@ -406,7 +448,7 @@ begin
       if ladderAttempt > 5 then Exit(False);
     end else Break;
   end;
-  Result := Self.WebWalk(dest);
+  Result := Self.WebWalk(dest, waitUntilDistance);
 end;
 
 function TRSMapObject.WalkHover(attempts: Int32 = 2): Boolean; override;

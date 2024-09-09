@@ -137,6 +137,7 @@ begin
       STEP_TYPE.CUTSCENE: SolveCutsceneStep(currentStep);
       STEP_TYPE.CLICK_TILE: SolveClickTileStep(currentStep);
       STEP_TYPE.USE_ON_NPC: SolveUseOnNPCStep(currentStep);
+      STEP_TYPE.USE_ON_OBJECT: SolveUseOnObjectStep(currentStep);
       STEP_TYPE.CUSTOM: SolveCustomStep(currentStep);
     end;
 

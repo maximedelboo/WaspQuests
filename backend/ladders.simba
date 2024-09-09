@@ -250,7 +250,6 @@ begin
   ladderTree.Free();
   ladderTree.Init(System.Copy(ladderPoints));
   oldLen := Length(Self.Walker.WebGraph^.Nodes);
-
   for i := 0 to high(ladderPoints) do
   begin
     try
@@ -260,7 +259,7 @@ begin
       begin
         nearestNodes := [Self.Walker.WebGraph^.Nodes.Find(Self.Walker.WebGraph^.Tree.Nearest(ladderPoints[i]))];
       end;
-      Self.Walker.WebGraph^.Nodes += ladderPoints[i];
+       Self.Walker.WebGraph^.Nodes += ladderPoints[i];
       Self.Walker.WebGraph^.Paths += [nearestNodes[0]];
       Self.Walker.WebGraph^.Paths[nearestNodes[0]] += high(Self.Walker.WebGraph^.Nodes);
     except
@@ -268,6 +267,7 @@ begin
       Self.Walker.WebGraph^.Paths += [high(Self.Walker.WebGraph^.Nodes)];
     end;
   end;
+  //Wait(10000);
   WriteLn('part 3: ', Timerr.ElapsedTime);
   Timerr.Reset();
 

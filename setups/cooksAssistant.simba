@@ -17,9 +17,9 @@ begin
   Quest.steps += SetupConversationStep('Finish cook conversation', [1,1]);
 end;
 
-begin
-  QuestArray.AddQuest('Cook''s Assistant', @SetupCooksAssistant);
-end;
+//begin
+//  QuestArray.AddQuest('Cook''s Assistant', @SetupCooksAssistant);
+//end;
 
 function CooksStartIron(): Boolean;
 begin

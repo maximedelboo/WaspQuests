@@ -2,3 +2,125 @@
 {$IFNDEF WQ_OSR}
 	{$I WaspQuests/osr.simba}
 {$ENDIF}
+
+function KnightsSwordStart(): Boolean;
+begin
+  if not (Inventory.CountItemStack('Varrock teleport') > 0) then RaiseException('No varrack teleport in inventory');
+  if not (Inventory.CountItemStack('Falador teleport') > 2) then RaiseException('No falador teleport in inventory');
+  if not (Inventory.CountItemStack('Pest control teleport') > 1) then RaiseException('No Pest control teleport in inventory');
+
+  if not (Inventory.CountItem('Iron bar') > 1) then RaiseException('Not enough iron bars in inventory');
+  if not Inventory.ContainsItem('Redberry pie') then RaiseException('No Redberry pie in inventory');
+  Result := True;
+end;
+
+procedure SetupKnightsSword();
+  function customCompletion1: Boolean;
+    function getnearestdot: Boolean;
+    var tpa: TPointArray; me: TPoint;
+    begin
+      tpa := Minimap.GetNPCDots;
+      Result := tpa.NearestPoint(me).DistanceTo(me) > 7;
+    end;
+  var
+    step1, step2: TStep;
+    customQuest: TQuest;
+  begin
+    step1 := SetupInteractObjectStep('take pic', 'Cupboard', 'Search', False);
+    step2 := SetupConversationStep('Pic conversation', []);
+
+    if not WaitUntil(getnearestdot, 50,15000) then Worldhopper.Hop(login.GetPlayer().Worlds);
+    Wait(3000);
+    customQuest.steps := [step1, step2];
+    customQuest.questName := 'Portrait subquest';
+    customquest.Solve();
+
+    Result := WaitUntil(inventory.ContainsItem('Portrait'),50,10000);
+  end;
+
+  procedure customAction1;
+  begin
+    combat.SetAutoRetaliate(False);
+  end;
+
+  procedure customAction2;
+  begin
+    if Minimap.GetHPPercent < 75 then Inventory.Consume(ERSConsumable.FOOD);
+  end;
+
+  procedure customAction3;
+  begin
+    Minimap.SetCompassAngle(180);
+  end;
+var
+  Reldo: TRSNPCV2;
+
+begin
+  Quest.region := [[[46,149,47,149],[0]], [[46,52,46,51],[1,2]], [[45,50,47,48],[0,1]], [[46,52,47,51],[0]], [[49,54,50,53],[0]], [[41,41,41,41],[0]]]; // sample region
+  Quest.StartingConditions := @KnightsSwordStart; // use @emptyStart for always true starting condition
+  Quest.reqStats.mining := 10;
+
+  Reldo.SetupCoordinates([25],[[8744, 36454]]);
+  Reldo.SetupUpText('Reldo');
+  Reldo.Finder.Colors += CTS2(5007978, 11, 0.06, 0.09);
+  Reldo.Walker := @Map.Walker;
+  Reldo.Size := [0.8,0.8,5];
+
+  Quest.steps += SetupInteractNpcStep('Talk to Squire', 'Squire', 'Talk-to');
+  Quest.steps += SetupConversationStep('Conversation Squire', [1,2,1,1]);
+  Quest.steps += SetupInteractInventoryStep('Teleport to varrock', 'Varrock teleport', 'Break');
+  Quest.steps[high(Quest.steps)].CustomWaitTile([8630, 36620], 200);
+  Quest.steps += SetupInteractNpcStep('Talk to Reldo', 'Reldo', 'Talk-to');
+  Quest.steps[high(Quest.steps)].CustomizeNPC(Reldo);
+  Quest.steps += SetupConversationStep('Conversation Reldo', [4]);
+  Quest.steps += SetupInteractNpcStep('Talk to Reldo', 'Reldo', 'Talk-to');
+  Quest.steps[high(Quest.steps)].CustomizeNPC(Reldo);
+  Quest.steps += SetupConversationStep('Conversation Reldo', [3]);
+  Quest.steps += SetupInteractInventoryStep('Teleport to pest control', 'Pest control teleport', 'Teleport', nil, @CustomAction3);
+  Quest.steps[high(Quest.steps)].CustomWaitTile([6540, 39790],50);
+  Quest.steps += SetupWalkStep('Walk to squire', [6536, 39730]);
+  Quest.steps += SetupInteractNpcStep('Talk to Squire', 'Squire', 'Travel', False);
+  Quest.steps[high(Quest.steps)].CustomWaitTile([21124, 37634], 50, 15000);
+  Quest.steps += SetupInteractObjectStep('Walk gangplank', 'Gangplank', 'Cross', False);
+  Quest.steps[high(Quest.steps)].CustomWaitTile([8068, 37622],50);
+  Quest.steps += SetupWalkStep('Walk to Thurgo', [7888, 37862]);
+  Quest.steps += SetupInteractNpcStep('Talk to Thurgo', 'Thurgo', 'Talk-to');
+  Quest.steps += SetupConversationStep('Conversation Thurgo', [2]);
+  Quest.steps += SetupCutsceneStep('Conversation Thurgo', 3000);
+  Quest.steps += SetupInteractNpcStep('Talk to Thurgo', 'Thurgo', 'Talk-to');
+  Quest.steps += SetupConversationStep('Conversation Thurgo', [1]);
+  Quest.steps += SetupInteractObjectStep('Open Trapdoor', 'Trapdoor', 'Climb-down', True, [0,0]);
+  Quest.steps[high(Quest.steps)].CustomWaitTile([7940, 12230],50);
+  Quest.steps += SetupWalkStep('Walk to rock', [8104, 12154]);
+  Quest.steps[high(Quest.steps)].CustomWaitTile([8104, 12154],10);
+  Quest.steps += SetupInteractObjectStep('Mine rocks', 'Blurite rocks', 'Mine', False, [0,0], nil, @customAction2);
+  Quest.steps[high(Quest.steps)].CustomWaitItem('Blurite ore', 10000);
+  Quest.steps += SetupInteractInventoryStep('Teleport to Falador', 'Falador teleport', 'Break');
+  Quest.steps[high(Quest.steps)].CustomWaitTile([7768, 36914],50);
+  Quest.steps += SetupInteractNpcStep('Talk to Squire', 'Squire', 'Talk-to');
+  Quest.steps += SetupConversationStep('Conversation Squire', []);
+  Quest.steps += SetupWalkStep('Walk to cupboard', [33956, 37090]);
+  Quest.steps += SetupInteractObjectStep('Open cupboard', 'Cupboard', 'Open', False, [0,0], @customCompletion1);
+  Quest.steps += SetupInteractInventoryStep('Teleport to pest control', 'Pest control teleport', 'Teleport', nil, @CustomAction3);
+  Quest.steps[high(Quest.steps)].CustomWaitTile([6540, 39790],50);
+  Quest.steps += SetupWalkStep('Walk to squire', [6536, 39730]);
+  Quest.steps += SetupInteractNpcStep('Talk to Squire', 'Squire', 'Travel', False);
+  Quest.steps[high(Quest.steps)].CustomWaitTile([21124, 37634], 50, 15000);
+  Quest.steps += SetupInteractObjectStep('Walk gangplank', 'Gangplank', 'Cross', False);
+  Quest.steps[high(Quest.steps)].CustomWaitTile([8068, 37622],50);
+  Quest.steps += SetupWalkStep('Walk to Thurgo', [7888, 37862]);
+  Quest.steps += SetupInteractNpcStep('Talk to Thurgo', 'Thurgo', 'Talk-to');
+  Quest.steps += SetupConversationStep('Conversation Thurgo', [1]);
+  Quest.steps += SetupInteractNpcStep('Talk to Thurgo', 'Thurgo', 'Talk-to');
+  Quest.steps += SetupConversationStep('Conversation Thurgo', [1]);
+  Quest.steps[high(Quest.steps)].CustomWaitItem('Blurite sword', 10000);
+  Quest.steps += SetupInteractInventoryStep('Teleport to Falador', 'Falador teleport', 'Break');
+  Quest.steps[high(Quest.steps)].CustomWaitTile([7768, 36914],50);
+  Quest.steps += SetupInteractNpcStep('Talk to Squire', 'Squire', 'Talk-to');
+  Quest.steps += SetupConversationStep('Conversation Squire', []);
+
+end;
+
+begin
+  QuestArray.AddQuest('The Knights Sword', @SetupKnightsSword); // in order to actually make this quest appear, you should include it in the main QuestSolver script with {$I WaspQuests/QuestTemplate.simba}
+end;
