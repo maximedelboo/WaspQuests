@@ -1,4 +1,3 @@
-//{$DEFINE DEBUG_WALKERV2}
 {$I WaspQuests/osr.simba}
 {$I WaspQuests/loadQuests.simba}
 
