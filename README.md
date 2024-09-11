@@ -4,6 +4,7 @@ This library in meant as an extension to the SLR-T and WaspLib modules for Simba
 
 ### Installation
 To install this library, download it and place it in the Includes folder in a folder named 'WaspQuests', just like the other libraries.
+Alternatively, you can run the `WaspQuests` script, found on the WaspScripts.com website to auto-install the library.
 
 ### Sequential tasks
 As said before, this library focusses specifically on solving sequential tasks. This is fundamentally different from most other bots you will see developed for the game. Most bots written for SLR-T and WaspLib are what you call **Finite State Machines (FSM)**, where you can determine the current state of the machine from the given context, and then you enact a certain logic based on that detected state. This library focusses on another type of automation machine, called the **Sequential State Machine**. Rather than only taking the input of the current context and figuring out what to do from there, this machine knows its 'history' so to say and makes decisions based on that. How does this work in practice? The script has a given set of steps to perform, where each step has a clear terminal condition, determining success or failure. Success means your system is ready to perform the next task in the sequence, whereas failure means you can retry the current step and then hopefully reach the terminal condition. 
