@@ -29,8 +29,6 @@ begin
 end;
 
 function TQuest.GetQuestInfo(): String;
-var
-  i: Integer;
 begin
   Quest.Free();
   self.SetupProcedure();
@@ -56,9 +54,6 @@ end;
 procedure TQuestConfig.Run(); override;
 var
   tab: TTabSheet;
-  i: integer;
-  OptionsArray: TStringArray;
-  strings: TObject;
 begin
   Self.Setup('QuestSolver Config');
   Self.Start.SetOnClick(@Self.StartScript);

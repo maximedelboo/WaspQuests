@@ -38,7 +38,6 @@ procedure SetupSheepShearerIron();
   end;
 
   function CustomCompletion2(): Boolean;
-  var prevCount: Integer;
   begin
     Waituntil(make.IsOpen, 50,3000);
     Make.Select('Ball of Wool', 20);

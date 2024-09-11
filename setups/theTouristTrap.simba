@@ -87,10 +87,7 @@ procedure SetupTouristTrap();
   end;
 
   function customCompletion4(): Boolean;
-  var
-    step1: TStep;
   begin
-
     Wait(5000);
     if minimap.PercentBlack > 95 then
     begin
