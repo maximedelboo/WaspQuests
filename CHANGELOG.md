@@ -1,3 +1,10 @@
+## [0.1.1](https://github.com/maximedelboo/WaspQuests/compare/v0.1.0...v0.1.1) (2024-09-11)
+
+
+### Bug Fixes
+
+* removed unused variables ([4efc1f3](https://github.com/maximedelboo/WaspQuests/commit/4efc1f3bf022ff4ea63d00f34405a115565c2ecd))
+
 # [0.1.0](https://github.com/maximedelboo/WaspQuests/compare/v0.0.3...v0.1.0) (2024-09-11)
 
 
