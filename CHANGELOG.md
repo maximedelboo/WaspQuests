@@ -1,3 +1,10 @@
+# [0.1.0](https://github.com/maximedelboo/WaspQuests/compare/v0.0.3...v0.1.0) (2024-09-11)
+
+
+### Features
+
+* force bump ([c638747](https://github.com/maximedelboo/WaspQuests/commit/c6387471fc157e018121950724114da31ed785b8))
+
 ## [0.0.3](https://github.com/maximedelboo/WaspQuests/compare/v0.0.2...v0.0.3) (2024-09-10)
 
 
