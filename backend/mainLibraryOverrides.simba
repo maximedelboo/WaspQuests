@@ -109,6 +109,7 @@ var
   timer: TCountdown;
   hits: Integer;
 begin
+  XPBar.EarnedXP;
   timer.Init(5500);
   while not timer.IsFinished do
   begin

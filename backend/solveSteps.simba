@@ -76,15 +76,17 @@ begin
 
   Inventory.open();
 
-  if not Mainscreen.IsInCombat then
+  if not WaitUntil(Mainscreen.IsInCombat, 50,6000) then
   begin
     step.actionSucceeded := False;
-    Exit();
-  end;
+  end else
+  begin
+    step.actionSucceeded := True;
+    WriteLn('Waiting ', step.CombatTime/1000, ' seconds until out of combat');
+    WaitUntil(not Mainscreen.IsInCombat, 50, step.CombatTime);
 
-  step.actionSucceeded := True;
-  WaitUntil(not Mainscreen.IsInCombat, 50, step.time);
-  if not (step.prayers = []) then Prayer.DisablePrayer(step.prayers);
+    if not (step.prayers = []) then Prayer.DisablePrayer(step.prayers);
+  end;
 
   if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
 

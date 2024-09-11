@@ -8,7 +8,6 @@ begin
   if not (inventory.CountItem('Bronze bar') > 4) then RaiseException('You need at least 5 bronze bars in inventory to start');
   if not (inventory.CountItemStack('Feather') > 49) then RaiseException('You need at least 50 feathers in inventory to start');
   if not inventory.ContainsItem('Hammer') then RaiseException('You need a hammer in inventory to start');
-  if not inventory.ContainsItem('Shantay pass') then RaiseException('You need a Shantay pass in inventory to start');
   if not inventory.ContainsAll(['Desert robe', 'Desert shirt', 'Desert boots']) then RaiseException('You need a full set of desert robes in inventory to start');
   if inventory.Count > 18 then RaiseException('You need at least 10 free inventory spaces');
   Result := True;
@@ -99,18 +98,19 @@ procedure SetupTouristTrap();
       Exit(True);
     end;
   end;
-
-
+var
+  Irena: TRSNPCV2;
 begin
   Quest.region := [[[49,49,51,46],[0]], [[50,148,52,146],[0]]]; // sample region
   Quest.StartingConditions := @TouristTrapStart; // use @emptyStart for always true starting condition
   Quest.reqStats.fletching := 10;
   Quest.reqStats.smithing := 20;
 
+  Irena := SetupNPC('Irena', [9112, 37982]);
+
   //Setup steps (mockup of dorics quest)
-  Quest.steps += SetupInteractObjectStep('Go through shantay pass', 'Shantay pass', 'Go-through');
-  Quest.steps[high(quest.steps)].CustomWaitTile([9120, 37970],5);
   Quest.steps += SetupInteractNPCStep('Talk to Irena', 'Irena', 'Talk-to', False);
+  Quest.steps[high(Quest.steps)].CustomizeNPC(Irena);
   Quest.steps += SetupConversationStep('Conversation Irena', [1,1,2,1,1]);
   Quest.steps += SetupInteractNPCStep('Talk to Captain', 'Mercenary captain', 'Talk-to', True, [8984, 38314]);
   Quest.steps += SetupConversationStep('Conversation Captain', [1,2,2,2,1]);
@@ -191,9 +191,10 @@ begin
   Quest.steps += SetupConversationStep('Conversation Guard', [2,2,1,3,3,3,1,2]);
   Quest.steps += SetupWaitStep('Wait cutscene', 5000);
   Quest.steps += SetupInteractNPCStep('Talk to Irena', 'Irena', 'Talk-to', False);
+  Quest.steps[high(Quest.steps)].CustomizeNPC(Irena);
   Quest.steps += SetupConversationStep('Conversation Irena', []);
 end;
 
-begin
-  QuestArray.AddQuest('Tourist Trap', @SetupTouristTrap); // in order to actually make this quest appear, you should include it in the main QuestSolver script with {$I WaspQuests/QuestTemplate.simba}
-end;
+//begin
+//  QuestArray.AddQuest('Tourist Trap', @SetupTouristTrap); // in order to actually make this quest appear, you should include it in the main QuestSolver script with {$I WaspQuests/QuestTemplate.simba}
+//end;

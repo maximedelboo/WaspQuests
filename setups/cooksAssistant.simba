@@ -75,6 +75,9 @@ begin
   Quest.region := [[[48,52,51,49],[0,1]], [[49,150,50,149],[0]]];
   Quest.StartingConditions := @CooksStartIron;
 
+  Quest.questInfo += 'Start anywhere around Lumbridge';
+  Quest.questInfo += 'Have at least 6 free inventory spaces';
+
   Quest.steps += SetupInteractObjectStep('Go down trapdoor', 'Trapdoor', 'Climb-down', True, [8744, 37566], @customcompletion3);
   Quest.steps += SetupWalkStep('Walk to bucket', [8768, 11934]);
   Quest.steps += SetupLootStep('Loot bucket', 'Bucket', 3, nil, @customAction1);

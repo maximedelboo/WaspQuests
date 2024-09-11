@@ -48,6 +48,8 @@ procedure SetupSheepShearerIron();
 begin
   Quest.region := [[[49,51,51,49],[0,1]]];
   Quest.StartingConditions := @SheepStartIron;
+  Quest.questInfo += 'Start anywhere around Lumbridge';
+  Quest.questInfo += 'Make sure you have 5 or less items in inventory';
 
   Quest.steps += SetupInteractNpcStep('Talk to Fred', 'Fred the Farmer', 'Talk-to');
   Quest.steps += SetupConversationStep('Finish Fred conversation', [1,1]);

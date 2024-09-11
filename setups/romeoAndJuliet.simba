@@ -29,6 +29,9 @@ begin
   Quest.region := [[[48,54,51,52],[0,1]]]; // sample region
   Quest.StartingConditions := @RomeoStart; // use @emptyStart for always true starting condition
 
+  Quest.questInfo += 'Start anywhere around Varrock';
+  Quest.questInfo += 'No item requirements, have at least 2 free inventory spaces';
+
   //Setup steps (mockup of dorics quest)
   Quest.steps += SetupWalkStep('Walk to romeo', [8760, 36742]);
   Quest.steps += SetupInteractNpcStep('Talk to Romeo', 'Romeo', 'Talk-to');

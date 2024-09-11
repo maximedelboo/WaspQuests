@@ -60,6 +60,11 @@ begin
   Quest.StartingConditions := @KnightsSwordStart; // use @emptyStart for always true starting condition
   Quest.reqStats.mining := 10;
 
+  Quest.questInfo += 'Start anywhere around Falador';
+  Quest.questInfo += 'You need at least 10 mining';
+  Quest.questInfo += 'You need to be in a members world for this quest';
+  Quest.questInfo += 'You need 3 falador tabs, 1 varrock tab, 2 pest control teleports, 2 iron bars and 1 redberry pie in your inventory';
+
   Reldo.SetupCoordinates([25],[[8744, 36454]]);
   Reldo.SetupUpText('Reldo');
   Reldo.Finder.Colors += CTS2(5007978, 11, 0.06, 0.09);

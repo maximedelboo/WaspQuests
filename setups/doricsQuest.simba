@@ -12,6 +12,8 @@ procedure SetupDorics();
 begin
   Quest.region := [[[45,54,46,52],[0]]];
   Quest.StartingConditions := @DoricStart;
+  Quest.questInfo += 'Start anywhere around Falador';
+  Quest.questInfo += 'Start with 6 clay, 4 Copper ore and 2 Iron ores';
 
   Quest.steps += SetupInteractNpcStep('Talk to Doric', 'Doric', 'Talk-to');
   Quest.steps += SetupConversationStep('Finish Doric conversation', [1,1]);

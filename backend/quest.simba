@@ -25,7 +25,7 @@ type
     height: Double;
     colors: TCTS2ColorArray;
     prayers: ERSPrayerArray;
-    time, waitRange: Integer;
+    time, waitRange, combatTime: Integer;
     bankItems: TRSItemArray;
     withdrawItems: TRSBankItemArray;
     conversationIndices: TIntegerArray;
@@ -48,6 +48,7 @@ type
     steps: TStepArray;
     currentStep: TStep;
     index: Integer;
+    questInfo: TStringArray;
 
     reqStats: TStatCheck;
     questName, quitMessage: String;

@@ -261,6 +261,9 @@ begin
   door10.offset := [0,-2, 0];
   door10.walker:=@Map.Walker;
 
+  Quest.questInfo += 'Start anywhere around Draynor manor';
+  Quest.questInfo += 'Have at least 5 free inventory spaces';
+
   //Setup steps (mockup of dorics quest)
   Quest.steps += SetupInteractNpcStep('Talk to Veronica', 'Veronica', 'Talk-to');
   Quest.steps += SetupConversationStep('Finish Veronica conversation', [1]);
