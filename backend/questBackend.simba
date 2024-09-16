@@ -46,7 +46,7 @@ begin
   if stats.GetLevel(ERSSkill.FARMING) < self.farming then Exit(False);
 end;
 
-procedure TRSWalkerV2.WalkerTasks(Walker: PRSWalkerV2; Position: TPoint; Destination: TPoint);
+procedure TRSWalkerV2.WalkerTasks({$H-}Walker: PRSWalkerV2; Position: TPoint; Destination: TPoint);{$H+}
 begin
   if (Minimap.GetRunEnergy < Random(40,60)) and not Minimap.HasStamina then Inventory.Consume(ERSConsumable.ENERGY);
   if Minimap.GetHPPercent < 80 then Inventory.Consume(ERSConsumable.FOOD);

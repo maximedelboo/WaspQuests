@@ -8,206 +8,238 @@ function TStep.StandardCompletion(): Boolean;
     Result := Self.actionSucceeded;
   end;
 
-function SetupInteractNpcStep(stepName, NPC_name, action: String; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddInteractNpcStep(stepName, NPC_name, action: String; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.INTERACT_NPC;
-  Result.name := stepName;
-  Result.NPC_name := NPC_name;
-  Result.action := action;
-  Result.coordinate := coordinate;
-  Result.webWalk := WebWalk;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.INTERACT_NPC;
+  Step.name := stepName;
+  Step.NPC_name := NPC_name;
+  Step.action := action;
+  Step.coordinate := coordinate;
+  Step.webWalk := WebWalk;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupInteractObjectStep(stepName, objectName, action: String; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddInteractObjectStep(stepName, objectName, action: String; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.INTERACT_OBJECT;
-  Result.name := stepName;
-  Result.objName := objectName;
-  Result.action := action;
-  Result.coordinate := coordinate;
-  Result.webWalk := WebWalk;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.INTERACT_OBJECT;
+  Step.name := stepName;
+  Step.objName := objectName;
+  Step.action := action;
+  Step.coordinate := coordinate;
+  Step.webWalk := WebWalk;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupConversationStep(stepName: String; conversationIndices: TIntegerArray; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddConversationStep(stepName: String; conversationIndices: TIntegerArray; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.CONVERSATION;
-  Result.name := stepName;
-  Result.conversationIndices := conversationIndices;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.CONVERSATION;
+  Step.name := stepName;
+  Step.conversationIndices := conversationIndices;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupQueryStep(stepName: String; conversationIndices: TIntegerArray; query, answer: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddQueryStep(stepName: String; conversationIndices: TIntegerArray; query, answer: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.QUERY;
-  Result.name := stepName;
-  Result.action := query;
-  Result.answer := answer;
-  Result.conversationIndices := conversationIndices;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.QUERY;
+  Step.name := stepName;
+  Step.action := query;
+  Step.answer := answer;
+  Step.conversationIndices := conversationIndices;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupInteractInventoryStep(stepName: String; item: TRSItem; action: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddInteractInventoryStep(stepName: String; item: TRSItem; action: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.INTERACT_INVENTORY;
-  Result.name := stepName;
-  Result.item1 := item;
-  Result.action := action;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.INTERACT_INVENTORY;
+  Step.name := stepName;
+  Step.item1 := item;
+  Step.action := action;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupLootStep(stepName: String; item: TRSItem; height: Double = 0; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddLootStep(stepName: String; item: TRSItem; height: Double = 0; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.LOOT;
-  Result.name := stepName;
-  Result.item1 := item;
-  Result.height := height;
-  Result.CompletionCondition := @CompletionCondition;;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.LOOT;
+  Step.name := stepName;
+  Step.item1 := item;
+  Step.height := height;
+  Step.CompletionCondition := @CompletionCondition;;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupCombineStep(stepName: String; item1, item2: TRSItem; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddCombineStep(stepName: String; item1, item2: TRSItem; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.COMBINE;
-  Result.name := stepName;
-  Result.item1 := item1;
-  Result.item2 := item2;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.COMBINE;
+  Step.name := stepName;
+  Step.item1 := item1;
+  Step.item2 := item2;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupBankStep(stepName: String; withdrawItems: TRSBankItemArray; depositAll: Boolean = False; bankItems: TRSItemArray = []; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddBankStep(stepName: String; withdrawItems: TRSBankItemArray; depositAll: Boolean = False; bankItems: TRSItemArray = []; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.BANK;
-  Result.name := stepName;
-  Result.bankItems := bankItems;
-  Result.withdrawItems := withdrawItems;
-  Result.depositAll := depositAll;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.BANK;
+  Step.name := stepName;
+  Step.bankItems := bankItems;
+  Step.withdrawItems := withdrawItems;
+  Step.depositAll := depositAll;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupKillStep(stepName, NPC_name: String; time: Integer = 7000; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddKillStep(stepName, NPC_name: String; time: Integer = 7000; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.KILL;
-  Result.name := stepName;
-  Result.NPC_name := NPC_name;
-  Result.CombatTime := time;
-  Result.coordinate := coordinate;
-  Result.webWalk := WebWalk;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.KILL;
+  Step.name := stepName;
+  Step.NPC_name := NPC_name;
+  Step.CombatTime := time;
+  Step.coordinate := coordinate;
+  Step.webWalk := WebWalk;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupWalkStep(stepName: String; Coordinate: TPoint; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddWalkStep(stepName: String; Coordinate: TPoint; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.WALK;
-  Result.name := stepName;
-  Result.coordinate := coordinate;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.WALK;
+  Step.name := stepName;
+  Step.coordinate := coordinate;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupWaitStep(stepName: String; time: Integer; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddWaitStep(stepName: String; time: Integer; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.WAIT;
-  Result.name := stepName;
-  Result.time := time;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.WAIT;
+  Step.name := stepName;
+  Step.time := time;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupCutsceneStep(stepName: String; maxTime: Integer; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddCutsceneStep(stepName: String; maxTime: Integer; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.CUTSCENE;
-  Result.name := stepName;
-  Result.time := maxTime;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.CUTSCENE;
+  Step.name := stepName;
+  Step.time := maxTime;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupClickTileStep(stepName: String; Coordinate: TPoint; Action: String = ''; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddClickTileStep(stepName: String; Coordinate: TPoint; Action: String = ''; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.CLICK_TILE;
-  Result.name := stepName;
-  Result.coordinate := coordinate;
-  Result.action := Action;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.CLICK_TILE;
+  Step.name := stepName;
+  Step.coordinate := coordinate;
+  Step.action := Action;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupUseOnNPCStep(stepName: String; item: TRSItem; npcName: String; WebWalk: Boolean = False; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddUseOnNPCStep(stepName: String; item: TRSItem; npcName: String; WebWalk: Boolean = False; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.USE_ON_NPC;
-  Result.name := stepName;
-  Result.item1 := item;
-  Result.NPC_name := npcName;
-  Result.webWalk := WebWalk;
-  Result.coordinate := Coordinate;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.USE_ON_NPC;
+  Step.name := stepName;
+  Step.item1 := item;
+  Step.NPC_name := npcName;
+  Step.webWalk := WebWalk;
+  Step.coordinate := Coordinate;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupUseOnObjectStep(stepName: String; item: TRSItem; objectName: String; WebWalk: Boolean = False; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddUseOnObjectStep(stepName: String; item: TRSItem; objectName: String; WebWalk: Boolean = False; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.USE_ON_OBJECT;
-  Result.name := stepName;
-  Result.item1 := item;
-  Result.objName := objectName;
-  Result.webWalk := WebWalk;
-  Result.coordinate := Coordinate;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.USE_ON_OBJECT;
+  Step.name := stepName;
+  Step.item1 := item;
+  Step.objName := objectName;
+  Step.webWalk := WebWalk;
+  Step.coordinate := Coordinate;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-function SetupCustomStep(stepName: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil): TStep;
+procedure TStepArray.AddCustomStep(stepName: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
 begin
-  Result.step_type := STEP_TYPE.CUSTOM;
-  Result.name := stepName;
-  Result.CompletionCondition := @CompletionCondition;
-  Result.SpecialEvent := @SpecialEvent;
+  Step.step_type := STEP_TYPE.CUSTOM;
+  Step.name := stepName;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
 end;
 
-procedure TStep.CustomizeNPC(npc: TRSNPCV2);
+procedure TStepArray.CustomizeNPC(npc: TRSNPCV2);
 begin
-  self.NPC_target := npc;
+  self[high(self)].NPC_target := npc;
 end;
 
-procedure TStep.CustomizeObject(obj: TRSObjectV2);
+procedure TStepArray.CustomizeObject(obj: TRSObjectV2);
 begin
-  self.objectTarget := obj;
+  self[high(self)].objectTarget := obj;
 end;
 
-procedure TStep.CustomizeColor(colorarray: TCTS2ColorArray);
+procedure TStepArray.CustomizeColor(colorarray: TCTS2ColorArray);
 begin
-  self.colors := colorarray;
+  self[high(self)].colors := colorarray;
 end;
 
-procedure TStep.CustomWaitTile(coord: TPoint; waitRange: Integer = 5; waitTime: Integer = 10000);
+procedure TStepArray.CustomWaitTile(coord: TPoint; waitRange: Integer = 5; waitTime: Integer = 10000);
 begin
-  self.waitCoord := coord;
-  self.waitRange := waitRange;
-  self.time := WaitTime;
+  self[high(self)].waitCoord := coord;
+  self[high(self)].waitRange := waitRange;
+  self[high(self)].time := WaitTime;
 end;
 
-procedure TStep.CustomWaitItem(item: TRSItem; maxTime: Integer = 5000);
+procedure TStepArray.CustomWaitItem(item: TRSItem; maxTime: Integer = 5000);
 begin
-  self.waitItem := item;
-  self.time := maxTime;
+  self[high(self)].waitItem := item;
+  self[high(self)].time := maxTime;
 end;
 
-procedure TStep.CustomPrayerArray(prayerArray: ERSPrayerArray);
+procedure TStepArray.CustomPrayerArray(prayerArray: ERSPrayerArray);
 begin
-  self.prayers := prayerArray;
+  self[high(self)].prayers := prayerArray;
 end;
 
-function SetupNPC(name: String; coordinate: TPoint; colorArray: TCTS2ColorArray = [[3504679, 17, 2.17, 2.93]]): TRSNPCV2;
+function CreateNPC(name: String; coordinate: TPoint; colorArray: TCTS2ColorArray = [[3504679, 17, 2.17, 2.93]]): TRSNPCV2;
 begin
   Result.SetupCoordinates([28],[coordinate]);
   Result.Walker := @Map.Walker;

@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load the CSV file
-file_path = 'Naamloze spreadsheet - Blad1.csv'
+file_path = 'C:\\Users\\maxim\\AppData\\Local\\Simba\\Includes\\WaspQuests\\questNames.csv'
 df = pd.read_csv(file_path)
 
 # Display the content to understand its structure
@@ -31,7 +31,7 @@ for name in names:
     file_name = f"{camel_case_name}.simba"
     file_path = os.path.join(output_dir, file_name)
     with open(file_path, 'w') as file:
-        file.write(f"{{$DEFINE WQ_{camel_case_name.upper()}_INCLUDED}}\n{{$IFNDEF WQ_OSR}}\n\t{{$I WaspQuests/osr.simba}}\n{{$ENDIF}}")
+        file.write(f"{{$IFNDEF WQ_OSR}}\n\t{{$I WaspQuests/osr.simba}}\n{{$ENDIF}}")
 
 output_dir
 
@@ -43,17 +43,12 @@ print(os.listdir(output_dir))
 absolute_output_dir = os.path.abspath(output_dir)
 print(absolute_output_dir)
 
-file_path = 'osr.simba'
+file_path = 'osr2.simba'
 lines = []
 with open(file_path, 'w') as file:
     for name in names:
         fullcaps_name = to_camel_case_without_apostrophe(name).upper()
         camel_case_name = to_camel_case_without_apostrophe(name) + '.simba'
-        lines.append(f'{{$IFNDEF WQ_{fullcaps_name}_INCLUDED}}\t\t{{$I setups/{camel_case_name}.simba}}\n')
-        
-    lines.append('\n')
-    
-    for name in names:
-        lines.append(f'{{$ENDIF}}\n')
+        lines.append(f'{{$I setups/{camel_case_name}.simba}}\n')
     
     file.writelines(lines)
