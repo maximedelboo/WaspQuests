@@ -107,7 +107,7 @@ var
   objArr, usedLadders: TRSObjectV2Array;
   potentialLadder: TRSObjectV2;
   Timerr: TStopwatch;
-  objs: TRSMapJSONParser;
+  objs: TRSObjectJSONParser;
   ladderArray: TRSLadderArray;
   actions: String;
   nearestNodes: TIntegerArray;

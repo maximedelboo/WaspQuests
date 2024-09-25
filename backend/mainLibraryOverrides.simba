@@ -354,45 +354,112 @@ begin
   end;
 end;
 
-//function TWebGraph.FindNearestNodes(p: TPoint; amount: Int32): TIntegerArray; override;
-//var
-//  i: Int32;
-//  weights: TIntegerArray;
-//  tpa: TPointArray;
-//  timer: Double;
-//begin
-//  if Self.Tree.Size = 0 then
-//  begin
-//    Self.Tree.Init(System.Copy(Self.Nodes));
-//    AddOnTerminate(@Self.Tree.Free);
-//  end;
-//
-//  tpa := Self.Tree.KNearest(p, amount);
-//  SetLength(Result, Length(tpa));
-//  SetLength(weights, Length(tpa));
-//
-//  for i :=0 to High(tpa) do
-//    Result[i] := Self.Nodes.find(tpa[i]);
-//
-//  for i := 0 to High(Result) do
-//    weights[i] := Round(p.DistanceTo(Self.Nodes[Result[I]]));
-//
-//  for i := 0 to High(Result) do
-//    if not Self.WalkableClusters.InSameTPA(p, Self.Nodes[Result[I]]) then weights[i] := $FFFFFF;
-//
-//  //for i := 0 to High(Result) do
-//  //begin
-//  //  if weights[i] = $FFFFFF then continue;
-//  //  if not Self.WalkableSpace.ContainsAll(p.lineTo(Self.Nodes[Result[I]])) then weights[i] += 50;
-//  //end;
-//
-//  Result.SortWeighted(weights, 0, High(Result), True);
-//  if weights[0] = $FFFFFF then
-//    RaiseException('No near nodes were found around point ' + p.ToString());
-//
-//  for i := 0 to High(weights.findAll($FFFFFF)) do
-//    Result.Pop();
-//end;
+function TRSWalkerV2.WebWalkEx(me: TPoint; destination: TPoint; waitUntilDistance: Int32 = 0; pathRandomness: Double = 0; debug: Boolean = False): Boolean; override;
+  function _GetPath(me: TPoint; safe: Boolean): TPointArray;
+  var
+    bmp: TMufasaBitmap;
+    tmp: TWebGraphV2;
+    closestMe, closestDest: TIntegerArray;
+    i: Int32;
+    errorTimer: TCountdown;
+  begin
+    try
+      Result := Self.WebGraph^.PathBetweenEx(me, destination, pathRandomness, 4, safe);
+    except
+      errorTimer.Init(5000);
+      while not errorTimer.IsFinished do
+      begin
+        try
+          Result := Self.WebGraph^.PathBetweenEx(me, destination, pathRandomness, 4, safe);
+          Exit(Result);
+        except
+          Wait(100);
+        end;
+      end;
+
+      if Assigned(Self.MapImage) and (Length(Self.WebGraph^.Nodes) > 0) then
+      begin
+        bmp := Self.MapImage.Copy();
+        tmp := Self.WebGraph^;
+
+        closestMe   := Self.WebGraph^.FindNearestNodes(me, 4);
+        closestDest := Self.WebGraph^.FindNearestNodes(destination, 4);
+
+        if (@Self.GetLocal <> nil) then
+        begin
+          tmp.Nodes := Self.GetLocal(tmp.Nodes);
+          me := Self.GetLocal([me])[0];
+          destination := Self.GetLocal([destination])[0];
+        end;
+
+        tmp.Draw(bmp);
+
+        for i := 0 to 3 do
+        begin
+          if i < Length(closestMe) then
+            bmp.DrawCircle(tmp.Nodes[closestMe[i]], 4, $FF00FF);
+          if i < Length(closestDest) then
+            bmp.DrawCircle(tmp.Nodes[closestDest[i]], 4, $FF0000);
+        end;
+
+        if bmp.Bounds().Contains(me) then
+          bmp.DrawBorderedCross(me, 4, $00FF00, $0);
+
+        if bmp.Bounds().Contains(destination) then
+          bmp.DrawBorderedCross(destination, 4, $00FF00,  $0);
+
+        bmp.Debug();
+        bmp.Free();
+      end;
+      TerminateScript(GetExceptionMessage());
+    end;
+  end;
+
+var
+  path: TPointArray;
+  tries: Int32;
+  doors: TRSDoorArray;
+begin
+  if not System.InRange(pathRandomness, 0, 1) then
+    Self.Fatal('TRSWalkerV2.WebWalk `PathRandomness` must be within 0..1');
+
+  for tries := 0 to 4 do
+  begin
+    path := _GetPath(Self.Position(), False);
+    doors := Self.GetDoorsOnPath(path);
+
+    Self._DoorHandler.SettingUp := False;
+    Self._DoorHandler.Handling := False;
+
+    if Length(doors) = 0 then Break;
+
+    Self._DoorHandler.Door := doors[0];
+    Self._DoorHandler.DoorsOnPath := doors;
+
+    Self.DebugLn('Attempting to solve door, attempt ' + ToStr(tries + 1));
+
+    if not Self.WalkDoorway(path, 0, debug) then
+    begin
+      Inc(tries);
+    end else
+    begin
+      tries := 0;
+      Continue;
+    end;
+
+    Self._DoorHandler.SettingUp := False;
+    Self._DoorHandler.Handling := False;
+
+    if tries <= 2 then Continue;
+    Self.DebugLn('Hard solving door.');
+    if Self.WalkStep(Self.Position(), Self._DoorHandler.Door.Before) then
+      if Self._HardSolveDoor(Self._DoorHandler.Door) then tries := 0;
+  end;
+
+  if Self.Position() = destination then Exit(True);
+  path := _GetPath(Self.Position(), True);
+  Result := Self.WalkPath(path, waitUntilDistance, debug);
+end;
 
 function TRSWalkerV2.LadderWalk(dest: TPoint; waitUntilDistance: Integer = 0): Boolean;
 var
