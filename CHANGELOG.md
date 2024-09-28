@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/maximedelboo/WaspQuests/compare/v0.1.3...v0.2.0) (2024-09-28)
+
+
+### Features
+
+* compatibility with rogues den ([869514c](https://github.com/maximedelboo/WaspQuests/commit/869514c7af5f390a134a28873ca8bf7d84e56c92))
+
 ## [0.1.3](https://github.com/maximedelboo/WaspQuests/compare/v0.1.2...v0.1.3) (2024-09-26)
 
 
