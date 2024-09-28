@@ -107,12 +107,13 @@ begin
   Self.index := QuestStartIndex;
 end;
 
-procedure TQuest.Solve();
+procedure TQuest.Solve(startStep: Integer = 1);
 var
   currentIndex: Integer;
   attempts: Integer;
 begin
   attempts := 0;
+  self.index := startStep - 1;
   while self.index <= high(self.steps) do
   begin
     currentIndex := self.index;
@@ -120,7 +121,7 @@ begin
     self.DebugLn('Executing step ' + IntToStr(currentIndex + 1) + ': ' + self.currentStep.name);
     WriteLn(currentStep.step_type);
 
-    WaitUntil(not Minimap.IsPlayerMoving(250),50,5000);
+    WaitUntil(not Minimap.IsPlayerMoving,50,5000);
 
     case currentStep.step_type of
       STEP_TYPE.INTERACT_NPC: SolveInteractNPCStep(currentStep);

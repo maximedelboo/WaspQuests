@@ -145,7 +145,7 @@ var
   p: TPoint;
 begin
   rect := self.GetTileMS(coord);
-  Mouse.Move(rect.Mean);
+  Mouse.Move(rect.Mean, 1, True);
   if Action <> '' then
   begin
     if ChooseOption.Select(Action) then Exit(True);
@@ -352,6 +352,49 @@ begin
       end;
     end;
   end;
+end;
+
+function TRSMap.Position(): TPoint; override;
+var
+  cleanMinimap: TMufasaBitmap;
+  tpa: TPointArray;
+  i: Int32;
+  hit: TPoint;
+  match: Single;
+begin
+  Self.RegionIndex := -1;
+  Self.Region := [];
+  Self.Similarity := 0;
+
+  cleanMinimap := Minimap.GetCleanMinimap();
+
+  tpa := Self.ScaledSearch(cleanMinimap);
+  for i := 0 to High(tpa) do
+  begin
+    hit := Self.FullSearch(cleanMinimap, Self.Loader.Map, tpa[i], match);
+
+    if match > Self.Similarity then
+    begin
+      Self.Similarity := match;
+      Result := hit;
+    end;
+  end;
+
+  cleanMinimap.Free();
+
+  Self.RegionIndex := Self.Loader.LocalIndex(Result);
+  if Self.RegionIndex > -1 then
+  begin
+    Self.Region := Self.Loader.Regions[Self.RegionIndex];
+    Result := Self.Loader.GetGlobal(Self.RegionIndex, Result);
+    if Self.Loader.UsingChunks then
+      Exit(RSTranslator.Normalize(Result))
+    else
+      Exit;
+  end;
+
+  Result := [0,0];
+
 end;
 
 function TRSWalkerV2.WebWalkEx(me: TPoint; destination: TPoint; waitUntilDistance: Int32 = 0; pathRandomness: Double = 0; debug: Boolean = False): Boolean; override;

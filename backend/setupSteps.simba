@@ -248,5 +248,16 @@ begin
   Result.Size := [0.8,0.8,5];
 end;
 
+function CreateObject(name: String; coordinate: TPoint; colorArray: TCTS2ColorArray = [[3504679, 17, 2.17, 2.93]]; size: Vector3 = [1,1,4]; offset: Vector3 = [0,0,0]): TRSObjectV2;
+begin
+  Result.Setupcoordinates([coordinate]);
+  Result.Rotations := [0];
+  Result.SetupUpText(name);
+  Result.finder.Colors := colorArray;
+  Result.Size := Size;
+  Result.offset := offset;
+  Result.Walker := @Map.Walker;
+end;
+
 
 

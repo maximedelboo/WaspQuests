@@ -333,8 +333,6 @@ begin
   else
     step.actionSucceeded := WaitUntil(map.Position.InRange(step.coordinate,5),50,step.time);
 
-  WriteLn('Actionsucc1: ', step.actionSucceeded);
-
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
   if @step.CompletionCondition <> nil then
@@ -373,7 +371,7 @@ begin
   step.actionSucceeded := Map.ClickTile(step.coordinate, step.action);
   if step.actionSucceeded and (step.waitCoord <> [0,0]) then
   begin
-    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
+    step.actionSucceeded := WaitUntil(map.Walker.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
     Wait(1200);
   end;
   if step.actionSucceeded and not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
@@ -392,6 +390,7 @@ var
   tpa: TPointArray;
   p: TPoint;
 begin
+  if inventory.GetSelectedSlot <> -1 then inventory.clickslot(inventory.GetSelectedSlot);
   if step.webWalk and (step.coordinate <> [0,0]) then
     Map.Walker.LadderWalk(step.coordinate,10);
   WaitUntil(not Minimap.IsPlayerMoving, 50,5000);
@@ -424,7 +423,10 @@ begin
     begin
       mouse.click(MOUSE_LEFT);
       step.actionSucceeded := Mainscreen.DidRedClick(600);
-    end;
+      if step.actionSucceeded then break;
+    end
+    else
+      step.actionSucceeded := False;
   end;
 
   if step.actionSucceeded and (step.waitCoord <> [0,0]) then
@@ -448,6 +450,7 @@ var
   tpa: TPointArray;
   p: TPoint;
 begin
+  if inventory.GetSelectedSlot <> -1 then inventory.clickslot(inventory.GetSelectedSlot);
   if step.webWalk and (step.coordinate <> [0,0]) then
     Map.Walker.LadderWalk(step.coordinate, 10);
   WaitUntil(not Minimap.IsPlayerMoving, 50,5000);
@@ -480,7 +483,10 @@ begin
     begin
       mouse.click(MOUSE_LEFT);
       step.actionSucceeded := Mainscreen.DidRedClick(600);
-    end;
+      if step.actionSucceeded then break;
+    end
+    else
+      step.actionSucceeded := False;
   end;
 
   if step.actionSucceeded and (step.waitCoord <> [0,0]) then
