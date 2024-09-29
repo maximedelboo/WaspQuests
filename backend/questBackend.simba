@@ -119,7 +119,6 @@ begin
     currentIndex := self.index;
     Self.currentStep := self.steps[currentIndex];
     self.DebugLn('Executing step ' + IntToStr(currentIndex + 1) + ': ' + self.currentStep.name);
-    WriteLn(currentStep.step_type);
 
     WaitUntil(not Minimap.IsPlayerMoving,50,5000);
 

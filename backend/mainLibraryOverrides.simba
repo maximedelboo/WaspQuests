@@ -145,6 +145,7 @@ var
   p: TPoint;
 begin
   rect := self.GetTileMS(coord);
+  if not Mainscreen.IsVisible(Rect) then Exit(False);
   Mouse.Move(rect.Mean, 1, True);
   if Action <> '' then
   begin
