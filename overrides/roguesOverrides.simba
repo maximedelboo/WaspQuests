@@ -1,0 +1,75 @@
+{$IFNDEF WQ_OSR}
+  {$I WaspQuests/osr.simba}
+{$ENDIF}
+
+procedure TQuest.Solve(startStep: Integer = 1); override;
+var
+  currentIndex: Integer;
+  attempts: Integer;
+begin
+  attempts := 0;
+  self.index := startStep - 1;
+  while self.index <= high(self.steps) do
+  begin
+    currentIndex := self.index;
+    Self.currentStep := self.steps[currentIndex];
+    self.DebugLn('Executing step ' + IntToStr(currentIndex + 1) + ': ' + self.currentStep.name);
+    WriteLn(currentStep.step_type);
+
+    WaitUntil(not Minimap.IsPlayerMoving(250),50,5000);
+
+    if not (MM2MS.ZoomLevel = 0) then options.SetZoomLevel(0);
+
+    case currentStep.step_type of
+      STEP_TYPE.INTERACT_NPC: SolveInteractNPCStep(currentStep);
+      STEP_TYPE.KILL: SolveKillStep(currentStep);
+      STEP_TYPE.INTERACT_OBJECT: SolveInteractObjectStep(currentStep);
+      STEP_TYPE.INTERACT_INVENTORY: SolveInteractInventoryStep(currentStep);
+      STEP_TYPE.CONVERSATION: SolveConversationStep(currentStep);
+      STEP_TYPE.QUERY: SolveQueryStep(currentStep);
+      STEP_TYPE.COMBINE: SolveCombineStep(currentStep);
+      STEP_TYPE.LOOT: SolveLootStep(currentStep);
+      STEP_TYPE.BANK: SolveBankStep(currentStep);
+      STEP_TYPE.WALK: SolveWalkStep(currentStep);
+      STEP_TYPE.WAIT: SolveWaitStep(currentStep);
+      STEP_TYPE.CUTSCENE: SolveCutsceneStep(currentStep);
+      STEP_TYPE.CLICK_TILE: SolveClickTileStep(currentStep);
+      STEP_TYPE.USE_ON_NPC: SolveUseOnNPCStep(currentStep);
+      STEP_TYPE.USE_ON_OBJECT: SolveUseOnObjectStep(currentStep);
+      STEP_TYPE.CUSTOM: SolveCustomStep(currentStep);
+    end;
+
+    if self.forceQuit then TerminateScript(self.Quitmessage);
+
+    if Minimap.GetRunEnergy < 10 then
+    begin
+      WriteLn('Waiting til run energy is 30');
+      waitUntil(Minimap.GetRunenergy > 29, 5000, 2 * ONE_MINUTE);
+    end;
+
+    if map.position().InRange([21184, 30478], 5) and not ((currentindex = 0) or (currentindex = high(self.steps))) then
+    begin
+      Self.completed := False;
+      Exit();
+    end;
+
+    if currentStep.completed then
+    begin
+      self.index += 1;
+      DebugLn('Step Solved, going to next step');
+      Wait(150,200);
+      attempts := 0;
+      Continue;
+    end else
+      attempts += 1;
+    DebugLn('Step failed on try ' + IntToStr(attempts));
+    Antiban.RandomRotate();
+    if attempts > 5 then
+    begin
+      DebugLn('Minimgame failed');
+      Exit();
+    end;
+  end;
+  Self.completed := True;
+  DebugLn('Minimgame solved');
+end;
