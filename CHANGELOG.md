@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/maximedelboo/WaspQuests/compare/v0.2.1...v0.2.2) (2024-09-29)
+
+
+### Bug Fixes
+
+* roguesOverrides now does better objectClicking ([01286fe](https://github.com/maximedelboo/WaspQuests/commit/01286fe1ed27556b618eb393d257a93e208f0b34))
+
 ## [0.2.1](https://github.com/maximedelboo/WaspQuests/compare/v0.2.0...v0.2.1) (2024-09-29)
 
 
