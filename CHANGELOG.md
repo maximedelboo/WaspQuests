@@ -1,3 +1,10 @@
+## [0.2.3](https://github.com/maximedelboo/WaspQuests/compare/v0.2.2...v0.2.3) (2024-09-30)
+
+
+### Bug Fixes
+
+* rogues den more overrides ([1f7c18c](https://github.com/maximedelboo/WaspQuests/commit/1f7c18c0cd05b51923732a96b66f6c0a8032b31f))
+
 ## [0.2.2](https://github.com/maximedelboo/WaspQuests/compare/v0.2.1...v0.2.2) (2024-09-29)
 
 
