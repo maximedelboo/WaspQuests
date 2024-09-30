@@ -44,7 +44,7 @@ begin
     if Minimap.GetRunEnergy < 10 then
     begin
       WriteLn('Waiting til run energy is 30');
-      waitUntil(Minimap.GetRunenergy > 29, 5000, 2 * ONE_MINUTE);
+      waitUntil(Minimap.GetRunenergy > Random(25,40), 5000, 2 * ONE_MINUTE);
     end;
 
     if map.position().InRange([21184, 30478], 5) and not ((currentindex = 0) or (currentindex = high(self.steps))) then
@@ -97,4 +97,21 @@ begin
   if Self.Filter.UpText and Text.ContainsAny(Self.UpText) and Self.GetCuboidArray[0].Fill.contains(Mouse.Position) then Exit(True);
   Self.TrackTarget := False;
   shouldExit := False;
+end;
+
+procedure SolveClickTileStep(var step: TStep); override;
+begin
+  step.actionSucceeded := Map.ClickTile(step.coordinate, step.action);
+  if step.actionSucceeded and (step.waitCoord <> [0,0]) then
+  begin
+    if waitUntil(minimap.IsPlayerMoving(), 10,600) then waituntil(not Minimap.IsPlayerMoving,10,step.time);
+    step.actionSucceeded := WaitUntil(map.Walker.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
+  end;
+  if step.actionSucceeded and not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
 end;
