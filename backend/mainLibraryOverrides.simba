@@ -262,9 +262,21 @@ begin
   Self.InternalSetup();
 end;
 
-procedure TRSMap.SetupChunksEx(chunks: TBoxArray; planes: TIntegerArray = [0]; downscale: UInt32; addLadders: Boolean); overload;
+procedure TRSMap.SetupChunksEx(boxes: TBoxArray; planes: TIntegerArray = [0]; downscale: UInt32 = 8; addLadders: Boolean); overload;
+var
+  i: Int32;
+  chunk: TRSMapChunk;
+  chunks: array of TRSMapChunk;
 begin
-  Self.Loader.Load(chunks, planes, downscale);
+  chunk.Planes := planes;
+
+  for i := 0 to High(boxes) do
+  begin
+    chunk.Chunk := boxes[i];
+    chunks += chunk;
+  end;
+
+  Self.Loader.Load(chunks, downscale);
   Self.InternalSetup();
   if addLadders then
     Self.AddLadders();
