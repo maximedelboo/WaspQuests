@@ -123,8 +123,9 @@ begin
   Timerr.start;
   imgTar := GetImageTarget;
 
-  ladderDTM := DTMFromString('mggAAAHicY2NgYNBlZGDQh2IdRgS/mAmCK6C4AIojNBmxYlyAEQeGAABPegb0');//DTMFromString('mggAAAHicY2NgYFCDYk0g1gBibSjmYWRgEARiXiAWgNIgfoQmI1aMCzDiwBAAAGGzBGo=');
+  ladderDTM := DTMFromString('mggAAAHicY2OAACYo/g8EMD4MsELxX6AcCEdrMTBgw7gAIw4MAQAt8w8r'); //DTMFromString('mggAAAHicY2NgYNBlZGDQh2IdRgS/mAmCK6C4AIojNBmxYlyAEQeGAABPegb0');//DTMFromString('mggAAAHicY2NgYFCDYk0g1gBibSjmYWRgEARiXiAWgNIgfoQmI1aMCzDiwBAAAGGzBGo=');
   bmp := Self.Loader.Map.copy();
+  bmp.Debug();
   bmpbox := bmp.Bounds;
   client.getMBitmaps.AddBMP(bmp);
   i := SetTargetBitmap(bmp.getIndex());
@@ -134,8 +135,9 @@ begin
   bmp.Free();
 
   SetImageTarget(imgTar);
+  WriteLn(arr1);
 
-  objs.Setup(Self.Loader.ObjectData,@Self.Walker);
+  objs.Setup(Self.Objects,@Self.Walker);
 
   for i := 0 to High(Self.Loader.Regions) do
     maxLevel := Max(maxLevel,Self.Loader.Regions[i].Plane);
