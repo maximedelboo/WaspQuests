@@ -1,3 +1,10 @@
+## [0.2.4](https://github.com/maximedelboo/WaspQuests/compare/v0.2.3...v0.2.4) (2024-10-07)
+
+
+### Bug Fixes
+
+* compatibility with latest SRL-T ([c180448](https://github.com/maximedelboo/WaspQuests/commit/c180448775e33b57b8a334fc15071cce62d53814))
+
 ## [0.2.3](https://github.com/maximedelboo/WaspQuests/compare/v0.2.2...v0.2.3) (2024-09-30)
 
 
