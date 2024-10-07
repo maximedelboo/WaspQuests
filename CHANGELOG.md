@@ -1,3 +1,10 @@
+## [0.2.5](https://github.com/maximedelboo/WaspQuests/compare/v0.2.4...v0.2.5) (2024-10-07)
+
+
+### Bug Fixes
+
+* map fixes to basement of lumbridge castle ([faae618](https://github.com/maximedelboo/WaspQuests/commit/faae6189ae36208d76e291a29e79684f5fa2fed8))
+
 ## [0.2.4](https://github.com/maximedelboo/WaspQuests/compare/v0.2.3...v0.2.4) (2024-10-07)
 
 
