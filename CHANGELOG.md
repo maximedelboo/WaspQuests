@@ -1,3 +1,10 @@
+## [0.2.6](https://github.com/maximedelboo/WaspQuests/compare/v0.2.5...v0.2.6) (2024-10-07)
+
+
+### Bug Fixes
+
+* ladders are fixed again ([78fe50b](https://github.com/maximedelboo/WaspQuests/commit/78fe50b2d033745ce440b45122f754ec095721be))
+
 ## [0.2.5](https://github.com/maximedelboo/WaspQuests/compare/v0.2.4...v0.2.5) (2024-10-07)
 
 
