@@ -130,11 +130,10 @@ begin
 
   for i := 1 to 3 do
   begin
-    Mouse.Click(GetTabBox(Tab), MOUSE_LEFT, SRL.Dice(50));
+    Mouse.Click(Self.Boxes[tab], MOUSE_LEFT, SRL.Dice(50));
 
-    Result := WaitUntil(Self.GetCurrentTab() = Tab, SRL.TruncatedGauss(50, 2000), SRL.TruncatedGauss(2000, 3000));
-    if Result then
-      Exit;
+    Result := WaitUntil(Self.GetCurrentTab() = tab, SRL.TruncatedGauss(50, 2000), SRL.TruncatedGauss(2000, 3000));
+    if Result then Exit;
   end;
 end;
 
@@ -169,9 +168,9 @@ function TRSMinimap.GetItemDots(): TPointArray;
   function GetMinimapGrid(angle: Single): Vector3Array;
   var x, y: Integer;
   begin
-    for x := Minimap.Center().X - 20 * 4 to Minimap.Center().X + 20 * 4 with 4 do
-      for y := Minimap.Center().Y - 20 * 4 to Minimap.Center().Y + 20 * 4 with 4 do
-        Result += Vec3(x, y).RotateXY(angle, Minimap.Center().X, Minimap.Center.Y);
+    for x := Minimap.Center.X - 20 * 4 to Minimap.Center.X + 20 * 4 with 4 do
+      for y := Minimap.Center.Y - 20 * 4 to Minimap.Center.Y + 20 * 4 with 4 do
+        Result += Vec3(x, y).RotateXY(angle, Minimap.Center.X, Minimap.Center.Y);
   end;
 
   function DotsToTile(dots: TPointArray; angle: Single): TPointArray;
@@ -211,9 +210,9 @@ function TRSMinimap.GetNPCDots(): TPointArray;
   function GetMinimapGrid(angle: Single): Vector3Array;
   var x, y: Integer;
   begin
-    for x := Minimap.Center().X - 20 * 4 to Minimap.Center().X + 20 * 4 with 4 do
-      for y := Minimap.Center().Y - 20 * 4 to Minimap.Center().Y + 20 * 4 with 4 do
-        Result += Vec3(x, y).RotateXY(angle, Minimap.Center().X, Minimap.Center.Y);
+    for x := Minimap.Center.X - 20 * 4 to Minimap.Center.X + 20 * 4 with 4 do
+      for y := Minimap.Center.Y - 20 * 4 to Minimap.Center.Y + 20 * 4 with 4 do
+        Result += Vec3(x, y).RotateXY(angle, Minimap.Center.X, Minimap.Center.Y);
   end;
 
   function DotsToTile(dots: TPointArray; angle: Single): TPointArray;
