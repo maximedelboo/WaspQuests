@@ -1,3 +1,10 @@
+## [0.2.8](https://github.com/maximedelboo/WaspQuests/compare/v0.2.7...v0.2.8) (2025-02-09)
+
+
+### Bug Fixes
+
+* interface update 2 ([779ff86](https://github.com/maximedelboo/WaspQuests/commit/779ff8619e26496ef3cf634dfe21e17f4168aecc))
+
 ## [0.2.7](https://github.com/maximedelboo/WaspQuests/compare/v0.2.6...v0.2.7) (2025-02-07)
 
 
