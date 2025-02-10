@@ -66,6 +66,11 @@ var
   emptyQuest: TQuest;
 begin
   Self := emptyQuest;
+  GENERATED_GRAPH.Spacing := 18;
+  GENERATED_GRAPH.MinimumTiles := 4;
+  GENERATED_GRAPH.NodeRadius := 50;
+  GENERATED_GRAPH.MaxConnections := 6;
+  GENERATED_GRAPH.WallCrossings := True;
 end;
 
 procedure TQuestArray.AddQuest(name: String; setup: procedure() of object);
@@ -90,15 +95,22 @@ begin
   if Options.GetBrightnessLevel < 100 then
     Options.SetMaxBrightness;
   Self.PrintTimer.Init(5 * ONE_SECOND);
-  Stats.CacheAll();
-  combatLvl := combat.GetCombatLevel;
+
   Self.SetupProcedure();
-  if not quest.reqStats.Check(combatLvl) then RaiseException('Required stats are not met');
+
+  if not self.questName.Contains('Tutorial') then
+  begin
+    Stats.CacheAll();
+    combatLvl := combat.GetCombatLevel;
+    if not quest.reqStats.Check(combatLvl) then RaiseException('Required stats are not met');
+  end;
 
   options.SetNPCAttackOption(ERSAttackOption.ALWAYS_LEFT_CLICK);
 
   Self.DebugLn('Setting up map, this can take a second');
-  Map.SetupChunks(Quest.region, 8, True);
+
+  Map.SetupChunks(Quest.region, 8, not Quest.DisableLadders);
+  Map.Loader.Graph.UseCollisionData := True;
   NPCs.Setup(Map.NPCs(), @Map.Walker);
   Objects.Setup(Map.Objects(), @Map.Walker);
 
@@ -168,6 +180,7 @@ end;
 procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);
 begin
   Self.Init(MaxActions, MaxTime);
+  //Map.Debug();
   WriteLn('Starting at step: ', self.Index + 1);
   if (self.index = 0) and not self.StartingConditions() then TerminateScript('Starting conditions not satisfied');
   Self.Solve(self.Index + 1);

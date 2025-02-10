@@ -263,6 +263,9 @@ begin
   Quest.questInfo += 'Start anywhere around Draynor manor';
   Quest.questInfo += 'Have at least 5 free inventory spaces';
 
+  GENERATED_GRAPH.NodeRadius := 30;
+  Quest.DisableLadders := True;
+
   //Setup steps (mockup of dorics quest)
   Quest.steps.AddInteractNpcStep('Talk to Veronica', 'Veronica', 'Talk-to');
   Quest.steps.AddConversationStep('Finish Veronica conversation', [1]);

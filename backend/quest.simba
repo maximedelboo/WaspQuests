@@ -58,6 +58,8 @@ type
     StartingConditions: function(): boolean of object;
     completed, forceQuit: Boolean;
     blockingAreas: TBoxArray;
+
+    DisableLadders: Boolean;
   end;
 
   TQuestArray = array of TQuest;

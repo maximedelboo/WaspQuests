@@ -358,7 +358,7 @@ begin
         node.Indices := current.Indices + pathIdx;
 
         hyp := Hypot(p.x-q.x, p.y-q.y);
-        if hyp > 1000 then hyp := 10;
+        if hyp > 1000 then hyp := 50;
         node.Score   := current.Score + hyp + (hyp*Random()*Rnd-Rnd/2);
         queue += node;
       end;
@@ -419,12 +419,15 @@ function TRSWalkerV2.WebWalkEx(me: TPoint; destination: TPoint; waitUntilDistanc
     errorTimer: TCountdown;
   begin
     try
+      me := RSTranslator.NormalizeDoor(me);
       Result := Self.WebGraph^.PathBetweenEx(me, destination, pathRandomness, 4, safe);
     except
       errorTimer.Init(5000);
       while not errorTimer.IsFinished do
       begin
         try
+          Self.DebugLn('Cannot find position, rotating');
+          Antiban.RandomRotate();
           Result := Self.WebGraph^.PathBetweenEx(me, destination, pathRandomness, 4, safe);
           Exit(Result);
         except
@@ -478,13 +481,16 @@ begin
   if not System.InRange(pathRandomness, 0, 1) then
     Self.Fatal('TRSWalkerV2.WebWalk `PathRandomness` must be within 0..1');
 
-  for tries := 0 to 4 do
+  while tries <= 4 do
   begin
     path := _GetPath(Self.Position(), False);
+    WriteLn('Found path: ', path);
     doors := Self.GetDoorsOnPath(path);
 
     Self._DoorHandler.SettingUp := False;
     Self._DoorHandler.Handling := False;
+
+    WriteLn('Doors on path found: ', Length(Doors));
 
     if Length(doors) = 0 then Break;
 
@@ -498,6 +504,7 @@ begin
       Inc(tries);
     end else
     begin
+      WriteLn('Door Solved!');
       tries := 0;
       Continue;
     end;

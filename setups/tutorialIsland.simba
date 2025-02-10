@@ -150,7 +150,7 @@ begin
   Quest.StartingConditions := @EmptyStart;
   Quest.questInfo += 'You need to start the bot after making a character, talking to the Gielinor Guide until you get the options tab and setting the game to fixed mode';
   Quest.questInfo += 'Will make a non-ironman by default';
-
+  Quest.blockingAreas += [8459, 37998, 8520, 38038];
 
   Quest.steps.AddInteractNpcStep('Talk to Gielinor Guide', 'Gielinor Guide', 'Talk-to');
   Quest.steps.AddConversationStep('Conversation Gielinor guide', []); //
@@ -215,6 +215,7 @@ begin
   Quest.steps.AddInteractNpcStep('Talk to prayer dude 3', 'Brother Brace', 'Talk-to');
   Quest.steps.AddConversationStep('Conversation Brother Brace 3', [], @customCompletion18); //rotate south
   Quest.steps.AddClickTileStep('click door', [8392, 38022], 'Open', @customCompletion19); // wait till in right area
+  Quest.steps.AddClickTileStep('move away from door', [8400, 38026]);
   Quest.steps.AddWalkStep('Walk to magic dude', [8468, 38074]);
   Quest.steps.AddInteractNpcStep('Talk to magic dude', 'Magic Instructor', 'Talk-to');
   Quest.steps.AddConversationStep('Conversation Magic dude', [], @customCompletion20); //open magic tab
@@ -239,7 +240,7 @@ begin
   Quest.StartingConditions := @EmptyStart;
   Quest.questInfo += 'You need to start the bot after making a character, talking to the Gielinor Guide until you get the options tab and setting the game to fixed mode';
   Quest.questInfo += 'Stops at the point where you select the character type';
-
+  Quest.blockingAreas += [8459, 37998, 8520, 38038];
 
   Quest.steps.AddInteractNpcStep('Talk to Gielinor Guide', 'Gielinor Guide', 'Talk-to');
   Quest.steps.AddConversationStep('Conversation Gielinor guide', []); //
@@ -304,6 +305,7 @@ begin
   Quest.steps.AddInteractNpcStep('Talk to prayer dude 3', 'Brother Brace', 'Talk-to');
   Quest.steps.AddConversationStep('Conversation Brother Brace 3', [], @customCompletion18); //rotate south
   Quest.steps.AddClickTileStep('click door', [8392, 38022], 'Open', @customCompletion19); // wait till in right area
+  Quest.steps.AddClickTileStep('move away from door', [8400, 38026]);
   Quest.steps.AddWalkStep('Walk to magic dude', [8468, 38074]);
   Quest.steps.AddInteractNpcStep('Talk to magic dude', 'Magic Instructor', 'Talk-to');
   Quest.steps.AddConversationStep('Conversation Magic dude', [], @customCompletion20); //open magic tab

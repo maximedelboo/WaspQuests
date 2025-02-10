@@ -73,6 +73,7 @@ begin
 
   Quest.region := [[[48,52,51,49],[0,1]], [[49,150,50,149],[0]]];
   GENERATED_GRAPH.NodeRadius := 30;
+  GENERATED_GRAPH.Spacing := 12;
   Quest.StartingConditions := @CooksStartIron;
 
   Quest.questInfo += 'Start anywhere around Lumbridge';

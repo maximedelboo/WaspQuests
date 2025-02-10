@@ -124,8 +124,7 @@ begin
   imgTar := GetImageTarget;
 
   ladderDTM := DTMFromString('mggAAAHicY2OAACYo/g8EMD4MsELxX6AcCEdrMTBgw7gAIw4MAQAt8w8r'); //DTMFromString('mggAAAHicY2NgYNBlZGDQh2IdRgS/mAmCK6C4AIojNBmxYlyAEQeGAABPegb0');//DTMFromString('mggAAAHicY2NgYFCDYk0g1gBibSjmYWRgEARiXiAWgNIgfoQmI1aMCzDiwBAAAGGzBGo=');
-  bmp := Self.Loader.Map.copy();
-  bmp.Debug();
+  bmp := Self.Loader.Map.copy();;
   bmpbox := bmp.Bounds;
   client.getMBitmaps.AddBMP(bmp);
   i := SetTargetBitmap(bmp.getIndex());
@@ -135,7 +134,7 @@ begin
   bmp.Free();
 
   SetImageTarget(imgTar);
-  WriteLn(arr1);
+
 
   objs.Setup(Self.Objects,@Self.Walker);
 
@@ -146,8 +145,6 @@ begin
   laddersATPA := arr1.NRCluster(1);
   for arr2 in laddersATPA do
     ladderMeans += Self.Loader.GetGlobal(arr2.Mean());
-
-  WriteLn('Num of ladders found: ', Length(ladderMeans));
 
   objArr += objs.GetAllByAction('Climb');
   objArr += objs.GetAllByAction('Climb-up');
@@ -183,7 +180,6 @@ begin
     ladderPoints += ladderArray[ladderIndex].coord;
     ladderIndex += 1;
   end;
-  WriteLn('part 1: ', Timerr.ElapsedTime);
   Timerr.Reset();
 
   if length(Ladderpoints) = 0 then Exit();
@@ -245,7 +241,6 @@ begin
         ladderPoints += ladderArray[high(ladderArray)].coord;
       end;
   end;
-  WriteLn('part 2: ', Timerr.ElapsedTime);
   Timerr.Reset();
 
   ladderTree.Free();
@@ -269,7 +264,7 @@ begin
     end;
   end;
   //Wait(10000);
-  WriteLn('part 3: ', Timerr.ElapsedTime);
+
   Timerr.Reset();
 
   newNodes := System.Copy(Self.Walker.WebGraph^.Nodes, oldLen);
@@ -304,7 +299,6 @@ begin
       end;
     end;
   end;
-  WriteLn('part 4: ', Timerr.ElapsedTime);
   Timerr.Reset();
 
   Ladders := usedLadders;
