@@ -153,6 +153,8 @@ begin
   objArr += objs.GetAllByAction('Walk-down');
   objArr := objArr.Split();
 
+  Self.Walker.WebGraph^.UseCollisionData := True;
+
 
   for i := 0 to high(ladderMeans) do
   begin
