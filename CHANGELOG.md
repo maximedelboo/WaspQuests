@@ -1,3 +1,10 @@
+## [0.2.9](https://github.com/maximedelboo/WaspQuests/compare/v0.2.8...v0.2.9) (2025-02-10)
+
+
+### Bug Fixes
+
+* doors now works better in ernest and tutorial island ([aa549b6](https://github.com/maximedelboo/WaspQuests/commit/aa549b6832807317b5e4008cc3b9e2767fd56faf))
+
 ## [0.2.8](https://github.com/maximedelboo/WaspQuests/compare/v0.2.7...v0.2.8) (2025-02-09)
 
 
