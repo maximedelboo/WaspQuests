@@ -1,3 +1,10 @@
+## [0.2.10](https://github.com/maximedelboo/WaspQuests/compare/v0.2.9...v0.2.10) (2025-02-10)
+
+
+### Bug Fixes
+
+* ladders go brr ([a69522d](https://github.com/maximedelboo/WaspQuests/commit/a69522de732870c35d0702f5d3699fe3bd333657))
+
 ## [0.2.9](https://github.com/maximedelboo/WaspQuests/compare/v0.2.8...v0.2.9) (2025-02-10)
 
 
