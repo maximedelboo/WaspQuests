@@ -1,3 +1,10 @@
+## [0.2.11](https://github.com/maximedelboo/WaspQuests/compare/v0.2.10...v0.2.11) (2025-02-10)
+
+
+### Bug Fixes
+
+* remove map.debug ([bb6c258](https://github.com/maximedelboo/WaspQuests/commit/bb6c2586be37a449ee2337de2beaef6c5abc3ab4))
+
 ## [0.2.10](https://github.com/maximedelboo/WaspQuests/compare/v0.2.9...v0.2.10) (2025-02-10)
 
 
