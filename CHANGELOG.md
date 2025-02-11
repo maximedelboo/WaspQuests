@@ -1,3 +1,10 @@
+## [0.2.12](https://github.com/maximedelboo/WaspQuests/compare/v0.2.11...v0.2.12) (2025-02-11)
+
+
+### Bug Fixes
+
+* Restless ghost skull fix ([d08fcf5](https://github.com/maximedelboo/WaspQuests/commit/d08fcf5f6257be6e3cd6fbcb2fb558bdfdcf6356))
+
 ## [0.2.11](https://github.com/maximedelboo/WaspQuests/compare/v0.2.10...v0.2.11) (2025-02-10)
 
 
