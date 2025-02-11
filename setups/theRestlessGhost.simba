@@ -78,7 +78,7 @@ begin
   Quest.steps.AddClickTileStep('click past door', [8340, 37770]);
   Quest.Steps.AddInteractObjectStep('Click coffin', 'Coffin', 'Open', True, [8907, 37659], @customComplete2);
   Quest.steps.AddWaitStep('Wait for ghost', 2000);
-  Quest.steps.AddUseOnObjectStep('Use skull on coffin', 'Skull', 'Coffin', False);
+  Quest.steps.AddUseOnObjectStep('Use skull on coffin', "Ghost's skull", 'Coffin', False);
 end;
 
 begin

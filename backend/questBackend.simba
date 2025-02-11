@@ -108,7 +108,7 @@ begin
   options.SetNPCAttackOption(ERSAttackOption.ALWAYS_LEFT_CLICK);
 
   Self.DebugLn('Setting up map, this can take a second');
-  Map.Loader.Graph.UseCollisionData := True;
+
   Map.SetupChunks(Quest.region, 8, not Quest.DisableLadders);
   Map.Walker.WebGraph^.UseCollisionData := True;
 
