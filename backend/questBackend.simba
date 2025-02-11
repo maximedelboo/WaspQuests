@@ -48,10 +48,10 @@ end;
 
 procedure TRSWalkerV2.WalkerTasks({$H-}Walker: PRSWalkerV2; Position: TPoint; Destination: TPoint);
 begin
-  if inventory.ContainsConsumable(ERSConsumable.ENERGY) then
-    if (Minimap.GetRunEnergy < Random(40,60)) and not Minimap.HasStamina then Inventory.Consume(ERSConsumable.ENERGY);
-  if inventory.ContainsConsumable(ERSConsumable.FOOD) then
-    if Minimap.GetHPPercent < 80 then Inventory.Consume(ERSConsumable.FOOD);
+  //if inventory.ContainsConsumable(ERSConsumable.ENERGY) then
+  //  if (Minimap.GetRunEnergy < Random(40,60)) and not Minimap.HasStamina then Inventory.Consume(ERSConsumable.ENERGY);
+  //if inventory.ContainsConsumable(ERSConsumable.FOOD) then
+  //  if Minimap.GetHPPercent < 80 then Inventory.Consume(ERSConsumable.FOOD);
   Antiban.DoAntiban(False, False);
 end;
 {$H+}
@@ -181,7 +181,7 @@ end;
 procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);
 begin
   Self.Init(MaxActions, MaxTime);
-  //Map.Debug();
+  Map.Debug();
   WriteLn('Starting at step: ', self.Index + 1);
   if (self.index = 0) and not self.StartingConditions() then TerminateScript('Starting conditions not satisfied');
   Self.Solve(self.Index + 1);

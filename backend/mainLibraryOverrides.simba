@@ -535,12 +535,12 @@ begin
   begin
     me := Self.Position();
     path := self.WebGraph^.PathBetweenEx(me, dest);
-    WriteLn(path);
+    DebugLn(ToStr(path));
 
     if path.TotalDistance() > RSTranslator.MapWidth() then
     begin
       prev := path[0];
-      WriteLn('Ladder found on path!');
+      DebugLn('Ladder found on path!');
       for p in path do
       begin
         if p.DistanceTo(prev) > 1000 then
@@ -554,7 +554,7 @@ begin
       obj := Ladders.FindNearestSingle(ladderPoint);
       //Debug(obj);
       obj.Finder.Colors := [CTS2(3504679, 17, 2.17, 2.93)];
-      WriteLn('colors: ', obj.finder.Colors);
+
       if obj.Coordinates[0].InRange(Self.Position, 8) then
       begin
         if p.X - ladderPoint.X > 0 then
@@ -563,6 +563,8 @@ begin
           obj.SelectOption(['-down']);
       end else
       begin
+        if Abs(p.X - ladderPoint.X) > 9000 then
+          Continue;
         if p.X - ladderPoint.X > 0 then
           obj.WalkSelectOption(['-up'])
         else
