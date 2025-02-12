@@ -1,3 +1,10 @@
+## [0.3.3](https://github.com/maximedelboo/WaspQuests/compare/v0.3.2...v0.3.3) (2025-02-12)
+
+
+### Bug Fixes
+
+* remove override ([3070eb8](https://github.com/maximedelboo/WaspQuests/commit/3070eb8230768f67a67dfe963aa442d23a58a0df))
+
 ## [0.3.2](https://github.com/maximedelboo/WaspQuests/compare/v0.3.1...v0.3.2) (2025-02-12)
 
 
