@@ -179,7 +179,7 @@ end;
 procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);
 begin
   Self.Init(MaxActions, MaxTime);
-  Map.Debug();
+  //Map.Debug();
   WriteLn('Starting at step: ', self.Index + 1);
   if (self.index = 0) and not self.StartingConditions() then TerminateScript('Starting conditions not satisfied');
   Self.Solve(self.Index + 1);

@@ -1,6 +1,10 @@
 {$IFNDEF WQ_OSR}
 	{$INCLUDE_ONCE WaspQuests/osr.simba}
 {$ENDIF}
+{$IFNDEF WQ_SETTINGSSEARCHER_INCLUDED}
+	{$I WaspQuests/resources/settings_searcher.simba}
+{$ENDIF}
+
 
 function customCompletion1(): Boolean;
 begin
@@ -133,9 +137,10 @@ begin
 end;
 
 function customCompletion22(): Boolean;
+var
+  SettingsSearcher: TSettingsSearcher;
 begin
-  Keyboard.Send('::toggleroofs', VK_ENTER);
-  Result := True;
+  SettingsSearcher.Run();
 end;
 
 procedure customAction1();
@@ -227,7 +232,7 @@ begin
   Quest.steps.AddConversationStep('Conversation Magic dude 3', [1,3]); //open magic tab
   Quest.steps.AddWaitStep('wait few seconds', 4000);
   Quest.steps.AddConversationStep('Conversation Lumbridge', []);
-  Quest.steps.AddCustomStep('Hide roofs', @customCompletion22); // Keyboard.Send(Answer, VK_ENTER)
+  Quest.steps.AddCustomStep('Run Settings Searcher', @customCompletion22); // Keyboard.Send(Answer, VK_ENTER)
 end;
 
 begin
