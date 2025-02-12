@@ -7,11 +7,13 @@
 {$IFNDEF WQ_LADDERS} {$I backend/ladders.simba}
 {$IFNDEF WQ_OVERRIDES} {$I backend/mainLibraryOverrides.simba}
 {$IFNDEF WQ_QUEST} {$I backend/quest.simba}
+{$IFNDEF WQ_OVERWORLD} {$I backend/overworldWalker.simba}
 {$IFNDEF WQ_SETUPSTEPS} {$I backend/setupSteps.simba}
 {$IFNDEF WQ_SOLVESTEPS} {$I backend/solveSteps.simba}
 {$IFNDEF WQ_BACKEND} {$I backend/questBackend.simba}
 
 
+{$ENDIF}
 {$ENDIF}
 {$ENDIF}
 {$ENDIF}

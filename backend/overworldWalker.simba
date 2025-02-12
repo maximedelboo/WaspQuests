@@ -1,0 +1,23 @@
+{$DEFINE WQ_OVERWORLD}
+{$IFNDEF WQ_OSR}
+  {$I WaspQuests/osr.simba}
+{$ENDIF}
+
+function TRSMap.OnMap(tolerance: Single = 0.5): Boolean;
+begin
+  Self.Position();
+  Exit(Self.Similarity > tolerance);
+end;
+
+procedure TRSMap.ReturnToKnownTerritory();
+begin
+  Magic.CastSpell(ERSSpell.LUMBRIDGE_HOME_TELEPORT);
+  Wait(14000);
+end;
+
+procedure TRSMap.ReturnToQuest(Q: PQuest);
+begin
+  Self.Walker.WebWalk(Q^.startTile);
+end;
+
+

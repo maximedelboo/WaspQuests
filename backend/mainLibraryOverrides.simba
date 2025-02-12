@@ -264,6 +264,7 @@ var
   PositionTimer: TCountdown;
   WQCacheDir, positionFile, WQWebGraphDir: String;
   OverworldChunk: TRSMapChunk;
+  {$H-} Overworld: TRSMap; {$H+}
 
 begin
   PositionTimer.Init(15000);
@@ -271,6 +272,32 @@ begin
   PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
   OverworldChunk := [[16,64,61,39],[0]];
   WQWebGraphDir := IncludePath + 'WaspQuests' + DirectorySeparator + 'webgraph' + DirectorySeparator;
+end;
+
+procedure TRSMapLoader.Init(downscale: UInt32); override;
+var
+  version: String;
+begin
+  Self.Name := 'RSMap.Loader';
+  version := SHA1String(
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'map.zip') +
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'heightmap.zip') +
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'collision.zip') +
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'objects.zip') +
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'npcs.zip') +
+     SHA1File(IncludePath + 'WaspQuests' + DirectorySeparator + 'CHANGELOG.md')
+  );
+
+  version := version.SubString(6);
+  Self.Cache := CACHE_DIR + 'map' + DirectorySeparator +
+                version + DirectorySeparator;
+
+  if not ForceDirectories(Self.Cache) then
+    Self.Fatal('Failed to create TRSMapLoader cache directory for: ' + version);
+
+  Self.Downscale := downscale;
+  Self.Loader.Setup(Self.Name + '.Loader', cache);
+  Self.LegacyLoader.Setup(Self.Name + '.LegacyLoader', cache);
 end;
 
 function TRSChunkLoader.GetGraph(name: String; plane: UInt32; map: TMufasaBitmap): TWebGraphV2; override;
@@ -514,10 +541,6 @@ end;
 function TRSWalkerV2.WebWalkEx(me: TPoint; destination: TPoint; waitUntilDistance: Int32 = 0; pathRandomness: Double = 0; debug: Boolean = False): Boolean; override;
   function _GetPath(me: TPoint; safe: Boolean): TPointArray;
   var
-    bmp: TMufasaBitmap;
-    tmp: TWebGraphV2;
-    closestMe, closestDest: TIntegerArray;
-    i: Int32;
     errorTimer: TCountdown;
   begin
     try

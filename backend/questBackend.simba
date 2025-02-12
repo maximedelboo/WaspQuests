@@ -113,6 +113,9 @@ begin
   WriteLn(Map.loader.MapBox);
   Map.Walker.WebGraph^.UseCollisionData := True;
 
+  DebugLn('Setting up overworld map, this might take more than a minute');
+  Overworld.SetupChunk(OverworldChunk, 8);
+
   NPCs.Setup(Map.NPCs(), @Map.Walker);
   Objects.Setup(Map.Objects(), @Map.Walker);
 
@@ -122,6 +125,32 @@ begin
     Map.Walker.WebGraph^.BlockInside(box);
 
   Self.index := QuestStartIndex;
+end;
+
+function TQuest.CheckValidPosition(): Boolean;
+begin
+
+end;
+
+procedure TQuest.PreQuestRoutine();
+var
+  fails: Integer;
+begin
+  DebugLn('Going to start point');
+  while (not Quest.startTile.InRange(Map.Position(), 20)) or (fails > 3) do
+  begin
+    if not Map.OnMap() then
+      if not Overworld.OnMap() then
+        Overworld.ReturnToKnownTerritory()
+      else
+        Overworld.ReturnToQuest(@self)
+    else
+      Map.ReturnToQuest(@self);
+
+    Inc(fails);
+  end;
+  if fails > 3 then
+    DebugLn('Succesfully reached startingpoint');
 end;
 
 procedure TQuest.Solve(startStep: Integer = 1);
@@ -181,6 +210,7 @@ procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);
 begin
   Self.Init(MaxActions, MaxTime);
   //Map.Debug();
+  Self.PreQuestRoutine();
   WriteLn('Starting at step: ', self.Index + 1);
   if (self.index = 0) and not self.StartingConditions() then TerminateScript('Starting conditions not satisfied');
   Self.Solve(self.Index + 1);
