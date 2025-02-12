@@ -217,8 +217,8 @@ begin
   for i in step.conversation do
   begin
     try
-      StrToInt(i);
-      Chat.ChatToNumber(i-1);
+      chatIndex := StrToInt(i);
+      Chat.ChatToNumber(chatIndex-1);
     except
       o := Chat.GetOptions();
       options := o.ToStringArray();

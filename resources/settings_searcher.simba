@@ -23,20 +23,7 @@ var
   SettingsBorder : TPointArray;
 
 begin
-  if RSInterface.IsOpen() then
-  begin
-    Writeln("Settings open already");
-    Exit(true);
-  end;
-
-  if not RSInterface.IsOpen() then
-  begin
-    if not Options.Open() then
-    begin
-      Writeln("Tried to open options");
-      Exit(false);
-    end;
-  end;
+  Options.Open();
 
   SRL.FindColors(SettingsBorder, SettingsCornerColour, Options.Bounds);
 
@@ -506,7 +493,7 @@ type
     end;
 
 
-procedure TSettingsSearcher.Run();
+procedure TSettingsSearcher.Run1();
 begin
   if not RSClient.IsLoggedIn() then
     Login.LoginPlayer();
@@ -515,6 +502,13 @@ begin
   AddOnTerminate(@ClearBitMaps);
   CheckRegularSettings();
   CheckXPBarSettings();
+end;
+
+procedure TSettingsSearcher.Run2();
+begin
+  if not RSClient.IsLoggedIn() then
+    Login.LoginPlayer();
+
   CheckMagicSettings();
   CheckDisplaySettings();
 end;

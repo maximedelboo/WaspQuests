@@ -67,7 +67,7 @@ begin
   Reldo.Walker := @Map.Walker;
   Reldo.Size := [0.8,0.8,5];
 
-  Quest.steps.AddInteractNpcStep('Talk to Squire', 'Squire', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Squire', 'Squire');
   Quest.steps.AddConversationStep('Conversation Squire', [1,2,1,1]);
   Quest.steps.AddInteractInventoryStep('Teleport to varrock', 'Varrock teleport', 'Break');
   Quest.steps.CustomWaitTile([8630, 36620], 200);
@@ -82,10 +82,10 @@ begin
   Quest.steps.AddInteractObjectStep('Walk gangplank', 'Gangplank', 'Cross', False);
   Quest.steps.CustomWaitTile([8068, 37622],50);
   Quest.steps.AddWalkStep('Walk to Thurgo', [7888, 37862]);
-  Quest.steps.AddInteractNpcStep('Talk to Thurgo', 'Thurgo', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Thurgo', 'Thurgo');
   Quest.steps.AddConversationStep('Conversation Thurgo', [2]);
   Quest.steps.AddCutsceneStep('Conversation Thurgo', 3000);
-  Quest.steps.AddInteractNpcStep('Talk to Thurgo', 'Thurgo', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Thurgo', 'Thurgo');
   Quest.steps.AddConversationStep('Conversation Thurgo', [1]);
   Quest.steps.AddInteractObjectStep('Open Trapdoor', 'Trapdoor', 'Climb-down', True, [0,0]);
   Quest.steps.CustomWaitTile([7940, 12230],50);
@@ -95,7 +95,7 @@ begin
   Quest.steps.CustomWaitItem('Blurite ore', 10000);
   Quest.steps.AddInteractInventoryStep('Teleport to Falador', 'Falador teleport', 'Break');
   Quest.steps.CustomWaitTile([7768, 36914],50);
-  Quest.steps.AddInteractNpcStep('Talk to Squire', 'Squire', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Squire', 'Squire');
   Quest.steps.AddConversationStep('Conversation Squire', []);
   Quest.steps.AddWalkStep('Walk to cupboard', [33956, 37090]);
   Quest.steps.AddInteractObjectStep('Open cupboard', 'Cupboard', 'Open', False, [0,0], @customCompletion1);
@@ -107,14 +107,14 @@ begin
   Quest.steps.AddInteractObjectStep('Walk gangplank', 'Gangplank', 'Cross', False);
   Quest.steps.CustomWaitTile([8068, 37622],50);
   Quest.steps.AddWalkStep('Walk to Thurgo', [7888, 37862]);
-  Quest.steps.AddInteractNpcStep('Talk to Thurgo', 'Thurgo', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Thurgo', 'Thurgo');
   Quest.steps.AddConversationStep('Conversation Thurgo', [1]);
-  Quest.steps.AddInteractNpcStep('Talk to Thurgo', 'Thurgo', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Thurgo', 'Thurgo');
   Quest.steps.AddConversationStep('Conversation Thurgo', [1]);
   Quest.steps.CustomWaitItem('Blurite sword', 10000);
   Quest.steps.AddInteractInventoryStep('Teleport to Falador', 'Falador teleport', 'Break');
   Quest.steps.CustomWaitTile([7768, 36914],50);
-  Quest.steps.AddInteractNpcStep('Talk to Squire', 'Squire', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Squire', 'Squire');
   Quest.steps.AddConversationStep('Conversation Squire', []);
 end;
 

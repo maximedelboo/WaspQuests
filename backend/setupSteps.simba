@@ -42,6 +42,7 @@ begin
   Step.step_type := STEP_TYPE.TALKTO;
   Step.name := stepName;
   Step.NPC_name := NPC_name;
+  Step.Action := 'Talk-to';
   Step.coordinate := coordinate;
   Step.webWalk := WebWalk;
   Step.CompletionCondition := @CompletionCondition;

@@ -14,7 +14,7 @@ begin
   Quest.questInfo += 'Start anywhere around Falador';
   Quest.questInfo += 'Start with 6 clay, 4 Copper ore and 2 Iron ores';
 
-  Quest.steps.AddInteractNpcStep('Talk to Doric', 'Doric', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Doric', 'Doric');
   Quest.steps.AddConversationStep('Finish Doric conversation', [1,1]);
 end;
 

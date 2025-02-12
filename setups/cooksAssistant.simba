@@ -12,7 +12,7 @@ begin
   Quest.region := [[[50,50,50,50],[0]]];
   Quest.StartingConditions := @CooksStart;
 
-  Quest.steps.AddInteractNpcStep('Talk to cook', 'Cook', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to cook', 'Cook');
   Quest.steps.AddConversationStep('Finish cook conversation', [1,1]);
 end;
 
@@ -98,7 +98,7 @@ begin
   Quest.steps.CustomizeObject(flourBin);
   Quest.steps.AddWaitStep('Wait till milk', 1000);
   Quest.steps.AddInteractObjectStep('Click dairy cow', 'Dairy cow', 'Milk', True, [8588, 37162]);
-  Quest.steps.AddInteractNpcStep('Talk to cook', 'Cook', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to cook', 'Cook');
   Quest.steps.AddConversationStep('Finish cook conversation', [1,1]);
 end;
 

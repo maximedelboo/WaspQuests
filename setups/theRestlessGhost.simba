@@ -57,14 +57,14 @@ begin
   restlessGhost := CreateNPC('Restless ghost', RSTranslator.Normalize([8903, 37651]));
   altar := CreateObject('Altar', [8384, 12166]);
 
-  Quest.steps.AddInteractNpcStep('Talk to father Aereck', 'Father Aereck', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to father Aereck', 'Father Aereck');
   Quest.steps.AddConversationStep('Convo Father Aereck', [3,1]);
-  Quest.steps.AddInteractNpcStep('Talk to father Aearick', 'Father Urhney', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to father Aearick', 'Father Urhney');
   Quest.steps.AddConversationStep('Convo Father Urhney', [2,1]);
   Quest.steps.AddInteractInventoryStep('Equip ghostspeak amulet', 'Ghostspeak amulet', 'Wear');
   Quest.Steps.AddInteractObjectStep('Click coffin', 'Coffin', 'Open', True, [8907, 37659], @customComplete2);
   Quest.steps.AddWaitStep('Wait for ghost', 2000);
-  Quest.steps.AddInteractNpcStep('Click ghost', 'Restless ghost', 'Talk-to', False);
+  Quest.steps.AddTalkToStep('Click ghost', 'Restless ghost', False);
   Quest.steps.CustomizeNPC(restlessGhost);
   Quest.steps.AddConversationStep('Convo Ghost', [1]);
   Quest.Steps.AddInteractObjectStep('open door', 'Door', 'Open', True, [8333, 37781], @customComplete1);

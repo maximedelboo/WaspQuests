@@ -33,29 +33,29 @@ begin
 
   //Setup steps (mockup of dorics quest)
   Quest.steps.AddWalkStep('Walk to romeo', [8760, 36742]);
-  Quest.steps.AddInteractNpcStep('Talk to Romeo', 'Romeo', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Romeo', 'Romeo');
   Quest.steps.CustomizeNPC(Romeo);
   Quest.steps.AddConversationStep('Finish Romeo conversation', [1,1]);
-  Quest.steps.AddInteractNpcStep('Talk to Juliet', 'Juliet', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Juliet', 'Juliet');
   Quest.steps.CustomizeNPC(Juliet);
   Quest.steps.AddConversationStep('Finish Juliet conversation', [1,1]);
   Quest.steps.AddWalkStep('Walk to romeo', [8760, 36742]);
-  Quest.steps.AddInteractNpcStep('Talk to Romeo', 'Romeo', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Romeo', 'Romeo');
   Quest.steps.CustomizeNPC(Romeo);
   Quest.steps.AddConversationStep('Finish Romeo conversation', [4]);
-  Quest.steps.AddInteractNpcStep('Talk to Father Lawrence', 'Father Lawrence', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Father Lawrence', 'Father Lawrence');
   Quest.steps.AddConversationStep('Finish Father Lawrence conversation', []);
   Quest.steps.AddCutsceneStep('cutscene', 7500);
   Quest.steps.AddConversationStep('Finish Father Lawrence conversation', []);
   Quest.steps.AddInteractObjectStep('Pick cadava berries', 'Cadava bush', 'Pick-from');
   Quest.steps.CustomWaitItem('Cadava berries');
   Quest.steps.AddWalkStep('Walk away from dark wizard', [9016, 36726]);
-  Quest.steps.AddInteractNpcStep('Talk to Apothecary', 'Apothecary', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Apothecary', 'Apothecary');
   Quest.steps.AddConversationStep('Finish Apothecary conversation', [2,1]);
   Quest.steps.AddCutsceneStep('cutscene', 1500);
   Quest.steps.AddConversationStep('Finish Apothecary conversation', []);
   Quest.steps.CustomWaitItem('Cadava potion');
-  Quest.steps.AddInteractNpcStep('Talk to Juliet', 'Juliet', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Juliet', 'Juliet');
   Quest.steps.CustomizeNPC(Juliet);
   Quest.steps.AddConversationStep('Finish Juliet conversation', []);
   Quest.steps.AddCutsceneStep('cutscene', 5000);
@@ -69,7 +69,7 @@ begin
   Quest.steps.AddCutsceneStep('cutscene', 5000);
   Quest.steps.AddConversationStep('Finish Juliet conversation', []);
   Quest.steps.AddWalkStep('Walk to romeo', [8760, 36742]);
-  Quest.steps.AddInteractNpcStep('Talk to Romeo', 'Romeo', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Romeo', 'Romeo');
   Quest.steps.CustomizeNPC(Romeo);
   Quest.steps.AddConversationStep('Finish Romeo conversation', []);
   Quest.steps.AddCutsceneStep('cutscene', 5000);

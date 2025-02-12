@@ -48,6 +48,7 @@ type
     steps: TStepArray;
     index: Integer;
     questInfo: TStringArray;
+    startTile, endTile: TPoint;
 
     reqStats: TStatCheck;
     questName, quitMessage: String;

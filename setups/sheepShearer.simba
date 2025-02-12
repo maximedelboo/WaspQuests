@@ -12,7 +12,7 @@ begin
   Quest.region := [[[49,51,50,50],[0]]];
   Quest.StartingConditions := @SheepStart;
 
-  Quest.steps.AddInteractNpcStep('Talk to Fred', 'Fred the Farmer', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Fred', 'Fred the Farmer');
   Quest.steps.AddConversationStep('Finish Fred conversation', [1]);
 end;
 
@@ -44,12 +44,15 @@ procedure SetupSheepShearerIron();
   end;
 
 begin
-  Quest.region := [[[49,51,51,49],[0,1]]];
+  Quest.region := [[[49,51,51,49],[0,1,2]]];
   Quest.StartingConditions := @SheepStartIron;
   Quest.questInfo += 'Start anywhere around Lumbridge';
   Quest.questInfo += 'Make sure you have 5 or less items in inventory';
+  Quest.startTile := [8664, 37338];
+  Quest.endTile := [8664, 37338];
 
-  Quest.steps.AddInteractNpcStep('Talk to Fred', 'Fred the Farmer', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Fred', 'Fred the Farmer');
+  Quest.Steps.CustomizeColor([CTS2(8827067, 6, 0.20, 1.19)]);
   Quest.steps.AddConversationStep('Finish Fred conversation', [1,1]);
   Quest.steps.AddWalkStep('Walk to shears', [8668, 37338]);
   Quest.steps.AddLootStep('Get shears', 'Shears', 3);
@@ -94,7 +97,8 @@ begin
   Quest.steps.AddInteractNPCStep('Shear sheep 20', 'Sheep', 'Shear', False, [0,0], @CustomCompletion1);
   Quest.steps.CustomizeColor([CTS2(15856114, 5, 0.01, 0.90)]);
   Quest.steps.AddInteractObjectStep('Click spinning wheel', 'Spinning wheel', 'Spin', True, [21780, 37594], @CustomCompletion2);
-  Quest.steps.AddInteractNPCStep('Talk to Fred', 'Fred the Farmer', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Fred', 'Fred the Farmer');
+  Quest.Steps.CustomizeColor([CTS2(8827067, 6, 0.20, 1.19)]);
   Quest.steps.AddConversationStep('Finish Fred conversation', [1]);
 end;
 

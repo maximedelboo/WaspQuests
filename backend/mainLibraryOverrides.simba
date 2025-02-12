@@ -534,42 +534,6 @@ function TRSWalkerV2.WebWalkEx(me: TPoint; destination: TPoint; waitUntilDistanc
           Wait(100);
         end;
       end;
-
-      if Assigned(Self.MapImage) and (Length(Self.WebGraph^.Nodes) > 0) then
-      begin
-        bmp := Self.MapImage.Copy();
-        tmp := Self.WebGraph^;
-
-        closestMe   := Self.WebGraph^.FindNearestNodes(me, 4);
-        closestDest := Self.WebGraph^.FindNearestNodes(destination, 4);
-
-        if (@Self.GetLocal <> nil) then
-        begin
-          tmp.Nodes := Self.GetLocal(tmp.Nodes);
-          me := Self.GetLocal([me])[0];
-          destination := Self.GetLocal([destination])[0];
-        end;
-
-        tmp.Draw(bmp);
-
-        for i := 0 to 3 do
-        begin
-          if i < Length(closestMe) then
-            bmp.DrawCircle(tmp.Nodes[closestMe[i]], 4, $FF00FF);
-          if i < Length(closestDest) then
-            bmp.DrawCircle(tmp.Nodes[closestDest[i]], 4, $FF0000);
-        end;
-
-        if bmp.Bounds().Contains(me) then
-          bmp.DrawBorderedCross(me, 4, $00FF00, $0);
-
-        if bmp.Bounds().Contains(destination) then
-          bmp.DrawBorderedCross(destination, 4, $00FF00,  $0);
-
-        bmp.Debug();
-        bmp.Free();
-      end;
-      TerminateScript(GetExceptionMessage());
     end;
   end;
 
@@ -663,7 +627,7 @@ begin
           obj.SelectOption(['-down']);
       end else
       begin
-        if Abs(p.X - ladderPoint.X) > 9000 then
+        if Abs(me.X - ladderPoint.X) > 9000 then
           Continue;
         if p.X - ladderPoint.X > 0 then
           obj.WalkSelectOption(['-up'])
