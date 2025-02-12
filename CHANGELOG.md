@@ -1,3 +1,10 @@
+## [0.3.7](https://github.com/maximedelboo/WaspQuests/compare/v0.3.6...v0.3.7) (2025-02-12)
+
+
+### Bug Fixes
+
+* Added support to walk to quest start ([0af341a](https://github.com/maximedelboo/WaspQuests/commit/0af341a75f3bce767117be31332da59e2575f64b))
+
 ## [0.3.6](https://github.com/maximedelboo/WaspQuests/compare/v0.3.5...v0.3.6) (2025-02-12)
 
 
