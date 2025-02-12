@@ -1,3 +1,10 @@
+## [0.3.6](https://github.com/maximedelboo/WaspQuests/compare/v0.3.5...v0.3.6) (2025-02-12)
+
+
+### Bug Fixes
+
+* fix long loading bug ([30cdb2f](https://github.com/maximedelboo/WaspQuests/commit/30cdb2f8d98d7ba16609ae98e634fa783433397f))
+
 ## [0.3.5](https://github.com/maximedelboo/WaspQuests/compare/v0.3.4...v0.3.5) (2025-02-12)
 
 
