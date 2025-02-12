@@ -281,12 +281,15 @@ var
   s,f: TPoint;
   Loader: TRSMaploader;
 begin
-  overworldName := Loader._GetChunk(OverworldChunk.Chunk, s, f) + '-' + GENERATED_GRAPH.Hash();
   cacheroot := Self.Cache + 'graphs' + DirectorySeparator;
   cachename := cacheroot + ToStr(plane) + DirectorySeparator + name + '-' + GENERATED_GRAPH.Hash();
 
-  if (FileExists(WQWebGraphDir + overworldName + '.json')) and not FileExists(cachename + '.json') then
-    CopyFile(WQWebGraphDir + overworldName + '.json', cachename + '.json', True);
+  if (Loader._GetChunk(OverworldChunk.Chunk, s, f) = name) and (plane = 0) then
+  begin
+    overworldName := Loader._GetChunk(OverworldChunk.Chunk, s, f) + '-' + GENERATED_GRAPH.Hash();
+    if (FileExists(WQWebGraphDir + overworldName + '.json')) and not FileExists(cachename + '.json') then
+      CopyFile(WQWebGraphDir + overworldName + '.json', cachename + '.json', True);
+  end;
 
   if not FileExists(cachename + '.json') then
   begin
@@ -316,7 +319,6 @@ begin
 
     Exit;
   end;
-
   try
     json.Init(ReadFileContents(cachename + '.json'));
 

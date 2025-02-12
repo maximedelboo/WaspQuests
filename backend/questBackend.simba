@@ -110,6 +110,7 @@ begin
   Self.DebugLn('Setting up map, this can take a second');
 
   Map.SetupChunks(Quest.region, 8, not Quest.DisableLadders);
+  WriteLn(Map.loader.MapBox);
   Map.Walker.WebGraph^.UseCollisionData := True;
 
   NPCs.Setup(Map.NPCs(), @Map.Walker);
