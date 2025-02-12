@@ -1,3 +1,10 @@
+## [0.3.2](https://github.com/maximedelboo/WaspQuests/compare/v0.3.1...v0.3.2) (2025-02-12)
+
+
+### Bug Fixes
+
+* no infinite loop when wlking impossible path ([f66bce6](https://github.com/maximedelboo/WaspQuests/commit/f66bce67792200ded069389059e4ded3c239681f))
+
 ## [0.3.1](https://github.com/maximedelboo/WaspQuests/compare/v0.3.0...v0.3.1) (2025-02-12)
 
 
