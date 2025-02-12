@@ -331,38 +331,6 @@ begin
   end;
 end;
 
-function TRSWalkerV2._WalkPathHelper(out index: Int32; playerPoint: TPoint; fails: Int32; debug: Boolean): Int32; override;
-begin
-  if debug then
-    Self.DebugPath(index, playerPoint);
-
-  Result := fails;
-
-  if Self._AdvancePath(index, playerPoint) then
-    Exit(0);
-
-  //Likely haven't moved far enough to advance to next point
-  if Inc(Result) < 5 then
-  begin
-    Wait(300);
-    Exit;
-  end;
-  //Screen walking struggles, so disable it
-  if Self.AdaptiveWalk then
-  begin
-    //Self.ScreenWalk := False;
-  end
-  else if (Result = 5) then
-  begin
-    case SRL.Dice(50) of
-      True:  Minimap.SetCompassAngle(Minimap.GetCompassAngle() - SRL.TruncatedGauss(30, 360, 3));
-      False: Minimap.SetCompassAngle(Minimap.GetCompassAngle() + SRL.TruncatedGauss(30, 360, 3));
-    end;
-  end;
-
-  if (Result mod 2 = 0) then
-    Minimap.WaitFlag();
-end;
 
 procedure TRSMap.SetupChunks(chunks: array of TRSMapChunk; downscale: UInt32; addLadders: Boolean); overload;
 begin
