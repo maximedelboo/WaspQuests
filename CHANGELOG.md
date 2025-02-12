@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/maximedelboo/WaspQuests/compare/v0.3.0...v0.3.1) (2025-02-12)
+
+
+### Bug Fixes
+
+* add precomputed graph ([0c81233](https://github.com/maximedelboo/WaspQuests/commit/0c8123321b59be2a391f3989c46e6ed80b5e3068))
+
 # [0.3.0](https://github.com/maximedelboo/WaspQuests/compare/v0.2.12...v0.3.0) (2025-02-12)
 
 
