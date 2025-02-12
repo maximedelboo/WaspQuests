@@ -1,3 +1,15 @@
+# [0.3.0](https://github.com/maximedelboo/WaspQuests/compare/v0.2.12...v0.3.0) (2025-02-12)
+
+
+### Bug Fixes
+
+* added semicolon to remove simba warning ([035001a](https://github.com/maximedelboo/WaspQuests/commit/035001a14080f7d7946dd6d1583677b3bdd67255))
+
+
+### Features
+
+* new talk-to step type and convesation steps now support text as well as conversation indices ([353bb96](https://github.com/maximedelboo/WaspQuests/commit/353bb9650da6d8728690f8a7690be561792fc44f))
+
 ## [0.2.12](https://github.com/maximedelboo/WaspQuests/compare/v0.2.11...v0.2.12) (2025-02-11)
 
 
