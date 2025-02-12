@@ -115,7 +115,7 @@ procedure SetupErnestTCIron();
 
   procedure customAction2();
   begin
-    if not quest.currentStep.actionSucceeded then worldhopper.Hop([308,316,326,335,371,372])
+    if not quest.steps[quest.index].actionSucceeded then worldhopper.Hop([308,316,326,335,371,372])
   end;
 
 var

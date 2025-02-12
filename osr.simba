@@ -1,5 +1,7 @@
 {$IFNDEF SRL_OSR} {$I SRL-T/osr.simba}{$ENDIF}
 {$IFNDEF WL_OSR} {$I WaspLib/osr.simba}{$ENDIF}
+{$IFNDEF WL_QUESTS_INCLUDED} {$I WaspLib/optional/interfaces/gametabs/quests.simba} {$ENDIF}
+
 {$DEFINE WQ_OSR}
 
 {$IFNDEF WQ_LADDERS} {$I backend/ladders.simba}

@@ -36,25 +36,38 @@ begin
   Self += Step;
 end;
 
-procedure TStepArray.AddConversationStep(stepName: String; conversationIndices: TIntegerArray; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+procedure TStepArray.AddTalkToStep(stepName, NPC_name: String; WebWalk: Boolean = True; Coordinate: TPoint = [0,0]; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
 var step: TStep;
 begin
-  Step.step_type := STEP_TYPE.CONVERSATION;
+  Step.step_type := STEP_TYPE.TALKTO;
   Step.name := stepName;
-  Step.conversationIndices := conversationIndices;
+  Step.NPC_name := NPC_name;
+  Step.coordinate := coordinate;
+  Step.webWalk := WebWalk;
   Step.CompletionCondition := @CompletionCondition;
   Step.SpecialEvent := @SpecialEvent;
   Self += Step;
 end;
 
-procedure TStepArray.AddQueryStep(stepName: String; conversationIndices: TIntegerArray; query, answer: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+procedure TStepArray.AddConversationStep(stepName: String; conversation: array of Variant; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
+begin
+  Step.step_type := STEP_TYPE.CONVERSATION;
+  Step.name := stepName;
+  Step.conversation := conversation;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
+end;
+
+procedure TStepArray.AddQueryStep(stepName: String; conversation: array of Variant; query, answer: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
 var step: TStep;
 begin
   Step.step_type := STEP_TYPE.QUERY;
   Step.name := stepName;
   Step.action := query;
   Step.answer := answer;
-  Step.conversationIndices := conversationIndices;
+  Step.conversation := conversation;
   Step.CompletionCondition := @CompletionCondition;
   Step.SpecialEvent := @SpecialEvent;
   Self += Step;

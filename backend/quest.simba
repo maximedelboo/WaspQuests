@@ -5,7 +5,7 @@
 {$SCOPEDENUMS ON}
 
 type
-  STEP_TYPE = (INTERACT_NPC, KILL, INTERACT_OBJECT, INTERACT_INVENTORY, CONVERSATION,
+  STEP_TYPE = (INTERACT_NPC, TALKTO, KILL, INTERACT_OBJECT, INTERACT_INVENTORY, CONVERSATION,
                QUERY, COMBINE, LOOT, WALK, WAIT, CUTSCENE, BANK, CLICK_TILE,
                USE_ON_NPC, USE_ON_OBJECT, CUSTOM);
 
@@ -28,7 +28,7 @@ type
     time, waitRange, combatTime: Integer;
     bankItems: TRSItemArray;
     withdrawItems: TRSBankItemArray;
-    conversationIndices: TIntegerArray;
+    conversation: Array of Variant;
     exceptions, actionSucceeded, completed, webWalk, depositAll: Boolean;
     SpecialEvent: TStepEvent;
     CompletionCondition: TStepCompletion;
@@ -46,7 +46,6 @@ type
 
   TQuest = record(TBaseBankScript)
     steps: TStepArray;
-    currentStep: TStep;
     index: Integer;
     questInfo: TStringArray;
 

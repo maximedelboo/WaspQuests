@@ -6,22 +6,22 @@
 procedure SetupRestlessGhost();
   function customComplete1: Boolean;
   begin
-    if Quest.currentStep.actionSucceeded then
+    if quest.steps[quest.index].actionSucceeded then
       Exit(True)
     else
     begin
-      Quest.currentStep.objectTarget.Hover(1);
+      quest.steps[quest.index].objectTarget.Hover(1);
       if mainscreen.IsUpText('Close') then Exit(True) else Exit(False);
     end;
   end;
 
   function customComplete2: Boolean;
   begin
-    if Quest.currentStep.actionSucceeded then
+    if quest.steps[quest.index].actionSucceeded then
       Exit(True)
     else
     begin
-      Quest.currentStep.objectTarget.Hover(1);
+      quest.steps[quest.index].objectTarget.Hover(1);
       if mainscreen.IsUpText('Search') then
       begin
         Mouse.Click(MOUSE_LEFT);
@@ -33,11 +33,11 @@ procedure SetupRestlessGhost();
 
   function customComplete3: Boolean;
   begin
-    if Quest.currentStep.actionSucceeded then
+    if quest.steps[quest.index].actionSucceeded then
       Exit(True)
     else
     begin
-      Quest.currentStep.objectTarget.Hover(1);
+      quest.steps[quest.index].objectTarget.Hover(1);
       if mainscreen.IsUpText('Search') then
       begin
         Mouse.Click(MOUSE_LEFT);

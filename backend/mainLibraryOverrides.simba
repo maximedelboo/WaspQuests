@@ -50,6 +50,14 @@ begin
   Result := False;
 end;
 
+function TRSChatboxOptionArray.ToStringArray(): TStringArray;
+var
+  option: TRSChatboxOption;
+begin
+  for option in Self do
+    Result += option.Text;
+end;
+
 function TRSInventory.ContainsAll(bankitems: TRSBankItemArray): Boolean; overload;
 var
   bankitem: TRSBankItem;
@@ -252,6 +260,77 @@ end;
   {$I WaspQuests/osr.simba}
 {$ENDIF}
 
+var
+  PositionTimer: TCountdown;
+  WQCacheDir, positionFile, WQWebGraphDir: String;
+  OverworldChunk: TRSMapChunk;
+
+begin
+  PositionTimer.Init(15000);
+  WQCacheDir := Cache_dir + 'WaspQuests' + DirectorySeparator;
+  PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
+  OverworldChunk := [[16,64,61,39],[0]];
+  WQWebGraphDir := IncludePath + 'WaspQuests' + DirectorySeparator + 'webgraph' + DirectorySeparator;
+end;
+
+function TRSChunkLoader.GetGraph(name: String; plane: UInt32; map: TMufasaBitmap): TWebGraphV2; override;
+var
+  cacheroot, cachename, overworldName: String;
+  json: TJSONObject;
+  t: UInt64;
+  s,f: TPoint;
+  Loader: TRSMaploader;
+begin
+  overworldName := Loader._GetChunk(OverworldChunk.Chunk, s, f) + '-' + GENERATED_GRAPH.Hash();
+  cacheroot := Self.Cache + 'graphs' + DirectorySeparator;
+  cachename := cacheroot + ToStr(plane) + DirectorySeparator + name + '-' + GENERATED_GRAPH.Hash();
+
+  if (FileExists(WQWebGraphDir + overworldName + '.json')) and not FileExists(cachename + '.json') then
+    CopyFile(WQWebGraphDir + overworldName + '.json', cachename + '.json', True);
+
+  if not FileExists(cachename + '.json') then
+  begin
+    Self.DebugLn('Caching ' + name + ' webgraph, this will take a minute.');
+
+    if not ForceDirectories(cacheroot + ToStr(plane) + DirectorySeparator) then
+      Self.Fatal('Failed to create path: ' + cacheroot + ToStr(plane) + DirectorySeparator);
+
+    t := GetTickCount();
+    Result := Self.BuildGraph(name, map);
+    Self.DebugLn('Took ' + ToStr((GetTickCount()-t) div 1000) + ' seconds to generate webgraph.');
+    try
+      json.Init();
+
+      json.Put('nodes', Result.NodesToString());
+      json.Put('paths', Result.PathsToString());
+      json.Put('names', Result.NamesToString());
+      json.Put('doors', Result.DoorsToString());
+
+      if not WriteFileContents(cachename + '.json', json.ToString(2), False) then
+        Self.Fatal('Failed to save ' + name + ' webgraph.');
+    except
+      Self.Fatal('Something went wrong saving ' + name + ' webraph: ' + GetExceptionMessage());
+    finally
+      json.Free();
+    end;
+
+    Exit;
+  end;
+
+  try
+    json.Init(ReadFileContents(cachename + '.json'));
+
+    Result.LoadNodesFromString(json.getString('nodes'));
+    Result.LoadPathsFromString(json.getString('paths'));
+    Result.LoadNamesFromString(json.getString('names'));
+    Result.LoadDoorsFromString(json.getString('doors'));
+  except
+    TerminateScript('Something went wrong loading the webraph: ' + GetExceptionMessage());
+  finally
+    json.Free();
+  end;
+end;
+
 procedure TRSMap.SetupChunks(chunks: array of TRSMapChunk; downscale: UInt32; addLadders: Boolean); overload;
 begin
   Self.Loader.Load(chunks, downscale);
@@ -366,6 +445,21 @@ begin
   end;
 end;
 
+procedure TRSMap.CachePosition(coord: TPoint);
+var
+  JSON: TJSONObject;
+begin
+  if not DirectoryExists(WQCacheDir) then
+    CreateDirectory(WQCacheDir);
+
+  JSON.init();
+  JSON.put('x', coord.X);
+  JSON.put('y', coord.Y);
+  JSON.put('timestamp', GetTickCount());
+
+  WriteFileContents(positionFile, json.ToString(1), False);
+end;
+
 function TRSMap.Position(): TPoint; override;
 var
   cleanMinimap: TMufasaBitmap;
@@ -399,6 +493,11 @@ begin
   begin
     Self.Region := Self.Loader.Regions[Self.RegionIndex];
     Result := Self.Loader.GetGlobal(Self.RegionIndex, Result);
+    if PositionTimer.IsFinished and (Self.Similarity > 0.6)then
+    begin
+      PositionTimer.Restart();
+      Self.CachePosition(Result);
+    end;
     if Self.Loader.UsingChunks then
       Exit(RSTranslator.Normalize(Result))
     else
