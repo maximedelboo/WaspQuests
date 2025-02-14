@@ -319,6 +319,7 @@ begin
       end;
     UnZipFile(zipPath, cacheroot)
   end;
+  WriteFileContents(Self.Cache + 'cached.txt', 'yay', False);
 end;
 
 function TRSChunkLoader.GetBitmap(chunk: String; plane: UInt32; map: ERSMap): TMufasaBitmap; override;
@@ -355,8 +356,14 @@ begin
 
   Result.SetName(cachename);
 
-  if not FileExists(cachename + '.png') then
+  if not FileExists(self.Cache + 'cached.txt') then
     Self.StoreFullCache;
+
+  if not FileExists(cachename + '.png') then
+  begin
+    Result.SetSize(RSTranslator.Map.ChunkSide, RSTranslator.Map.ChunkSide);
+    Exit(Result);
+  end;
 
   Result.LoadFromFile(cachename + '.png');
 end;
@@ -377,7 +384,6 @@ var
   name, cacheroot, cachename: String;
 begin
   Result.Init();
-  WriteLn(Self.cache);
 
   for entry in entries do
     for i := 0 to entry.High() do
@@ -425,7 +431,7 @@ begin
       Self.Fatal('Failed to create path: ' + cacheroot);
 
     try
-      if not WriteFileContents(cachename + '.json', Result.ToString(2), False) then
+      if not WriteFileContents(cachename + '.json', Result.ToString, False) then
         Self.Fatal('Failed to save ' + cachename + ' json.');
     except
       Self.Fatal('Something went wrong saving ' + cachename + ' json: ' + GetExceptionMessage());
@@ -446,8 +452,13 @@ begin
   if (Loader._GetChunk(OverworldChunk.Chunk, s, f) = name) and (plane = 0) then
   begin
     overworldName := Loader._GetChunk(OverworldChunk.Chunk, s, f) + '-' + GENERATED_GRAPH.Hash();
+    ForceDirectories(CacheRoot + '0' + DirectorySeparator);
     if (FileExists(WQWebGraphDir + overworldName + '.txt')) and not FileExists(cachename + '.txt') then
+    begin
+      WriteLn('Copying file ', WQWebGraphDir + overworldName + '.txt', ' to ', cachename + '.txt');
       CopyFile(WQWebGraphDir + overworldName + '.txt', cachename + '.txt', True);
+      Self.DebugLn('First time loading this version of WaspQuest, this might take a few minutes...');
+    end;
   end;
 
   if not FileExists(cachename + '.txt') then
@@ -486,11 +497,10 @@ begin
   end;
 end;
 
-function TRSMapLoader.GetCache(folder: String; out res: TJsonArray): Boolean;
+function TRSMapLoader.GetCache(folder, name: String; out res: TJsonArray): Boolean;
 var
-  name, cacheroot, cachename: String;
+  cacheroot, cachename: String;
 begin
-  name := Self.RegionString();
   cacheroot := Self.Cache + folder + DirectorySeparator;
   cachename := cacheroot + name;
 
@@ -620,7 +630,7 @@ end;
 
 procedure TRSMapLoader.Load(chunks: array of TRSMapChunk; downscale: UInt32 = 8; padding: UInt32 = 40); override;
 var
-  i, j, idx: Int32;
+  i, j, idx, k: Int32;
   bitmaps, hbitmaps, cbitmaps: TMufasaBitmapArray;
   s, f, tmp: TPoint;
   graphs: array of TWebGraphV2;
@@ -631,7 +641,15 @@ var
 begin
   Self.Init(downscale);
 
-  for i := 0 to High(chunks) do j += Length(chunks[i].Planes);
+  for i := 0 to High(chunks) do
+  begin
+    j += Length(chunks[i].Planes);
+    for k in chunks[i].Planes do
+      name += ToStr(k) + '_' + Self._GetChunk(chunks[i].Chunk, s, f);
+  end;
+
+  objectsDone := Self.GetCache('mapobjects', name, Self.ObjectData);
+  npcsDone := Self.GetCache('mapnpcs', name, Self.NPCData);
 
   SetLength(Self.Regions, j);
 
@@ -656,14 +674,7 @@ begin
       bitmaps += Self.Loader.GetMap(s, f, chunks[i].Planes[j], ERSMap.NORMAL);
       bitmaps[idx].Pad(padding);
       Self.Regions[idx].Region := Box(0, 0, bitmaps[idx].GetWidth(), bitmaps[idx].GetHeight());
-    end;
 
-  objectsDone := Self.GetCache('mapobjects', Self.ObjectData);
-  npcsDone := Self.GetCache('mapnpcs', Self.NPCData);
-
-  for i := 0 to High(chunks) do
-    for j := 0 to High(chunks[i].Planes) do
-    begin
       if chunks[i].Planes[j] = 0 then
       begin
         hbitmaps += Self.Loader.GetMap(s, f, 0, ERSMap.HEIGHT);

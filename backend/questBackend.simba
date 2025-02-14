@@ -96,6 +96,9 @@ begin
     Options.SetMaxBrightness;
   Self.PrintTimer.Init(5 * ONE_SECOND);
 
+  DebugLn('Setting up overworld map, this takes around 15 seconds');
+  Overworld.SetupChunk(OverworldChunk, 8);
+
   Self.SetupProcedure();
 
   if not self.questName.Contains('Tutorial') then
@@ -110,11 +113,7 @@ begin
   Self.DebugLn('Setting up map, this can take a second');
 
   Map.SetupChunks(Quest.region, 8, not Quest.DisableLadders);
-  WriteLn(Map.loader.MapBox);
   Map.Walker.WebGraph^.UseCollisionData := True;
-
-  DebugLn('Setting up overworld map, this might take more than a minute');
-  Overworld.SetupChunk(OverworldChunk, 8);
 
   NPCs.Setup(Map.NPCs(), @Map.Walker);
   Objects.Setup(Map.Objects(), @Map.Walker);
