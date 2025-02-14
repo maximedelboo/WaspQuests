@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/maximedelboo/WaspQuests/compare/v0.3.7...v0.4.0) (2025-02-14)
+
+
+### Features
+
+* Major updates for quick graph loading ([4dd3083](https://github.com/maximedelboo/WaspQuests/commit/4dd30830aaf789bc46ef0a93937c5e5a8b8af5e1))
+
 ## [0.3.7](https://github.com/maximedelboo/WaspQuests/compare/v0.3.6...v0.3.7) (2025-02-12)
 
 
