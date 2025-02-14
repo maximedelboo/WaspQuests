@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/maximedelboo/WaspQuests/compare/v0.4.0...v0.4.1) (2025-02-14)
+
+
+### Bug Fixes
+
+* Rogues den should work again ([c0cbc9d](https://github.com/maximedelboo/WaspQuests/commit/c0cbc9df6b4ee8506b2d2e40fb0dcbc3cc1c1dbd))
+
 # [0.4.0](https://github.com/maximedelboo/WaspQuests/compare/v0.3.7...v0.4.0) (2025-02-14)
 
 
