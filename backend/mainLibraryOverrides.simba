@@ -300,10 +300,142 @@ begin
   Self.LegacyLoader.Setup(Self.Name + '.LegacyLoader', cache);
 end;
 
+procedure TRSChunkLoader.StoreFullCache();
+var
+  cacheroot, zipPath: String;
+  cachetype: String;
+  foldernames: TStringArray = ['map', 'npcs', 'objects', 'heightmap', 'collision'];
+begin
+  Self.DebugLn('Unziping all cache: ');
+  for cachetype in foldernames do
+  begin
+    WriteLn('Unziping ', cachetype);
+    cacheroot := Self.Cache + cachetype + DirectorySeparator;
+    zipPath := RSMAP_PATH + 'files' + DirectorySeparator + cachetype + '.zip';
+
+    if not ForceDirectories(cacheroot) then
+      begin
+        Self.Fatal('Failed to create TRSMapLoader cache directories.');
+      end;
+    UnZipFile(zipPath, cacheroot)
+  end;
+end;
+
+function TRSChunkLoader.GetBitmap(chunk: String; plane: UInt32; map: ERSMap): TMufasaBitmap; override;
+var
+  cacheroot, cachename, zipFile, zipPath: String;
+begin
+  Result.Init();
+
+  case map of
+    ERSMap.NORMAL:
+    begin
+      cacheroot := Self.Cache + 'map' + DirectorySeparator;
+      cachename := cacheroot + ToStr(plane) + DirectorySeparator + chunk;
+      zipPath := RSMAP_PATH + 'files' + DirectorySeparator + 'map.zip';
+      zipFile := ToStr(plane) + '/' + chunk + '.png';
+    end;
+
+    ERSMap.HEIGHT:
+    begin
+      cacheroot := Self.Cache + 'heightmap' + DirectorySeparator;
+      cachename := cacheroot + chunk;
+      zipPath := RSMAP_PATH + 'files' + DirectorySeparator + 'heightmap.zip';
+      zipFile := chunk + '.png';
+    end;
+
+    ERSMap.COLLISION:
+    begin
+      cacheroot := Self.Cache + 'collision' + DirectorySeparator;
+      cachename := cacheroot + ToStr(plane) + DirectorySeparator + chunk;
+      zipPath := RSMAP_PATH + 'files' + DirectorySeparator + 'collision.zip';
+      zipFile := ToStr(plane) + '/' + chunk + '.png';
+    end;
+  end;
+
+  Result.SetName(cachename);
+
+  if not FileExists(cachename + '.png') then
+    Self.StoreFullCache;
+
+  Result.LoadFromFile(cachename + '.png');
+end;
+
+function TRSMapLoader.RegionString(): String;
+var
+  region: TRSMapRegion;
+begin
+  for region in self.Regions do
+    Result += region.Name;
+end;
+
+function TRSMapLoader.InternalJSONLoad(entries: array of TJSONArray; folder: String): TJSONArray; overload;
+var
+  i, j, n, id: Int32;
+  json, rJSON: TJSONObject;
+  entry, coords, rotations: TJSONArray;
+  name, cacheroot, cachename: String;
+begin
+  Result.Init();
+  WriteLn(Self.cache);
+
+  for entry in entries do
+    for i := 0 to entry.High() do
+    begin
+      json := entry.getJSONObject(i);
+      id := json.GetInt('id');
+      coords := json.getJSONArray('coordinates');
+
+      if json.Has('rotations') then
+      begin
+        rotations := json.getJSONArray('rotations');
+        if coords.length() <> rotations.length() then
+          Self.Fatal('Coordinates and rotations for object id: ' + ToStr(id) + ' are not the same length.');
+      end;
+
+      for j := 0 to Result.High() do
+      begin
+        rJSON := Result.getJSONObject(j);
+        if id <> rJSON.getInt('id') then
+          Continue;
+
+        for n := 0 to coords.High() do
+        begin
+          rJSON.getJSONArray('coordinates').Put(coords.Get(n));
+          if rotations <> nil then
+            rJSON.getJSONArray('rotations').Put(rotations.Get(n));
+        end;
+
+        Continue(2);
+      end;
+
+      Result.Put(json);
+    end;
+
+  name := Self.RegionString();
+
+  cacheroot := Self.Cache + folder + DirectorySeparator;
+  cachename := cacheroot + name;
+
+  if not FileExists(cachename + '.json') then
+  begin
+    Self.DebugLn('Caching ' + cachename);
+
+    if not ForceDirectories(cacheroot) then
+      Self.Fatal('Failed to create path: ' + cacheroot);
+
+    try
+      if not WriteFileContents(cachename + '.json', Result.ToString(2), False) then
+        Self.Fatal('Failed to save ' + cachename + ' json.');
+    except
+      Self.Fatal('Something went wrong saving ' + cachename + ' json: ' + GetExceptionMessage());
+    end;
+  end;
+end;
+
 function TRSChunkLoader.GetGraph(name: String; plane: UInt32; map: TMufasaBitmap): TWebGraphV2; override;
 var
-  cacheroot, cachename, overworldName: String;
-  json: TJSONObject;
+  cacheroot, cachename, overworldName, j, grstr: String;
   t: UInt64;
   s,f: TPoint;
   Loader: TRSMaploader;
@@ -314,11 +446,11 @@ begin
   if (Loader._GetChunk(OverworldChunk.Chunk, s, f) = name) and (plane = 0) then
   begin
     overworldName := Loader._GetChunk(OverworldChunk.Chunk, s, f) + '-' + GENERATED_GRAPH.Hash();
-    if (FileExists(WQWebGraphDir + overworldName + '.json')) and not FileExists(cachename + '.json') then
-      CopyFile(WQWebGraphDir + overworldName + '.json', cachename + '.json', True);
+    if (FileExists(WQWebGraphDir + overworldName + '.txt')) and not FileExists(cachename + '.txt') then
+      CopyFile(WQWebGraphDir + overworldName + '.txt', cachename + '.txt', True);
   end;
 
-  if not FileExists(cachename + '.json') then
+  if not FileExists(cachename + '.txt') then
   begin
     Self.DebugLn('Caching ' + name + ' webgraph, this will take a minute.');
 
@@ -329,37 +461,246 @@ begin
     Result := Self.BuildGraph(name, map);
     Self.DebugLn('Took ' + ToStr((GetTickCount()-t) div 1000) + ' seconds to generate webgraph.');
     try
-      json.Init();
+      grstr := '"nodes": "' + Result.NodesToString() + '",';
+      grstr += '"paths": "' + Result.PathsToString() + '",';
+      grstr += '"names": "' + Result.NamesToString() + '",';
+      grstr += '"doors": "' + Result.DoorsToString() + '",';
 
-      json.Put('nodes', Result.NodesToString());
-      json.Put('paths', Result.PathsToString());
-      json.Put('names', Result.NamesToString());
-      json.Put('doors', Result.DoorsToString());
-
-      if not WriteFileContents(cachename + '.json', json.ToString(2), False) then
+      if not WriteFileContents(cachename + '.txt', grstr, False) then
         Self.Fatal('Failed to save ' + name + ' webgraph.');
     except
       Self.Fatal('Something went wrong saving ' + name + ' webraph: ' + GetExceptionMessage());
-    finally
-      json.Free();
     end;
 
     Exit;
   end;
   try
-    json.Init(ReadFileContents(cachename + '.json'));
+    j := ReadFileContents(cachename + '.txt');
 
-    Result.LoadNodesFromString(json.getString('nodes'));
-    Result.LoadPathsFromString(json.getString('paths'));
-    Result.LoadNamesFromString(json.getString('names'));
-    Result.LoadDoorsFromString(json.getString('doors'));
+    Result.LoadNodesFromString(j.Between('"nodes": "', '",'));
+    Result.LoadPathsFromString(j.Between('"paths": "', '",'));
+    Result.LoadNamesFromString(j.Between('"names": "', '",'));
+    Result.LoadDoorsFromString(j.Between('"doors": "', '",'));
   except
     TerminateScript('Something went wrong loading the webraph: ' + GetExceptionMessage());
-  finally
-    json.Free();
   end;
 end;
 
+function TRSMapLoader.GetCache(folder: String; out res: TJsonArray): Boolean;
+var
+  name, cacheroot, cachename: String;
+begin
+  name := Self.RegionString();
+  cacheroot := Self.Cache + folder + DirectorySeparator;
+  cachename := cacheroot + name;
+
+  if not FileExists(cachename + '.json') then
+    Exit(False);
+
+  res.Init(ReadFileContents(cachename + '.json'));
+  Result := True;
+end;
+
+function TPointArray.Str(): String;
+var
+  b: TBox;
+  translated: TPointArray;
+  bmp: TMufasaBitmap;
+begin
+  b := Self.Bounds();
+  Result += '"offx": "' + IntToStr(b.X1) + '"';
+  Result += '"offy": "' + IntToStr(b.Y1) + '"';
+  Result += '"w": "' + IntToStr(b.Width) + '"';
+  Result += '"h": "' + IntToStr(b.Height) + '"';
+  translated := Self.Offset(-b.X1,-b.Y1);
+  bmp.create(b.Width, b.Height);
+  bmp.drawTPA(translated, $FF);
+  Result += '"bmp": "' + bmp.ToString() + '"';
+end;
+
+function String.toATPA(): T2DPointArray;
+var
+  bmpString: String;
+  s: TStringArray;
+  i, ibmp, w, h: Integer;
+  p: TPoint;
+  tpa: TPointArray;
+begin
+  s := self.Split('_');
+
+  for i := 1 to high(s) do
+  begin
+    p.X := StrToInt(s[i].Between('"offx": "', '"'));
+    p.Y := StrToInt(s[i].Between('"offy": "', '"'));
+    w := StrToInt(s[i].Between('"w": "', '"'));
+    h := StrToInt(s[i].Between('"h": "', '"'));
+
+    bmpString := s[i].Between('"bmp": "', '"');
+    ibmp := BitMapFromString(w, h, bmpString);
+    FindColorsbitmap(ibmp, tpa, $FF);
+    Result += tpa.Offset(p);
+    FreeBitmap(ibmp);
+  end;
+end;
+
+function TRSMaploader.GetWalkableClusters(cachename: String; out walkableClusters: T2DPointArray): Boolean;
+var
+  s: String;
+begin
+  if FileExists(cachename) then
+  begin
+    s := ReadFileContents(cachename);
+    walkableClusters := s.toATPA();
+    Exit(True);
+  end;
+end;
+
+
+function TRSMapLoader.SetupGraph(name: String; idx, plane, padding: Int32; cbitmap: TMufasaBitmap): TWebGraphV2; override;
+var
+  gray, white, merged, graySubset: TPointArray;
+  whiteClusters, grayClusters, mergedClusters, wc: T2DPointArray;
+  i, j: Int32;
+  wcs, cacheroot, cachename: String;
+begin
+  Result := Self.Loader.GetGraph(name, plane, cbitmap);
+  Result.Nodes := Self.GetGlobal(idx, Result.Nodes, [padding,padding]);
+  cbitmap.FindColors(white, $FFFFFF);
+  cbitmap.FindColors(gray, $333333);
+
+  cacheroot := self.Cache + 'walkableclusters' + DirectorySeparator;
+  cachename := cacheroot + name + '.txt';
+
+  gray  := Self.GetGlobal(idx, gray, [padding,padding]);
+  white := Self.GetGlobal(idx, white, [padding,padding]);
+  grayClusters := gray.NRCluster(1);
+
+  if not Self.GetWalkableClusters(cachename, wc) then
+  begin
+    whiteClusters := white.NRCluster(1);
+
+    for i := 0 to High(whiteClusters) do
+    begin
+      if Length(whiteClusters[i]) <= 8 then
+        Continue;
+
+      graySubset := whiteclusters[i].Bounds.Expand(40).Filter(gray);
+      merged := whiteclusters[i] + graySubset;
+      mergedClusters := merged.NRCluster(1);
+
+      for j := 0 to (high(mergedClusters) - 1) do
+        if mergedClusters[j].Contains(whiteClusters[i][0]) then
+        begin
+          Result.WalkableClusters += mergedClusters[j];
+          Break;
+        end;
+    end;
+
+    for i := 0 to high(Result.WalkableClusters) do
+      wcs += '_' + Result.WalkableClusters[i].Str;
+    wcs += '_';
+
+    if not ForceDirectories(cacheroot) then
+    begin
+      Self.Fatal('Failed to create walkable cluster cache directories.');
+    end;
+    WriteFileContents(cachename, wcs, False);
+  end;
+
+  Result.WalkableSpace    := white + gray;
+  Result.ObjectClusters   := grayClusters;
+
+  for i := 0 to High(Result.Doors) do
+  begin
+    Result.Doors[i].Before := Self.GetGlobal(idx, Result.Doors[i].Before, [padding, padding]);
+    Result.Doors[i].After  := Self.GetGlobal(idx, Result.Doors[i].After,  [padding, padding]);
+    Result.Doors[i].Center := Self.GetGlobal(idx, Result.Doors[i].Center, [padding, padding]);
+  end;
+end;
+
+procedure TRSMapLoader.Load(chunks: array of TRSMapChunk; downscale: UInt32 = 8; padding: UInt32 = 40); override;
+var
+  i, j, idx: Int32;
+  bitmaps, hbitmaps, cbitmaps: TMufasaBitmapArray;
+  s, f, tmp: TPoint;
+  graphs: array of TWebGraphV2;
+  json: TJSONArray;
+  objects, npcs: array of TJSONArray;
+  name: String;
+  objectsDone, npcsDone: Boolean;
+begin
+  Self.Init(downscale);
+
+  for i := 0 to High(chunks) do j += Length(chunks[i].Planes);
+
+  SetLength(Self.Regions, j);
+
+  Self.Padding := padding;
+  idx := -1;
+
+  for i := 0 to High(chunks) do
+    for j := 0 to High(chunks[i].Planes) do
+    begin
+      idx += 1;
+      name := Self._GetChunk(chunks[i].Chunk, s, f);
+      Self.Regions[idx].Name :=  ToStr(chunks[i].Planes[j]) + '_' + name;
+      Self.Regions[idx].Original := RSTranslator.Chunk2Coordinate(chunks[i].Chunk);
+      if chunks[i].Planes[j] > 0 then
+        Self.Regions[idx].Original := Self.Regions[idx].Original.Offset([RSTranslator.MapWidth() * chunks[i].Planes[j], 0]);
+
+      Self.Regions[idx].Plane := chunks[i].Planes[j];
+
+      tmp :=  RSTranslator.Chunk2Coordinate(s);
+      tmp.X += RSTranslator.MapWidth() * chunks[i].Planes[j]; //easy way to handle upper levels
+      Self.Regions[idx].Offset := [tmp.X-padding, tmp.Y - padding];
+      bitmaps += Self.Loader.GetMap(s, f, chunks[i].Planes[j], ERSMap.NORMAL);
+      bitmaps[idx].Pad(padding);
+      Self.Regions[idx].Region := Box(0, 0, bitmaps[idx].GetWidth(), bitmaps[idx].GetHeight());
+    end;
+
+  objectsDone := Self.GetCache('mapobjects', Self.ObjectData);
+  npcsDone := Self.GetCache('mapnpcs', Self.NPCData);
+
+  for i := 0 to High(chunks) do
+    for j := 0 to High(chunks[i].Planes) do
+    begin
+      if chunks[i].Planes[j] = 0 then
+      begin
+        hbitmaps += Self.Loader.GetMap(s, f, 0, ERSMap.HEIGHT);
+        hbitmaps[High(hbitmaps)].Pad(padding);
+      end;
+      cbitmaps += Self.Loader.GetMap(s, f, chunks[i].Planes[j], ERSMap.COLLISION);
+      if not GENERATED_GRAPH.Disabled then
+        graphs += Self.SetupGraph(name, idx, chunks[i].Planes[j], padding, cbitmaps[idx]);
+
+      cbitmaps[idx].Pad(padding);
+      if not objectsDone then
+      begin
+        json := Self.Loader.GetJSON(s, f, chunks[i].Planes[j], ERSMapJSON.OBJECTS);
+        objects += json;
+      end;
+      if not npcsDone then
+      begin
+        json := Self.Loader.GetJSON(s, f, chunks[i].Planes[j], ERSMapJSON.NPCS);
+        npcs += json;
+      end;
+    end;
+  Self.Pack();
+
+  Self.Map        := Self.InternalLoad(bitmaps);
+  Self.Heightmap  := Self._InternalLoad(hbitmaps);
+  Self.Collision  := Self._InternalLoad(cbitmaps);
+
+  if not GENERATED_GRAPH.Disabled then
+    Self.Graph := Self.InternalGraphLoad(graphs);
+
+  if not objectsDone then
+    Self.ObjectData := Self.InternalJSONLoad(objects, 'mapobjects');
+  if not npcsDone then
+    Self.NPCData    := Self.InternalJSONLoad(npcs, 'mapnpcs');
+
+  Self.UsingChunks := True;
+end;
 
 procedure TRSMap.SetupChunks(chunks: array of TRSMapChunk; downscale: UInt32; addLadders: Boolean); overload;
 begin

@@ -127,30 +127,14 @@ begin
   Self.index := QuestStartIndex;
 end;
 
-function TQuest.CheckValidPosition(): Boolean;
+procedure TRSMap.WalkToQuest(Q: PQuest);
 begin
-
+  Self.Walker.WebWalk(Q^.startTile);
 end;
 
 procedure TQuest.PreQuestRoutine();
-var
-  fails: Integer;
 begin
-  DebugLn('Going to start point');
-  while (not Quest.startTile.InRange(Map.Position(), 20)) or (fails > 3) do
-  begin
-    if not Map.OnMap() then
-      if not Overworld.OnMap() then
-        Overworld.ReturnToKnownTerritory()
-      else
-        Overworld.ReturnToQuest(@self)
-    else
-      Map.ReturnToQuest(@self);
-
-    Inc(fails);
-  end;
-  if fails > 3 then
-    DebugLn('Succesfully reached startingpoint');
+  Map.GetToOverworldPoint(Self.startTile);
 end;
 
 procedure TQuest.Solve(startStep: Integer = 1);

@@ -9,15 +9,76 @@ begin
   Exit(Self.Similarity > tolerance);
 end;
 
-procedure TRSMap.ReturnToKnownTerritory();
+function TRSMap.HomeTeleport(): Boolean;
 begin
-  Magic.CastSpell(ERSSpell.LUMBRIDGE_HOME_TELEPORT);
-  Wait(14000);
+  case Magic.GetSpellBook of
+    ERSSpellBook.ANCIENT: Magic.CastSpell(ERSSpell.EDGEVILLE_HOME_TELEPORT);
+    ERSSpellBook.ARCEUUS: Magic.CastSpell(ERSSpell.ARCEUUS_HOME_TELEPORT);
+    ERSSpellBook.LUNAR: Magic.CastSpell(ERSSpell.LUNAR_HOME_TELEPORT);
+    ERSSpellBook.STANDARD: Magic.CastSpell(ERSSpell.LUMBRIDGE_HOME_TELEPORT);
+  end;
+
+  case Magic.GetSpellBook of
+    ERSSpellBook.ANCIENT: if WaitUntil(Overworld.Position.InRange([8260,36422], 24), 100,20000) then Exit(True);
+    ERSSpellBook.ARCEUUS: if WaitUntil(Overworld.Position.InRange([2704,34910], 24), 100,20000) then Exit(True);
+    ERSSpellBook.LUNAR: if WaitUntil(Overworld.Position.InRange([4356,34770], 24), 100,20000) then Exit(True);
+    ERSSpellBook.STANDARD: if WaitUntil(Overworld.Position.InRange([8788,37558], 24), 100,20000) then Exit(True);
+  end;
 end;
 
-procedure TRSMap.ReturnToQuest(Q: PQuest);
+function TRSMap.ReturnToKnownTerritory(): Boolean;
+var
+  fails: Integer;
+  task: TBreakTask;
 begin
-  Self.Walker.WebWalk(Q^.startTile);
+  Task := [1, 30*ONE_MINUTE + random(0,3)* ONE_MINUTE, 1, 0, GetTickCount(), GetTickCount()];
+  while not Self.HomeTeleport() or (fails < 3) do
+  begin
+    Antiban.TakeBreak(Task);
+    if not RSClient.IsLoggedIn() then
+      Login.LoginPlayer();
+  end;
+
+  if fails < 3 then
+    Result := True;
+end;
+
+//TODO
+function TRSMap.CheckPointOnMap(p: TPoint): Boolean;
+begin
+  Result := not (Self.Loader.GlobalIndex(p) = -1);
+end;
+
+procedure TRSMap.GetToOverworldPoint(p: TPoint);
+var
+  fails: Integer;
+begin
+
+  if not Self.CheckPointOnMap(p) then
+  begin
+    WriteLn('Target point not on overworld');
+    Exit();
+  end;
+  WriteLn('Going to start point');
+  while (not p.InRange(self.Position(), 20)) or (fails <= 3) do
+  begin
+    if not self.OnMap() then
+      if not Overworld.OnMap() then
+        Overworld.ReturnToKnownTerritory()
+      else
+        Overworld.Walker.WebWalk(p)
+    else
+      self.Walker.WebWalk(p);
+
+    Inc(fails);
+  end;
+  if fails <= 3 then
+    WriteLn('Succesfully reached startingpoint');
+end;
+
+procedure TRSMap.GetToGE();
+begin
+  Self.GetToOverworldPoint([8560, 36490]);
 end;
 
 
