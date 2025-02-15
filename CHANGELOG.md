@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/maximedelboo/WaspQuests/compare/v0.4.1...v0.4.2) (2025-02-15)
+
+
+### Bug Fixes
+
+* walkableclusters is properly stored again ([5597a0a](https://github.com/maximedelboo/WaspQuests/commit/5597a0a0572c5a86007d1fc297f2364681318f80))
+
 ## [0.4.1](https://github.com/maximedelboo/WaspQuests/compare/v0.4.0...v0.4.1) (2025-02-14)
 
 
