@@ -1,3 +1,10 @@
+## [0.4.4](https://github.com/maximedelboo/WaspQuests/compare/v0.4.3...v0.4.4) (2025-02-15)
+
+
+### Bug Fixes
+
+* added arc packaging of atpa ([a32a491](https://github.com/maximedelboo/WaspQuests/commit/a32a491fb0daa5fa62470022473218d8b52237d5))
+
 ## [0.4.3](https://github.com/maximedelboo/WaspQuests/compare/v0.4.2...v0.4.3) (2025-02-15)
 
 
