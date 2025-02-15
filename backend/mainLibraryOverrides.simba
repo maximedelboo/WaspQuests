@@ -578,14 +578,14 @@ begin
   cbitmap.FindColors(white, $FFFFFF);
   cbitmap.FindColors(gray, $333333);
 
-  cacheroot := self.Cache + 'walkableclusters' + DirectorySeparator;
+  cacheroot := self.Cache + 'walkableclusters' + DirectorySeparator + ToStr(plane) + DirectorySeparator;
   cachename := cacheroot + name + '.txt';
 
   gray  := Self.GetGlobal(idx, gray, [padding,padding]);
   white := Self.GetGlobal(idx, white, [padding,padding]);
   grayClusters := gray.NRCluster(1);
 
-  if not Self.GetWalkableClusters(cachename, wc) then
+  if not Self.GetWalkableClusters(cachename, Result.WalkableClusters) then
   begin
     whiteClusters := white.NRCluster(1);
 
