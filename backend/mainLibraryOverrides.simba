@@ -306,7 +306,7 @@ var
   cachetype: String;
   foldernames: TStringArray = ['map', 'npcs', 'objects', 'heightmap', 'collision'];
 begin
-  Self.DebugLn('Unziping all cache: ');
+  Self.DebugLn('Unziping all cache.After This takes around 1 minute');
   for cachetype in foldernames do
   begin
     WriteLn('Unziping ', cachetype);
@@ -511,82 +511,162 @@ begin
   Result := True;
 end;
 
-function TPointArray.Str(): String;
-var
-  b: TBox;
-  translated: TPointArray;
-  bmp: TMufasaBitmap;
+//Thanks to Torwent and Slacky for the following two functions
+function TPointArray.Str(): string;
 begin
-  b := Self.Bounds();
-  Result += '"offx": "' + IntToStr(b.X1) + '"';
-  Result += '"offy": "' + IntToStr(b.Y1) + '"';
-  Result += '"w": "' + IntToStr(b.Width) + '"';
-  Result += '"h": "' + IntToStr(b.Height) + '"';
-  translated := Self.Offset(-b.X1,-b.Y1);
-  bmp.create(b.Width, b.Height);
-  bmp.drawTPA(translated, $FF);
-  Result += '"bmp": "' + bmp.ToString() + '"';
+  SetLength(Result, Length(Self)*8);
+  Move(Self[0], Result[1], Length(Self)*8);
+end;
+
+function StrToTPA(str: string): TPointArray;
+begin
+  SetLength(Result, Length(str) div 8);
+  Move(str[1], Result[0], Length(str));
+end;
+
+
+function T2DPointArray.Str(): String;
+var
+  i: Integer;
+begin
+  Result += 'sep';
+  for i := 0 to high(Self) do
+    Result += self[i].Str() + 'sep';
 end;
 
 function String.toATPA(): T2DPointArray;
 var
-  bmpString: String;
+  i: Integer;
   s: TStringArray;
-  i, ibmp, w, h: Integer;
-  p: TPoint;
-  tpa: TPointArray;
 begin
-  s := self.Split('_');
-
+  s := self.Split('sep');
   for i := 1 to high(s) do
   begin
-    p.X := StrToInt(s[i].Between('"offx": "', '"'));
-    p.Y := StrToInt(s[i].Between('"offy": "', '"'));
-    w := StrToInt(s[i].Between('"w": "', '"'));
-    h := StrToInt(s[i].Between('"h": "', '"'));
-
-    bmpString := s[i].Between('"bmp": "', '"');
-    ibmp := BitMapFromString(w, h, bmpString);
-    FindColorsbitmap(ibmp, tpa, $FF);
-    Result += tpa.Offset(p);
-    FreeBitmap(ibmp);
+    Result += StrToTPA(s[i]);
   end;
 end;
 
-function TRSMaploader.GetWalkableClusters(cachename: String; out walkableClusters: T2DPointArray): Boolean;
+procedure CompressFile(const ArcPath, FilePath: string);
+var
+  ArcExe, s: string;
+  ExitCode: LongInt;
+begin
+  ArcExe := IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe';
+
+  Writeln('Creating ARC archive: ', ArcPath);
+  ExitCode := RunCommand(ArcExe, ['a', '-mx4', '-ep1', ArcPath, FilePath], s);
+
+  if ExitCode = 0 then
+  begin
+    Writeln('Compression successful! Deleting original file...');
+    if DeleteFile(FilePath) then
+      Writeln('Original file deleted.')
+    else
+      Writeln('Error: Could not delete the original file.');
+  end
+  else
+    Writeln('Error during compression. Exit Code: ', ExitCode);
+end;
+
+procedure ExtractARC(const ArcFile, OutputFolder: string);
+var
+  ArcExe, s: string;
+  ExitCode: LongInt;
+begin
+  ArcExe := IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe';
+
+  if not FileExists(ArcFile) then
+  begin
+    Writeln('Error: ARC file not found -> ', ArcFile);
+    Exit;
+  end;
+
+  if not DirectoryExists(OutputFolder) then
+    ForceDirectories(OutputFolder);
+
+  Writeln('Extracting ', ArcFile, ' to ', OutputFolder);
+  ExitCode := RunCommand(ArcExe, ['x', ArcFile, '-o+', '-dp' + OutputFolder], s);
+
+  if ExitCode = 0 then
+    Writeln('Extraction successful!')
+  else
+    Writeln('Error during extraction. Exit Code: ', ExitCode);
+end;
+
+function TRSMaploader.GetWalkableClusters(cacheroot, name: String; out walkableClusters: T2DPointArray): Boolean;
 var
   s: String;
 begin
-  if FileExists(cachename) then
+  if FileExists(cacheroot + name + '.arc') then
   begin
-    s := ReadFileContents(cachename);
+    ExtractARC(cacheroot + name + '.arc', cacheroot);
+    if not FileExists(cacheroot + name + '.txt') then
+    begin
+      DebugLn('Something when wrong in walkableclusters cache, please contact Bootie');
+      Exit(False);
+    end;
+    s := ReadFileContents(cacheroot + name + '.txt');
     walkableClusters := s.toATPA();
+    DeleteFile(cacheroot + name + '.txt');
     Exit(True);
   end;
 end;
+
+//function TRSChunkLoader.GetMap(start, finish: TPoint; plane: UInt32; map: ERSMap): TMufasaBitmap; override;
+//var
+//  chunks: TPointArray;
+//  cacheroot, name: String;
+//  needCache: Boolean;
+//begin
+//  name :=  ToStr(start.X) + '-' + ToStr(start.Y) + '_' + ToStr(finish.X) + '-' + ToStr(finish.Y) + '.bmp';
+//
+//  case map of
+//    ERSMap.COLLISION: cacheroot := Self.Cache + 'collision' + DirectorySeparator + ToStr(plane) + DirectorySeparator;
+//    ERSMap.HEIGHT: cacheroot := Self.Cache + 'heightmap' + DirectorySeparator;
+//    ERSMap.NORMAL: cacheroot := Self.Cache + 'map' + DirectorySeparator + ToStr(plane) + DirectorySeparator;
+//  end;
+//
+//  if not FileExists(cacheroot + name) then
+//    needCache := True
+//  else
+//  begin
+//    Result.FromFile(cacheroot + name);
+//    Exit(Result);
+//  end;
+//
+//  chunks := TRSChunkLoader.GetChunks(start, finish);
+//  Result := Self.GetMap(chunks, plane, map);
+//
+//  if needCache then
+//    Result.SaveToFile(cacheroot + name);
+//
+//  DebugLn('Saved map to file ' + cacheroot + name);
+//end;
 
 
 function TRSMapLoader.SetupGraph(name: String; idx, plane, padding: Int32; cbitmap: TMufasaBitmap): TWebGraphV2; override;
 var
   gray, white, merged, graySubset: TPointArray;
-  whiteClusters, grayClusters, mergedClusters, wc: T2DPointArray;
+  whiteClusters, grayClusters, mergedClusters: T2DPointArray;
   i, j: Int32;
   wcs, cacheroot, cachename: String;
 begin
   Result := Self.Loader.GetGraph(name, plane, cbitmap);
   Result.Nodes := Self.GetGlobal(idx, Result.Nodes, [padding,padding]);
+
   cbitmap.FindColors(white, $FFFFFF);
   cbitmap.FindColors(gray, $333333);
-
-  cacheroot := self.Cache + 'walkableclusters' + DirectorySeparator + ToStr(plane) + DirectorySeparator;
-  cachename := cacheroot + name + '.txt';
 
   gray  := Self.GetGlobal(idx, gray, [padding,padding]);
   white := Self.GetGlobal(idx, white, [padding,padding]);
   grayClusters := gray.NRCluster(1);
 
-  if not Self.GetWalkableClusters(cachename, Result.WalkableClusters) then
+  cacheroot := self.Cache + 'walkableclusters' + DirectorySeparator + ToStr(plane) + DirectorySeparator;
+  cachename := cacheroot + name;
+
+  if not Self.GetWalkableClusters(cacheroot, name, Result.WalkableClusters) then
   begin
+    Self.DebugLn('Caching Walkable Clusters');
     whiteClusters := white.NRCluster(1);
 
     for i := 0 to High(whiteClusters) do
@@ -598,7 +678,7 @@ begin
       merged := whiteclusters[i] + graySubset;
       mergedClusters := merged.NRCluster(1);
 
-      for j := 0 to (high(mergedClusters) - 1) do
+      for j := 0 to high(mergedClusters) do
         if mergedClusters[j].Contains(whiteClusters[i][0]) then
         begin
           Result.WalkableClusters += mergedClusters[j];
@@ -606,15 +686,17 @@ begin
         end;
     end;
 
-    for i := 0 to high(Result.WalkableClusters) do
-      wcs += '_' + Result.WalkableClusters[i].Str;
-    wcs += '_';
+    wcs := Result.WalkableClusters.Str();
 
     if not ForceDirectories(cacheroot) then
     begin
       Self.Fatal('Failed to create walkable cluster cache directories.');
     end;
-    WriteFileContents(cachename, wcs, False);
+    WriteFileContents(cachename + '.txt', wcs, False);
+
+    if FileExists(cachename + '.txt') then
+      CompressFile(cachename + '.arc',cachename + '.txt');
+    Self.DebugLn('Done caching Walkable Clusters');
   end;
 
   Result.WalkableSpace    := white + gray;
@@ -639,8 +721,9 @@ var
   name: String;
   objectsDone, npcsDone: Boolean;
 begin
+  DebugLn('part 1');
   Self.Init(downscale);
-
+  DebugLn('part 2');
   for i := 0 to High(chunks) do
   begin
     j += Length(chunks[i].Planes);
@@ -650,7 +733,7 @@ begin
 
   objectsDone := Self.GetCache('mapobjects', name, Self.ObjectData);
   npcsDone := Self.GetCache('mapnpcs', name, Self.NPCData);
-
+  DebugLn('part 3');
   SetLength(Self.Regions, j);
 
   Self.Padding := padding;
@@ -674,16 +757,18 @@ begin
       bitmaps += Self.Loader.GetMap(s, f, chunks[i].Planes[j], ERSMap.NORMAL);
       bitmaps[idx].Pad(padding);
       Self.Regions[idx].Region := Box(0, 0, bitmaps[idx].GetWidth(), bitmaps[idx].GetHeight());
-
+      DebugLn('part 4');
       if chunks[i].Planes[j] = 0 then
       begin
         hbitmaps += Self.Loader.GetMap(s, f, 0, ERSMap.HEIGHT);
         hbitmaps[High(hbitmaps)].Pad(padding);
       end;
+      DebugLn('part 4.1');
       cbitmaps += Self.Loader.GetMap(s, f, chunks[i].Planes[j], ERSMap.COLLISION);
+      DebugLn('part 5');
       if not GENERATED_GRAPH.Disabled then
         graphs += Self.SetupGraph(name, idx, chunks[i].Planes[j], padding, cbitmaps[idx]);
-
+      DebugLn('part 6');
       cbitmaps[idx].Pad(padding);
       if not objectsDone then
       begin
@@ -695,9 +780,10 @@ begin
         json := Self.Loader.GetJSON(s, f, chunks[i].Planes[j], ERSMapJSON.NPCS);
         npcs += json;
       end;
+      DebugLn('part 7');
     end;
   Self.Pack();
-
+  DebugLn('part 8');
   Self.Map        := Self.InternalLoad(bitmaps);
   Self.Heightmap  := Self._InternalLoad(hbitmaps);
   Self.Collision  := Self._InternalLoad(cbitmaps);
@@ -709,7 +795,7 @@ begin
     Self.ObjectData := Self.InternalJSONLoad(objects, 'mapobjects');
   if not npcsDone then
     Self.NPCData    := Self.InternalJSONLoad(npcs, 'mapnpcs');
-
+  DebugLn('part 9');
   Self.UsingChunks := True;
 end;
 
