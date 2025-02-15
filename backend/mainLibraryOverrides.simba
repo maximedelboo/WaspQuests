@@ -591,10 +591,10 @@ begin
 
     for i := 0 to High(whiteClusters) do
     begin
-      if Length(whiteClusters[i]) <= 8 then
+      if Length(whiteClusters[i]) <= 6 then
         Continue;
 
-      graySubset := whiteclusters[i].Bounds.Expand(40).Filter(gray);
+      graySubset := whiteclusters[i].Bounds.Expand(80).Filter(gray);
       merged := whiteclusters[i] + graySubset;
       mergedClusters := merged.NRCluster(1);
 
