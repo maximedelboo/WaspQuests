@@ -1,3 +1,10 @@
+## [0.4.3](https://github.com/maximedelboo/WaspQuests/compare/v0.4.2...v0.4.3) (2025-02-15)
+
+
+### Bug Fixes
+
+* walkablecluster fix ([6d83492](https://github.com/maximedelboo/WaspQuests/commit/6d83492662b2e834665759abe101cae9e1093a6c))
+
 ## [0.4.2](https://github.com/maximedelboo/WaspQuests/compare/v0.4.1...v0.4.2) (2025-02-15)
 
 
