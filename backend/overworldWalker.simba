@@ -118,7 +118,7 @@ function TRSOverworldWalker.OverworldPosition(): TPoint;
 var
   map, downmap: TMufasaBitmap;
   minimapImage, minimapSample: TMufasaBitmap;
-  cache: TMatchTemplateRGBCache;
+  cached: TMatchTemplateRGBCache;
   tpa: TPointArray;
   i: Integer;
   match: Single;
@@ -132,9 +132,9 @@ begin
   minimapImage := Minimap.GetCleanMinimap();
   minimapSample := Minimap.ScaleMinimap(minimapImage, 8, 67);
 
-  cache := TMatchTemplateRGBCache.Create(downmap.ToMatrix(), MinimapSample.ToMatrix());
+  cached := TMatchTemplateRGBCache.Create(downmap.ToMatrix(), MinimapSample.ToMatrix());
 
-  tpa := Self.ScaledSearch(minimapSample, cache);
+  tpa := Self.ScaledSearch(minimapSample, cached);
 
   for i := 0 to High(tpa) do
   begin
@@ -177,11 +177,36 @@ begin
       Result += [x,y];
 end;
 
+procedure TRSOverworldWalker.StoreFullCache();
+var
+  cacheroot, zipPath: String;
+  cachetype: String;
+  foldernames: TStringArray = ['map', 'npcs', 'objects', 'heightmap', 'collision'];
+begin
+  Self.DebugLn('Unziping all cache. This takes around 1 minute');
+  for cachetype in foldernames do
+  begin
+    WriteLn('Unziping ', cachetype, ' to ', Self.Cache + cachetype + DirectorySeparator);
+    cacheroot := Self.Cache + cachetype + DirectorySeparator;
+    zipPath := RSMAP_PATH + 'files' + DirectorySeparator + cachetype + '.zip';
+
+    if not ForceDirectories(cacheroot) then
+      begin
+        Self.Fatal('Failed to create TRSMapLoader cache directories.');
+      end;
+    UnZipFile(zipPath, cacheroot)
+  end;
+  WriteFileContents(Self.Cache + 'cached.txt', 'yay', False);
+end;
+
 function TRSOverworldWalker.GetBitmap(chunk: TPoint): TMufasaBitmap;
 var
   cacheroot, cachename: String;
 begin
   Result.Init();
+
+  if not FileExists(self.Cache + 'cached.txt') then
+    Self.StoreFullCache;
 
   cacheroot := Self.Cache + 'map' + DirectorySeparator;
   cachename := cacheroot + '0' + DirectorySeparator + ToStr(chunk.X) + '-' + ToStr(chunk.Y);
