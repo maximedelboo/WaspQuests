@@ -82,6 +82,11 @@ begin
   self += addedQuest;
 end;
 
+procedure TQuest.LoadOverworld();
+begin
+  Overworld.SetupChunk(Overworldchunk);
+end;
+
 procedure TQuest.Init(MaxActions: UInt32; MaxTime: UInt64); override;
 var
   box: TBox;
@@ -96,9 +101,6 @@ begin
     Options.SetMaxBrightness;
   Self.PrintTimer.Init(5 * ONE_SECOND);
 
-  DebugLn('Setting up overworld map, this takes around 15 seconds');
-  Overworld.SetupChunk(OverworldChunk, 8);
-
   Self.SetupProcedure();
 
   if not self.questName.Contains('Tutorial') then
@@ -109,8 +111,6 @@ begin
   end;
 
   options.SetNPCAttackOption(ERSAttackOption.ALWAYS_LEFT_CLICK);
-
-  Self.DebugLn('Setting up map, this can take a second');
 
   Map.SetupChunks(Quest.region, 8, not Quest.DisableLadders);
   Map.Walker.WebGraph^.UseCollisionData := True;
@@ -131,9 +131,35 @@ begin
   Self.Walker.WebWalk(Q^.startTile);
 end;
 
-procedure TQuest.PreQuestRoutine();
+
+function TQuest.CachedTimePos(): TTimedPos;
+var
+  json: TJsonObject;
 begin
-  Map.GetToOverworldPoint(Self.startTile);
+  json.init(ReadFileContents(PositionFile));
+  Result.pos := [json.getInt('x'), json.getInt('y')];
+  Result.time := StrToInt(json.getString('timestamp').Before('.'));
+end;
+
+function TQuest.PreQuestRoutine(): Boolean;
+var
+  tp: TTimedPos;
+begin
+  if not (Self.startTile = [0,0]) then
+  begin
+    tp := Self.CachedTimePos;
+    if (tp.Time - GetTickCount()) > 2*ONE_MINUTE then
+    begin
+      if map.CheckPointOnMap(tp.pos) then
+        if Map.OnMap() then
+        begin
+          if not Map.Walker.WebWalk(Self.startTile) then Exit(False);
+        end else
+          Exit(False);
+    end;
+
+    Map.GetToOverworldPoint(Self.startTile);
+  end;
 end;
 
 procedure TQuest.Solve(startStep: Integer = 1);
@@ -187,6 +213,7 @@ begin
     if attempts > 5 then TerminateScript('Failed to solve step: ' + self.steps[index].name + ' with index ' + IntToStr(self.index + 1));
   end;
   DebugLn('Quest solved');
+  Self.completed := True;
 end;
 
 procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);

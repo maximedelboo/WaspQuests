@@ -264,14 +264,18 @@ var
   PositionTimer: TCountdown;
   WQCacheDir, positionFile, WQWebGraphDir: String;
   OverworldChunk: TRSMapChunk;
+  GLOBAL_BLOCKED_AREAS: TBoxArray;
   {$H-} Overworld: TRSMap; {$H+}
 
 begin
-  PositionTimer.Init(15000);
   WQCacheDir := Cache_dir + 'WaspQuests' + DirectorySeparator;
+  if not RSClient.IsLoggedIn() then
+    Login.LoginPlayer();
   PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
   OverworldChunk := [[16,64,61,39],[0]];
   WQWebGraphDir := IncludePath + 'WaspQuests' + DirectorySeparator + 'webgraph' + DirectorySeparator;
+  PositionTimer.Init(1);
+  GLOBAL_BLOCKED_AREAS += [7353, 36712, 7376, 36742];
 end;
 
 procedure TRSMapLoader.Init(downscale: UInt32); override;
@@ -300,13 +304,48 @@ begin
   Self.LegacyLoader.Setup(Self.Name + '.LegacyLoader', cache);
 end;
 
+procedure TRSMap.AddExtraNode(coord: TPoint; distance: Integer);
+var
+  i: Integer;
+  nearNodes, path, area: TPointArray;
+  s: TStopWatch;
+  added := False;
+begin
+  Self.Walker.WebGraph^.tree.Init(Copy(Map.Walker.WebGraph^.Nodes));
+  nearNodes := Self.Walker.WebGraph^.tree.RangeQueryEx(coord, distance,distance, False);
+  area := Self.Walker.WebGraph^.WalkableSpace.FilterBox(Box(coord, distance + 5, distance + 5));
+  for i := 0 to high(nearNodes) do
+  begin
+    added := False;
+    try
+      s.Start;
+      path := area.AStar(coord, nearNodes[i], False);
+      WriteLn('1: ', s.ElapsedTime());
+      if Length(path) > 0 then
+      begin
+        if not added then
+          Self.Walker.WebGraph^.AddNode(coord, -1);
+        added := True;
+        s.Start;
+        Self.Walker.WebGraph^.ConnectNodes(high(Self.Walker.WebGraph^.nodes), nearNodes[i]);
+        Writeln('Node added');
+        WriteLn('2: ', s.ElapsedTime());
+      end;
+    except
+      Writeln('Node skipped');
+      Continue;
+    end;
+  end;
+  Self.Walker.WebGraph^.tree.Free();
+end;
+
 procedure TRSChunkLoader.StoreFullCache();
 var
   cacheroot, zipPath: String;
   cachetype: String;
   foldernames: TStringArray = ['map', 'npcs', 'objects', 'heightmap', 'collision'];
 begin
-  Self.DebugLn('Unziping all cache.After This takes around 1 minute');
+  Self.DebugLn('Unziping all cache. This takes around 1 minute');
   for cachetype in foldernames do
   begin
     WriteLn('Unziping ', cachetype);
@@ -434,7 +473,7 @@ begin
       if not WriteFileContents(cachename + '.json', Result.ToString, False) then
         Self.Fatal('Failed to save ' + cachename + ' json.');
     except
-      Self.Fatal('Something went wrong saving ' + cachename + ' json: ' + GetExceptionMessage());
+      Self.Fatal('Something went wrong saving ' + cachename + '.json: ' + GetExceptionMessage());
     end;
   end;
 end;
@@ -453,11 +492,10 @@ begin
   begin
     overworldName := Loader._GetChunk(OverworldChunk.Chunk, s, f) + '-' + GENERATED_GRAPH.Hash();
     ForceDirectories(CacheRoot + '0' + DirectorySeparator);
-    if (FileExists(WQWebGraphDir + overworldName + '.txt')) and not FileExists(cachename + '.txt') then
+    if (FileExists(WQWebGraphDir + 'webgraph.txt')) and not FileExists(cachename + '.txt') then
     begin
-      WriteLn('Copying file ', WQWebGraphDir + overworldName + '.txt', ' to ', cachename + '.txt');
-      CopyFile(WQWebGraphDir + overworldName + '.txt', cachename + '.txt', True);
-      Self.DebugLn('First time loading this version of WaspQuest, this might take a few minutes...');
+      WriteLn('Copying file ', WQWebGraphDir + 'webgraph.txt', ' to ', cachename + '.txt');
+      CopyFile(WQWebGraphDir + 'webgraph.txt', cachename + '.txt', True);
     end;
   end;
 
@@ -493,7 +531,7 @@ begin
     Result.LoadNamesFromString(j.Between('"names": "', '",'));
     Result.LoadDoorsFromString(j.Between('"doors": "', '",'));
   except
-    TerminateScript('Something went wrong loading the webraph: ' + GetExceptionMessage());
+    TerminateScript('Something went wrong loading the webgraph: ' + GetExceptionMessage());
   end;
 end;
 
@@ -584,11 +622,11 @@ begin
   if not DirectoryExists(OutputFolder) then
     ForceDirectories(OutputFolder);
 
-  Writeln('Extracting ', ArcFile, ' to ', OutputFolder);
+  //Writeln('Extracting ', ArcFile, ' to ', OutputFolder);
   ExitCode := RunCommand(ArcExe, ['x', ArcFile, '-o+', '-dp' + OutputFolder], s);
 
   if ExitCode = 0 then
-    Writeln('Extraction successful!')
+    //Writeln('Extraction successful!')
   else
     Writeln('Error during extraction. Exit Code: ', ExitCode);
 end;
@@ -721,9 +759,7 @@ var
   name: String;
   objectsDone, npcsDone: Boolean;
 begin
-  DebugLn('part 1');
   Self.Init(downscale);
-  DebugLn('part 2');
   for i := 0 to High(chunks) do
   begin
     j += Length(chunks[i].Planes);
@@ -731,9 +767,9 @@ begin
       name += ToStr(k) + '_' + Self._GetChunk(chunks[i].Chunk, s, f);
   end;
 
+
   objectsDone := Self.GetCache('mapobjects', name, Self.ObjectData);
   npcsDone := Self.GetCache('mapnpcs', name, Self.NPCData);
-  DebugLn('part 3');
   SetLength(Self.Regions, j);
 
   Self.Padding := padding;
@@ -757,18 +793,17 @@ begin
       bitmaps += Self.Loader.GetMap(s, f, chunks[i].Planes[j], ERSMap.NORMAL);
       bitmaps[idx].Pad(padding);
       Self.Regions[idx].Region := Box(0, 0, bitmaps[idx].GetWidth(), bitmaps[idx].GetHeight());
-      DebugLn('part 4');
+
       if chunks[i].Planes[j] = 0 then
       begin
         hbitmaps += Self.Loader.GetMap(s, f, 0, ERSMap.HEIGHT);
         hbitmaps[High(hbitmaps)].Pad(padding);
       end;
-      DebugLn('part 4.1');
+
       cbitmaps += Self.Loader.GetMap(s, f, chunks[i].Planes[j], ERSMap.COLLISION);
-      DebugLn('part 5');
       if not GENERATED_GRAPH.Disabled then
         graphs += Self.SetupGraph(name, idx, chunks[i].Planes[j], padding, cbitmaps[idx]);
-      DebugLn('part 6');
+
       cbitmaps[idx].Pad(padding);
       if not objectsDone then
       begin
@@ -780,10 +815,10 @@ begin
         json := Self.Loader.GetJSON(s, f, chunks[i].Planes[j], ERSMapJSON.NPCS);
         npcs += json;
       end;
-      DebugLn('part 7');
     end;
   Self.Pack();
-  DebugLn('part 8');
+
+
   Self.Map        := Self.InternalLoad(bitmaps);
   Self.Heightmap  := Self._InternalLoad(hbitmaps);
   Self.Collision  := Self._InternalLoad(cbitmaps);
@@ -795,7 +830,7 @@ begin
     Self.ObjectData := Self.InternalJSONLoad(objects, 'mapobjects');
   if not npcsDone then
     Self.NPCData    := Self.InternalJSONLoad(npcs, 'mapnpcs');
-  DebugLn('part 9');
+
   Self.UsingChunks := True;
 end;
 
@@ -916,14 +951,17 @@ end;
 procedure TRSMap.CachePosition(coord: TPoint);
 var
   JSON: TJSONObject;
+  time: UInt64;
 begin
   if not DirectoryExists(WQCacheDir) then
     CreateDirectory(WQCacheDir);
 
+  time := GetTickCount();
+
   JSON.init();
   JSON.put('x', coord.X);
   JSON.put('y', coord.Y);
-  JSON.put('timestamp', GetTickCount());
+  JSON.put('timestamp', ToStr(time));
 
   WriteFileContents(positionFile, json.ToString(1), False);
 end;
@@ -963,7 +1001,7 @@ begin
     Result := Self.Loader.GetGlobal(Self.RegionIndex, Result);
     if PositionTimer.IsFinished and (Self.Similarity > 0.6)then
     begin
-      PositionTimer.Restart();
+      PositionTimer.Init(15000);
       Self.CachePosition(Result);
     end;
     if Self.Loader.UsingChunks then
@@ -980,16 +1018,21 @@ function TRSWalkerV2.WebWalkEx(me: TPoint; destination: TPoint; waitUntilDistanc
   function _GetPath(me: TPoint; safe: Boolean): TPointArray;
   var
     errorTimer: TCountdown;
+    st: TStopwatch;
   begin
     try
       me := RSTranslator.NormalizeDoor(me);
+      st.Start;
       Result := Self.WebGraph^.PathBetweenEx(me, destination, pathRandomness, 4, safe);
+      WriteLn('Finding path took ', st.ElapsedTime, ' ms');
     except
+      WriteLn('Cannot find path from position ', me);
       errorTimer.Init(5000);
       while not errorTimer.IsFinished do
       begin
         try
-          Self.DebugLn('Cannot find position, rotating');
+          Self.DebugLn('Cannot find path, rotating');
+          WriteLn('errortimer: ', errortimer.TimeRemaining());
           Antiban.RandomRotate();
           Result := Self.WebGraph^.PathBetweenEx(me, destination, pathRandomness, 4, safe);
           Exit(Result);
@@ -1017,7 +1060,8 @@ begin
     Self._DoorHandler.SettingUp := False;
     Self._DoorHandler.Handling := False;
 
-    WriteLn('Doors on path found: ', Length(Doors));
+    if length(doors) > 0 then
+      WriteLn('Doors on path found: ', Length(Doors));
 
     if Length(doors) = 0 then Break;
 

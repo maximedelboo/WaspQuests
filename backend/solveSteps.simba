@@ -152,8 +152,6 @@ begin
       step.objectTarget.Finder.Colors := step.colors;
   end;
 
-  //Debug(step.objectTarget);
-
   try
     if step.webwalk then
       step.actionSucceeded := step.objectTarget.WalkSelectOption([step.action],5)
@@ -462,6 +460,9 @@ begin
     else
       step.NPC_target.Finder.Colors := step.colors;
   end;
+
+  //Writeln step.NPC_target.Coordinates;
+  //Debug(Step.NPC_target);
 
   if step.actionSucceeded then step.actionSucceeded := step.NPC_target.find(atpa);
 

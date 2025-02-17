@@ -3,11 +3,485 @@
   {$I WaspQuests/osr.simba}
 {$ENDIF}
 
-function TRSMap.OnMap(tolerance: Single = 0.5): Boolean;
+type
+  TRSOverworldWalker = record(TSRLBaseRecord)
+    Cache: String;
+    Area: TMufasaBitmap;
+    Similarity: Double;
+    LastPos: TPoint;
+    newMap, debug, isSetup: Boolean;
+    AreaBox: TBox;
+    Graph: TWebGraphV2;
+    Walker: TRSWalkerV2;
+  end;
+
+procedure TRSOverworldWalker.CachePosition(coord: TPoint);
+var
+  JSON: TJSONObject;
+  time: UInt64;
 begin
-  Self.Position();
-  Exit(Self.Similarity > tolerance);
+  if not DirectoryExists(WQCacheDir) then
+    CreateDirectory(WQCacheDir);
+
+  time := GetTickCount();
+
+  JSON.init();
+  JSON.put('x', coord.X);
+  JSON.put('y', coord.Y);
+  JSON.put('timestamp', ToStr(time));
+
+  WriteFileContents(positionFile, json.ToString(1), False);
 end;
+
+function TRSOverworldWalker.CachedTimePos(): TTimedPos;
+var
+  json: TJsonObject;
+begin
+  if not FileExists(PositionFile) then Exit();
+  json.init(ReadFileContents(PositionFile));
+  Result.pos := [json.getInt('x'), json.getInt('y')];
+  Result.time := StrToInt64(json.getString('timestamp').Before('.'));
+end;
+
+function TRSOverworldWalker.FullSearch(mini, bigmap: TMufasaBitmap; out match: Single; p: TPoint; b: TBox): TPoint;
+const
+  TEMPL_SIZE = 25;
+  SLICE_SIZE = TEMPL_SIZE + 45;
+  SCALING = 2;
+var
+  slice, downscaledSlice, downscaledTemplate: TMufasaBitmap;
+  matrix: TSingleMatrix;
+  a: TBox;
+  offset: TPoint;
+begin
+  a := [
+    Max(0, p.X - SLICE_SIZE),
+    Max(0, p.Y - SLICE_SIZE),
+    Min(bigmap.GetWidth()  - 1, p.X + SLICE_SIZE),
+    Min(bigmap.GetHeight() - 1, p.Y + SLICE_SIZE)
+  ];
+
+  slice := bigmap.Copy(a);
+  downscaledSlice := slice.Downsample(SCALING);
+  downscaledTemplate := mini.Downsample(SCALING);
+
+  with downscaledTemplate.GetCenter() do
+    downscaledTemplate.Crop(X - TEMPL_SIZE, Y - TEMPL_SIZE, X + TEMPL_SIZE, Y + TEMPL_SIZE);
+
+  matrix := downscaledSlice.MatchTemplate(downscaledTemplate, TM_CCOEFF_NORMED);
+  with matrix.ArgMax() do
+  begin
+    match := matrix[Y, X];
+    Result.X := a.X1 + (X + TEMPL_SIZE) * SCALING;
+    Result.Y := a.Y1 + (Y + TEMPL_SIZE) * SCALING;
+  end;
+
+  offset := RSTranslator.Chunk2Coordinate([b.X1, b.Y1]);
+  Result := Result.Offset(offset);
+  Result := RSTranslator.Normalize(Result);
+
+  downscaledTemplate.Free();
+  downscaledSlice.Free();
+  slice.Free();
+end;
+
+
+
+function TRSOverworldWalker.ScaledSearch(minidown: TMufasaBitmap; cache: TMatchTemplateRGBCache): TPointArray;
+var
+  matrix: TSingleMatrix;
+  w, h, n, loops: Int32;
+  p: TPoint;
+begin
+  matrix := MatchTemplateMask(cache, minidown.ToMatrix(), TM_CCOEFF_NORMED);
+
+  w := minidown.GetWidth() div 2;
+  h := minidown.GetHeight() div 2;
+
+  while Length(Result) < 4 do
+  begin
+    with matrix.ArgMax() do
+    begin
+      p := Offset(w, h) * 8;
+      Result += p;
+      matrix.Fill([X - 5, Y - 5, X + 5, Y + 5], 0);
+    end;
+
+    if Inc(loops) > 70 then Break;
+  end;
+
+  n := 8 div 2;
+  Result := Result.Offset(n, n);
+end;
+
+function TRSOverworldWalker.OverworldPosition(): TPoint;
+var
+  map, downmap: TMufasaBitmap;
+  minimapImage, minimapSample: TMufasaBitmap;
+  cache: TMatchTemplateRGBCache;
+  tpa: TPointArray;
+  i: Integer;
+  match: Single;
+  hit: TPoint;
+begin
+  DebugLn('Finding overworld position');
+  map.FromFile(WQWebgraphDir + 'overworld.png');
+  Downmap.Init();
+  map.Downsample(8, downmap);
+
+  minimapImage := Minimap.GetCleanMinimap();
+  minimapSample := Minimap.ScaleMinimap(minimapImage, 8, 67);
+
+  cache := TMatchTemplateRGBCache.Create(downmap.ToMatrix(), MinimapSample.ToMatrix());
+
+  tpa := Self.ScaledSearch(minimapSample, cache);
+
+  for i := 0 to High(tpa) do
+  begin
+    hit := Self.FullSearch(minimapImage, map, match, tpa[i], Box(16,64,61,39));
+
+    if match > Self.Similarity then
+    begin
+      Self.Similarity := match;
+      Result := hit;
+    end;
+  end;
+  minimapImage.Free();
+  map.Free();
+  downmap.Free();
+  minimapSample.Free();
+  DebugLn('Done finding overworld position');
+  if PositionTimer.IsFinished and (Self.Similarity > 0.6)then
+  begin
+    PositionTimer.Init(15000);
+    Self.CachePosition(Result);
+  end;
+end;
+
+function TRSOverworldWalker.GetNearChunk(p: TPoint): TBox;
+var chunk: TPoint;
+begin
+  chunk := RSTranslator.Global2Chunk(p);
+  Result := Box(chunk.X-1, chunk.Y + 1, chunk.X + 1, chunk.Y - 1);
+end;
+
+function TRSOverworldWalker.GetChunks(b: TBox): TPointArray; static;
+var
+  x, y: Int32;
+  s,f: TPoint;
+begin
+  s := [b.X1, b.Y1];
+  f := [b.X2, b.Y2];
+  for x := Min(s.X, f.X) to Max(s.X, f.X) do
+    for y := Min(s.Y, f.Y) to Max(s.Y, f.Y) do
+      Result += [x,y];
+end;
+
+function TRSOverworldWalker.GetBitmap(chunk: TPoint): TMufasaBitmap;
+var
+  cacheroot, cachename: String;
+begin
+  Result.Init();
+
+  cacheroot := Self.Cache + 'map' + DirectorySeparator;
+  cachename := cacheroot + '0' + DirectorySeparator + ToStr(chunk.X) + '-' + ToStr(chunk.Y);
+
+  Result.SetName(cachename);
+
+  Result.LoadFromFile(cachename + '.png');
+end;
+
+function TRSOverworldWalker.GetChunkBitmap(b: TBox): TMufasaBitmap;
+var
+  i, x, y, n: Int32;
+  lo, hi: TPoint;
+  chunks: TPointArray;
+  chunkMaps: array of record
+    Point: TPoint;
+    Image: TMufasaBitmap;
+  end;
+
+begin
+  chunks := Self.GetChunks(b);
+
+  SetLength(chunkMaps, Length(chunks));
+
+  lo := [$FFFFFF, $FFFFFF];
+
+  for i := 0 to High(chunks) do
+  begin
+    chunkMaps[i].Image := Self.GetBitmap(chunks[i]);
+
+    x := chunks[i].X;
+    y := 199 - chunks[i].Y;
+
+    chunkMaps[i].Point := [x,y];
+    lo := [Min(x, lo.X), Min(y, lo.Y)];
+    hi := [Max(x, hi.X), Max(y, hi.Y)];
+  end;
+
+  Result.Init();
+  n := RSTranslator.Map.ChunkSide;
+
+  Result.SetSize((hi.X-lo.X) * n + 1 + n, (hi.Y-lo.Y) * n + 1 + n);
+
+  for i := 0 to High(chunkMaps) do
+  begin
+    x := (chunkMaps[i].Point.X - lo.X) * n;
+    y := (chunkMaps[i].Point.Y - lo.Y) * n;
+
+    Result.DrawBitmap(chunkMaps[i].Image, Point(x, y));
+    chunkMaps[i].Image.Free();
+  end;
+end;
+
+procedure TRSOverworldWalker.SetCurrentArea(p: TPoint);
+var
+  b: TBox;
+begin
+  if self.area <> nil then
+    self.Area.Free();
+  b := Self.GetNearChunk(p);
+  Self.Area := Self.GetChunkBitmap(b);
+  Self.AreaBox := b;
+end;
+
+function TRSOverworldWalker.Position(): TPoint;
+const
+  TEMPL_SIZE = 25;
+  SCALING = 2;
+var
+  clean, dbg: TMufasaBitmap;
+  downscaledSlice, downscaledTemplate: TMufasaBitmap;
+  matrix: TSingleMatrix;
+  b: TBox;
+  offset: TPoint;
+  sw: TStopwatch;
+begin
+  if Self.newMap then
+  begin
+    Self.SetCurrentArea(Self.LastPos);
+    Self.newMap := False;
+  end;
+
+  Self.Similarity := 0;
+
+  clean := Minimap.GetCleanMinimap();
+
+  downscaledSlice := Self.Area.Downsample(SCALING);
+  downscaledTemplate := clean.Downsample(SCALING);
+
+  with downscaledTemplate.GetCenter() do
+    downscaledTemplate.Crop(X - TEMPL_SIZE, Y - TEMPL_SIZE, X + TEMPL_SIZE, Y + TEMPL_SIZE);
+
+  matrix := downscaledSlice.MatchTemplate(downscaledTemplate, TM_CCOEFF_NORMED);
+  with matrix.ArgMax() do
+  begin
+    Self.Similarity := matrix[Y, X];
+    Result.X := X + TEMPL_SIZE;
+    Result.Y := Y + TEMPL_SIZE;
+  end;
+
+  if debug = True then
+  begin
+    dbg.Create(Round(Self.Area.getWidth*1.2/SCALING), Self.Area.getHeight);
+    dbg.DrawBitmap(downscaledSlice.Copy(), [0,0]);
+    dbg.DrawBitmap(downscaledTemplate, [Round(RSTranslator.Map.ChunkSide*3.1 / SCALING), 0]);
+    b := Box(Self.Area.Bounds.Middle * (1/SCALING), Round(RSTranslator.Map.ChunkSide *0.7 / SCALING), Round(RSTranslator.Map.ChunkSide *0.7/ SCALING));
+    dbg.DrawCross(Result, 3, $FF);
+    dbg.DrawBox(b, $FFFFFF);
+    dbg.Debug();
+    dbg.Free();
+  end;
+
+  Result *= SCALING;
+
+  offset := RSTranslator.Chunk2Coordinate([self.AreaBox.X1, self.AreaBox.Y1]);
+  Result := Result.Offset(offset);
+  Result := RSTranslator.Normalize(Result);
+
+  b := Box(Self.Area.Bounds.Middle, Round(RSTranslator.Map.ChunkSide *0.7), Round(RSTranslator.Map.ChunkSide *0.7)).Offset(offset);
+
+  if not Result.InBox(b) then
+  begin
+    DebugLn('Setting new region');
+    sw.Start();
+    Self.SetCurrentArea(Result);
+    Writeln('Setting new region took: ', sw.ElapsedTime, ' ms');
+  end;
+
+  downscaledTemplate.Free();
+  downscaledSlice.Free();
+  clean.Free();
+
+  Self.LastPos := Result;
+
+  if PositionTimer.IsFinished and (Self.Similarity > 0.5)then
+    begin
+      PositionTimer.Init(15000);
+      Self.CachePosition(Result);
+    end;
+end;
+
+procedure TRSOverworldWalker.Free();
+begin
+  if Assigned(Self.Area) then
+  begin
+    Self.Area.Free();
+    Self.Area := nil;
+  end;
+end;
+
+function TRSOverworldWalker.InitPosition(): Boolean;
+var
+  p: TPoint;
+  tp:  TTimedPos;
+begin
+  tp := Self.CachedTimePos;
+  Self.newMap := True;
+  if (tp.Time - GetTickCount()) < 2*ONE_MINUTE then
+  begin
+    Self.LastPos := tp.pos;
+    if (Self.LastPos <> [0,0]) then
+      Self.SetCurrentArea(Self.LastPos);
+    p := Self.Position();
+    if Self.Similarity > 0.5 then
+      Self.LastPos := p
+    else
+    begin
+      p := Self.OverworldPosition();
+      if Self.Similarity > 0.5 then
+      begin
+        Self.LastPos := p;
+        Self.newMap := True;
+        Exit(True);
+      end
+      else
+      begin
+        Self.debugLn('Failed to find valid position on overworld');
+        Exit(False);
+      end;
+    end;
+    Result := True;
+    Self.newMap := True;
+  end
+  else
+  begin
+    p := Self.OverworldPosition();
+    if Self.Similarity > 0.5 then
+    begin
+      Self.LastPos := p;
+      Self.newMap := True;
+      Exit(True);
+    end
+    else
+    begin
+      Self.debugLn('Failed to find valid position on overworld');
+      Exit(False);
+    end;
+  end;
+end;
+
+procedure TRSOverworldWalker.InitWalker();
+var
+  cbitmap: TMufasaBitmap;
+  j: String;
+  gray, white: TPointArray;
+  grayClusters: T2DPointArray;
+  i: Int32;
+  offset: TPoint;
+  loader: TRSMapLoader;
+begin
+  Self.DebugLn('Initializing Overworld.Walker');
+  try
+    j := ReadFileContents(WQWebgraphDir + 'webgraph.txt');
+
+    Self.Graph.LoadNodesFromString(j.Between('"nodes": "', '",'));
+    Self.Graph.LoadPathsFromString(j.Between('"paths": "', '",'));
+    Self.Graph.LoadNamesFromString(j.Between('"names": "', '",'));
+    Self.Graph.LoadDoorsFromString(j.Between('"doors": "', '",'));
+  except
+    TerminateScript('Something went wrong loading the webgraph: ' + GetExceptionMessage());
+  end;
+
+  offset := RSTranslator.Chunk2Coordinate([16,64]);
+  Self.Graph.Nodes := Self.Graph.Nodes.Offset(offset);
+
+  cbitmap.FromFile(WQWebgraphDir + 'collision.png');
+
+  cbitmap.FindColors(white, $FFFFFF);
+  cbitmap.FindColors(gray, $333333);
+  cbitmap.Free();
+
+  white := white.Offset(offset);
+  gray := gray.offset(offset);
+
+  grayClusters := gray.NRCluster(1);
+
+  Self.Graph.WalkableSpace    := white + gray;
+  Self.Graph.ObjectClusters   := grayClusters;
+
+  loader.GetWalkableClusters(WQWebgraphDir, 'walkableclusters', Self.Graph.WalkableClusters);
+
+  for i := 0 to High(Self.Graph.Doors) do
+  begin
+    Self.Graph.Doors[i].Before := RSTranslator.Normalize(Self.Graph.Doors[i].Before.Offset(offset));
+    Self.Graph.Doors[i].After  := RSTranslator.Normalize(Self.Graph.Doors[i].After.Offset(offset));
+    Self.Graph.Doors[i].Center := RSTranslator.Normalize(Self.Graph.Doors[i].Center.Offset(offset));
+  end;
+
+  for i := 0 to high(GLOBAL_BLOCKED_AREAS) do
+    Self.Graph.BlockInside(GLOBAL_BLOCKED_AREAS[i]);
+
+  Self.Walker.Setup(@Self.Position, nil, nil, @Self.Graph, nil);
+  Self.Walker.Name := 'Overworld.Walker';
+  Self.Walker._DoorHandler.Enabled := True;
+  Self.Walker.WebGraph^.UseCollisionData := True;
+  AddOnTerminate(@Self.Free);
+  Self.DebugLn('Done initializing Overworld.Walker');
+end;
+
+function TRSOverworldWalker.Init(): Boolean;
+var
+  version: String;
+begin
+  Self.name := 'Overworld';
+
+  version := SHA1String(
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'map.zip') +
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'heightmap.zip') +
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'collision.zip') +
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'objects.zip') +
+     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'npcs.zip') +
+     SHA1File(IncludePath + 'WaspQuests' + DirectorySeparator + 'CHANGELOG.md')
+  );
+
+  version := version.SubString(6);
+  Self.Cache := CACHE_DIR + 'map' + DirectorySeparator +
+                version + DirectorySeparator;
+
+  Result := Self.InitPosition;
+  Self.InitWalker();
+  Self.IsSetup := True;
+end;
+
+function TRSMap.OnMap(tolerance: Single = 0.5; deepCheck: Boolean = False): Boolean;
+var
+  p,q: TPoint;
+begin
+  p := Self.Position();
+  if not deepCheck then
+    Exit(Self.Similarity > tolerance);
+
+  if Self.Similarity < tolerance then Exit(False);
+
+  Antiban.RandomRotate();
+  q := Self.Position();
+
+  Exit((Self.Similarity > tolerance) and (p = q));
+end;
+
+
 
 function TRSMap.HomeTeleport(): Boolean;
 begin
