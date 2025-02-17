@@ -124,7 +124,7 @@ begin
   imgTar := GetImageTarget;
 
   ladderDTM := DTMFromString('mggAAAHicY2OAACYo/g8EMD4MsELxX6AcCEdrMTBgw7gAIw4MAQAt8w8r'); //DTMFromString('mggAAAHicY2NgYNBlZGDQh2IdRgS/mAmCK6C4AIojNBmxYlyAEQeGAABPegb0');//DTMFromString('mggAAAHicY2NgYFCDYk0g1gBibSjmYWRgEARiXiAWgNIgfoQmI1aMCzDiwBAAAGGzBGo=');
-  bmp := Self.Loader.Map.copy();;
+  bmp := Self.Loader.Map.copy();
   bmpbox := bmp.Bounds;
   client.getMBitmaps.AddBMP(bmp);
   i := SetTargetBitmap(bmp.getIndex());
