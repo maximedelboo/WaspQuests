@@ -1,3 +1,10 @@
+## [0.5.1](https://github.com/maximedelboo/WaspQuests/compare/v0.5.0...v0.5.1) (2025-02-17)
+
+
+### Bug Fixes
+
+* Added tourist trap ([35b4742](https://github.com/maximedelboo/WaspQuests/commit/35b47428206b84e724af54d7319e1a20f16d3e3a))
+
 # [0.5.0](https://github.com/maximedelboo/WaspQuests/compare/v0.4.4...v0.5.0) (2025-02-17)
 
 
