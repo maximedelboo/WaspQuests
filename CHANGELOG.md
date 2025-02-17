@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/maximedelboo/WaspQuests/compare/v0.4.4...v0.5.0) (2025-02-17)
+
+
+### Features
+
+* Added OverworldWalker ([ce87b62](https://github.com/maximedelboo/WaspQuests/commit/ce87b62ab1b0a9192691c391df1a2a026d3eab4f))
+
 ## [0.4.4](https://github.com/maximedelboo/WaspQuests/compare/v0.4.3...v0.4.4) (2025-02-15)
 
 
