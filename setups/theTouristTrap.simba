@@ -166,7 +166,7 @@ begin
 
   Quest.questInfo += 'Start next to the quest start point (next to Irena)';
   Quest.questInfo += 'This quest requires 10 fletching and 20 smithing';
-  Quest.questInfo += 'The starting items are 5 bronze bars, 50 feather, the desert robe, shirt and boots (in your inventory)';
+  Quest.questInfo += 'The starting items are 5 bronze bars, 50 feather, a hammer, the desert robe, shirt and boots (in your inventory)';
   Quest.questInfo += 'You need 10 free inventory spaces and decent combat gear equipped to kill the mercenary captain';
   Quest.questInfo += 'A stamina potion and some waterskins are recommended!';
 
@@ -178,7 +178,7 @@ begin
   WoodenCart := CreateObject('Wooden cart', [9052, 38338]);
 
 
-  //Setup steps (mockup of dorics quest)
+  //Setup steps
   Quest.steps.AddTalkToStep('Talk to Irena', 'Irena', False);
   Quest.steps.CustomizeNPC(Irena);
   Quest.steps.AddConversationStep('Conversation Irena', [1,1,2,1,1]);
@@ -238,8 +238,8 @@ begin
   Quest.steps.CustomWaitTile([9016, 12722],20);
   Quest.steps.AddTalkToStep('Talk to Guard', 'Guard', True, [9012, 12762]);
   Quest.steps.AddConversationStep('Conversation Guard', []);
-  Quest.steps.AddInteractObjectStep('Go through Mine entrance', 'Mine cave', 'Walk through', True);
-  Quest.steps.CustomWaitTile([9040, 12770],5);
+  Quest.steps.AddInteractObjectStep('Go through Mine entrance', 'Mine cave', 'Walk through', False);
+  Quest.steps.CustomWaitTile([9044, 12770],10);
   Quest.steps.AddInteractObjectStep('Search barrel', 'Barrel', 'Search', True, [9112, 12770]);
   Quest.steps.AddConversationStep('Conversation Barrel', [1]);
   Quest.steps.CustomWaitItem('Barrel');
