@@ -123,6 +123,7 @@ var
 begin
   Quest.region := [[[47,53,49,51],[0,1,2]], [[48,152,48,152],[0]]]; // sample region
   Quest.StartingConditions := @ernestStart; // use @emptyStart for always true starting condition
+  Quest.startTile := [8344,37114];
 
   LeverA.size := Vec3(1.6,1.6,5);
   LeverA.SetupCoordinates([[8336, 11450]]);
@@ -264,10 +265,9 @@ begin
   Quest.questInfo += 'Have at least 5 free inventory spaces';
 
   GENERATED_GRAPH.NodeRadius := 30;
-  Quest.DisableLadders := True;
 
   //Setup steps (mockup of dorics quest)
-  Quest.steps.AddInteractNpcStep('Talk to Veronica', 'Veronica', 'Talk-to');
+  Quest.steps.AddTalkToStep('Talk to Veronica', 'Veronica');
   Quest.steps.AddConversationStep('Finish Veronica conversation', [1]);
   Quest.steps.AddWalkStep('Walk to poison', [8296, 36970]);
   Quest.steps.CustomWaitTile([8296, 36970], 5);
@@ -377,8 +377,7 @@ begin
   Quest.steps.AddWalkStep('Walk to fungi', [8256, 37018]);
   Quest.steps.AddClickTileStep('click behind fungi 2', [8264, 37030], 'Walk here');
   Quest.steps.AddWalkStep('Walk to fountain', [8256, 37086]);
-  Quest.steps.AddInteractInventoryStep('Click fish food', 'Poisoned fish food', 'Use');
-  Quest.steps.AddClickTileStep('Click fountain', [8256, 37090], '-> Fountain');
+  Quest.Steps.AddUseOnObjectStep('use fish food on fountain', 'Poisoned fish food', 'Fountain', False);
   Quest.steps.AddWaitStep('Wait a sec', 2000);
   Quest.steps.AddClickTileStep('Click fountain', [8256, 37090], 'Search');
   Quest.steps.AddConversationStep('Finish fountain convo', []);
@@ -390,9 +389,9 @@ begin
   Quest.steps.AddInteractObjectStep('Click stairs', 'Staircase', 'Climb-up', True, [21376, 36974]);
   Quest.steps.CustomWaitTile([34436, 36974], 9);
   Quest.steps.AddWalkStep('Walk to Oddenstein', [34456, 36966]);
-  Quest.steps.AddInteractNPCStep('Talk to Oddenstein', 'Professor Oddenstein', 'Talk-to', False, [34456, 36966]);
+  Quest.steps.AddTalkToStep('Talk to Oddenstein', 'Professor Oddenstein', False, [34456, 36966]);
   Quest.steps.AddConversationStep('Conversation Oddenstein', [1,2]);
-  Quest.steps.AddInteractNPCStep('Talk to Oddenstein', 'Professor Oddenstein', 'Talk-to', False);
+  Quest.steps.AddTalkToStep('Talk to Oddenstein', 'Professor Oddenstein', False);
   Quest.steps.AddConversationStep('Conversation Oddenstein', []);
   Quest.steps.AddWaitStep('Wait a sec', 6000);
   Quest.steps.AddConversationStep('Finish ernest convo', []);

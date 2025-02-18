@@ -584,6 +584,93 @@ begin
   end;
 end;
 
+function T2DIntegerArrayToString(const Arr: T2DIntArray): string;
+var
+  totalBytes, offset, i: Integer;
+  rowCount, rowLen: Integer;
+begin
+  // The header consists of:
+  //   1 Int32 for the row count, plus one Int32 per row for the row lengths.
+  rowCount := Length(Arr);
+  totalBytes := (1 + rowCount) * SizeOf(Int32);
+
+  // Then add each row's data size.
+  for i := 0 to rowCount - 1 do
+    totalBytes := totalBytes + (Length(Arr[i]) * SizeOf(Int32));
+
+  // Allocate the string (remember, Pascal strings are 1-indexed).
+  SetLength(Result, totalBytes);
+  offset := 1;
+
+  // Write the row count.
+  Move(rowCount, Result[offset], SizeOf(Int32));
+  Inc(offset, SizeOf(Int32));
+
+  // Write each row's length.
+  for i := 0 to rowCount - 1 do
+  begin
+    rowLen := Length(Arr[i]);
+    Move(rowLen, Result[offset], SizeOf(Int32));
+    Inc(offset, SizeOf(Int32));
+  end;
+
+  // Write each row's data.
+  for i := 0 to rowCount - 1 do
+  begin
+    if Length(Arr[i]) > 0 then
+    begin
+      Move(Arr[i][0], Result[offset], Length(Arr[i]) * SizeOf(Int32));
+      Inc(offset, Length(Arr[i]) * SizeOf(Int32));
+    end;
+  end;
+end;
+
+function T2DIntegerArrayFromString(const S: string): T2DIntArray;
+var
+  offset, rowCount, i, rowLen, dataBytes: Integer;
+begin
+  offset := 1;
+  // Make sure there's at least enough data for the row count.
+  if Length(S) < SizeOf(Int32) then
+    raiseException('Data too short to contain row count.');
+
+  // Read the row count.
+  Move(S[offset], rowCount, SizeOf(Int32));
+  Inc(offset, SizeOf(Int32));
+
+  // Allocate the outer array.
+  SetLength(Result, rowCount);
+
+  // For each row, read its length.
+  for i := 0 to rowCount - 1 do
+  begin
+    if (offset + SizeOf(Int32) - 1) > Length(S) then
+      raiseException('Data too short to contain length for row ' + tostr(i));
+
+    Move(S[offset], rowLen, SizeOf(Int32));
+    Inc(offset, SizeOf(Int32));
+    SetLength(Result[i], rowLen);
+  end;
+
+  // For each row, read its data.
+  for i := 0 to rowCount - 1 do
+  begin
+    dataBytes := Length(Result[i]) * SizeOf(Int32);
+    if (offset + dataBytes - 1) > Length(S) then
+      raiseException('Data too short for row');
+
+    if dataBytes > 0 then
+    begin
+      Move(S[offset], Result[i][0], dataBytes);
+      Inc(offset, dataBytes);
+    end;
+  end;
+
+  // Optional: Verify that we used exactly all the data.
+  if (offset - 1) <> Length(S) then
+    raiseException('Extra data found in the string.');
+end;
+
 procedure CompressFile(const ArcPath, FilePath: string);
 var
   ArcExe, s: string;
@@ -631,7 +718,7 @@ begin
     Writeln('Error during extraction. Exit Code: ', ExitCode);
 end;
 
-function TRSMaploader.GetWalkableClusters(cacheroot, name: String; out walkableClusters: T2DPointArray): Boolean;
+function TRSMaploader.LoadATPAfile(cacheroot, name: String; out walkableClusters: T2DPointArray): Boolean;
 var
   s: String;
 begin
@@ -645,6 +732,7 @@ begin
     end;
     s := ReadFileContents(cacheroot + name + '.txt');
     walkableClusters := s.toATPA();
+
     DeleteFile(cacheroot + name + '.txt');
     Exit(True);
   end;
@@ -702,7 +790,7 @@ begin
   cacheroot := self.Cache + 'walkableclusters' + DirectorySeparator + ToStr(plane) + DirectorySeparator;
   cachename := cacheroot + name;
 
-  if not Self.GetWalkableClusters(cacheroot, name, Result.WalkableClusters) then
+  if not Self.LoadATPAFile(cacheroot, name, Result.WalkableClusters) then
   begin
     Self.DebugLn('Caching Walkable Clusters');
     whiteClusters := white.NRCluster(1);

@@ -25,6 +25,8 @@ begin
   Romeo.Walker := @Map.Walker;
   Romeo.Size := [0.8,0.8,5];
 
+  Quest.startTile := [8764,36738];
+
   Quest.region := [[[48,54,51,52],[0,1]]]; // sample region
   Quest.StartingConditions := @RomeoStart; // use @emptyStart for always true starting condition
 

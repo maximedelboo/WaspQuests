@@ -105,6 +105,8 @@ begin
   inherited;
 end;
 
+
+
 var
   QuestConfig: TQuestConfig;
 

@@ -9,7 +9,8 @@ end;
 
 procedure SetupCooksAssistant();
 begin
-  Quest.region := [[[50,50,50,50],[0]]];
+  Quest.region := [[[49,50,50,49],[0]]];
+  Quest.startTile := [8740,37582];
   Quest.StartingConditions := @CooksStart;
 
   Quest.steps.AddTalkToStep('Talk to cook', 'Cook');
@@ -75,6 +76,8 @@ begin
   GENERATED_GRAPH.NodeRadius := 30;
   GENERATED_GRAPH.Spacing := 12;
   Quest.StartingConditions := @CooksStartIron;
+
+  Quest.startTile := [8740,37582];
 
   Quest.questInfo += 'Start anywhere around Lumbridge';
   Quest.questInfo += 'Have at least 6 free inventory spaces';

@@ -82,11 +82,6 @@ begin
   self += addedQuest;
 end;
 
-procedure TQuest.LoadOverworld();
-begin
-  Overworld.SetupChunk(Overworldchunk);
-end;
-
 procedure TQuest.Init(MaxActions: UInt32; MaxTime: UInt64); override;
 var
   box: TBox;
@@ -102,6 +97,9 @@ begin
   Self.PrintTimer.Init(5 * ONE_SECOND);
 
   Self.SetupProcedure();
+
+  if not OW.isSetup then
+    OW.Init();
 
   if not self.questName.Contains('Tutorial') then
   begin
@@ -147,17 +145,18 @@ var
 begin
   if not (Self.startTile = [0,0]) then
   begin
+    WriteLn('Walking to quest start');
     tp := Self.CachedTimePos;
     if (tp.Time - GetTickCount()) > 2*ONE_MINUTE then
     begin
       if map.CheckPointOnMap(tp.pos) then
         if Map.OnMap() then
-        begin
-          if not Map.Walker.WebWalk(Self.startTile) then Exit(False);
-        end else
-          Exit(False);
+          if not Map.Walker.WebWalk(Self.startTile) then
+            Exit(False)
+          else
+            Exit(True);
     end;
-
+    WriteLn('here');
     Map.GetToOverworldPoint(Self.startTile);
   end;
 end;
@@ -219,9 +218,11 @@ end;
 procedure TQuest.Run(MaxActions: UInt32; MaxTime: UInt64);
 begin
   Self.Init(MaxActions, MaxTime);
-  //Map.Debug();
-  Self.PreQuestRoutine();
   WriteLn('Starting at step: ', self.Index + 1);
-  if (self.index = 0) and not self.StartingConditions() then TerminateScript('Starting conditions not satisfied');
+  if (self.index = 0) then
+  begin
+    if not self.StartingConditions() then TerminateScript('Starting conditions not satisfied');
+    Self.PreQuestRoutine();
+  end;
   Self.Solve(self.Index + 1);
 end;

@@ -15,6 +15,9 @@ type
     Walker: TRSWalkerV2;
   end;
 
+var
+  OW: TRSOverworldWalker;
+
 procedure TRSOverworldWalker.CachePosition(coord: TPoint);
 var
   JSON: TJSONObject;
@@ -31,6 +34,19 @@ begin
   JSON.put('timestamp', ToStr(time));
 
   WriteFileContents(positionFile, json.ToString(1), False);
+end;
+
+function TRSOverworldWalker.OverworldBox(): TBox;
+var p1, p2: TPoint;
+begin
+  p1 := RSTranslator.Chunk2Coordinate([16, 64]);
+  p2 := RSTranslator.Chunk2Coordinate([62,38]);
+  Result := [p1.X, p1.Y, p2.X, p2.Y];
+end;
+
+function TRSOverworldWalker.InOverworld(p: TPoint): Boolean;
+begin
+  Result := p.InBox(Self.OverworldBox);
 end;
 
 function TRSOverworldWalker.CachedTimePos(): TTimedPos;
@@ -364,12 +380,14 @@ var
 begin
   tp := Self.CachedTimePos;
   Self.newMap := True;
-  if (tp.Time - GetTickCount()) < 2*ONE_MINUTE then
+  if (GetTickCount() - tp.Time) < 2*ONE_MINUTE then
   begin
     Self.LastPos := tp.pos;
     if (Self.LastPos <> [0,0]) then
+    begin
       Self.SetCurrentArea(Self.LastPos);
-    p := Self.Position();
+      p := Self.Position();
+    end;
     if Self.Similarity > 0.5 then
       Self.LastPos := p
     else
@@ -412,7 +430,7 @@ var
   cbitmap: TMufasaBitmap;
   j: String;
   gray, white: TPointArray;
-  grayClusters: T2DPointArray;
+  a: T2DPointArray;
   i: Int32;
   offset: TPoint;
   loader: TRSMapLoader;
@@ -421,32 +439,23 @@ begin
   try
     j := ReadFileContents(WQWebgraphDir + 'webgraph.txt');
 
-    Self.Graph.LoadNodesFromString(j.Between('"nodes": "', '",'));
-    Self.Graph.LoadPathsFromString(j.Between('"paths": "', '",'));
     Self.Graph.LoadNamesFromString(j.Between('"names": "', '",'));
     Self.Graph.LoadDoorsFromString(j.Between('"doors": "', '",'));
+
+    Self.Graph.Paths := T2DIntegerArrayFromString(ReadFileContents(WQWebgraphDir + 'paths.txt'));
+    Self.Graph.nodes := STRtoTPA(ReadFileContents(WQWebgraphDir + 'nodes.txt'));
   except
     TerminateScript('Something went wrong loading the webgraph: ' + GetExceptionMessage());
   end;
 
+
   offset := RSTranslator.Chunk2Coordinate([16,64]);
   Self.Graph.Nodes := Self.Graph.Nodes.Offset(offset);
 
-  cbitmap.FromFile(WQWebgraphDir + 'collision.png');
-
-  cbitmap.FindColors(white, $FFFFFF);
-  cbitmap.FindColors(gray, $333333);
-  cbitmap.Free();
-
-  white := white.Offset(offset);
-  gray := gray.offset(offset);
-
-  grayClusters := gray.NRCluster(1);
-
-  Self.Graph.WalkableSpace    := white + gray;
-  Self.Graph.ObjectClusters   := grayClusters;
-
-  loader.GetWalkableClusters(WQWebgraphDir, 'walkableclusters', Self.Graph.WalkableClusters);
+  loader.LoadATPAFile(WQWebgraphDir, 'walkableclusters', Self.Graph.WalkableClusters);
+  loader.LoadATPAFile(WQWebgraphDir, 'objectclusters', Self.Graph.ObjectClusters);
+  loader.LoadATPAFile(WQWebgraphDir, 'walkablespace', a);
+  Self.Graph.WalkableSpace := a[0];
 
   for i := 0 to High(Self.Graph.Doors) do
   begin
@@ -490,11 +499,30 @@ begin
   Self.IsSetup := True;
 end;
 
+function TRSOverworldWalker.OnMap(tolerance: Single = 0.5; deepCheck: Boolean = False): Boolean;
+var
+  p,q: TPoint;
+begin
+  p := Self.Position();
+  WriteLn('found pos ', p, ' with sim ', Self.Similarity);
+  if not deepCheck then
+    Exit(Self.Similarity > tolerance);
+
+  if Self.Similarity < tolerance then Exit(False);
+
+  Antiban.RandomRotate();
+  q := Self.Position();
+
+  Exit((Self.Similarity > tolerance) and (p = q));
+end;
+
 function TRSMap.OnMap(tolerance: Single = 0.5; deepCheck: Boolean = False): Boolean;
 var
   p,q: TPoint;
 begin
   p := Self.Position();
+  WriteLn('found pos ', p, ' with sim ', Self.Similarity);
+
   if not deepCheck then
     Exit(Self.Similarity > tolerance);
 
@@ -508,7 +536,7 @@ end;
 
 
 
-function TRSMap.HomeTeleport(): Boolean;
+function TRSOverworldWalker.HomeTeleport(): Boolean;
 begin
   case Magic.GetSpellBook of
     ERSSpellBook.ANCIENT: Magic.CastSpell(ERSSpell.EDGEVILLE_HOME_TELEPORT);
@@ -518,14 +546,14 @@ begin
   end;
 
   case Magic.GetSpellBook of
-    ERSSpellBook.ANCIENT: if WaitUntil(Overworld.Position.InRange([8260,36422], 24), 100,20000) then Exit(True);
-    ERSSpellBook.ARCEUUS: if WaitUntil(Overworld.Position.InRange([2704,34910], 24), 100,20000) then Exit(True);
-    ERSSpellBook.LUNAR: if WaitUntil(Overworld.Position.InRange([4356,34770], 24), 100,20000) then Exit(True);
-    ERSSpellBook.STANDARD: if WaitUntil(Overworld.Position.InRange([8788,37558], 24), 100,20000) then Exit(True);
+    ERSSpellBook.ANCIENT: if WaitUntil(OW.OverworldPosition.InRange([8260,36422], 24), 100,20000) then Exit(True);
+    ERSSpellBook.ARCEUUS: if WaitUntil(OW.OverworldPosition.InRange([2704,34910], 24), 100,20000) then Exit(True);
+    ERSSpellBook.LUNAR: if WaitUntil(OW.OverworldPosition.InRange([4356,34770], 24), 100,20000) then Exit(True);
+    ERSSpellBook.STANDARD: if WaitUntil(OW.OverworldPosition.InRange([8788,37558], 24), 100,20000) then Exit(True);
   end;
 end;
 
-function TRSMap.ReturnToKnownTerritory(): Boolean;
+function TRSOverworldWalker.ReturnToKnownTerritory(): Boolean;
 var
   fails: Integer;
   task: TBreakTask;
@@ -542,7 +570,6 @@ begin
     Result := True;
 end;
 
-//TODO
 function TRSMap.CheckPointOnMap(p: TPoint): Boolean;
 begin
   Result := not (Self.Loader.GlobalIndex(p) = -1);
@@ -555,29 +582,33 @@ begin
 
   if not Self.CheckPointOnMap(p) then
   begin
-    WriteLn('Target point not on overworld');
+    WriteLn('Target point not on configured map');
     Exit();
   end;
-  WriteLn('Going to start point');
-  while (not p.InRange(self.Position(), 20)) or (fails <= 3) do
+
+  while (not p.InRange(self.Position(), 20)) and (fails <= 3) do
   begin
+    WriteLn(self.OnMap(),OW.OnMap());
     if not self.OnMap() then
-      if not Overworld.OnMap() then
-        Overworld.ReturnToKnownTerritory()
+      if not OW.OnMap() then
+        OW.ReturnToKnownTerritory()
       else
-        Overworld.Walker.WebWalk(p)
+        if Length(OW.Walker.WebGraph^.PathBetweenEx(OW.Position, p, 0.1, 4, True)) > 0 then
+          OW.Walker.WebWalk(p)
     else
-      self.Walker.WebWalk(p);
+      if Length(OW.Walker.WebGraph^.PathBetweenEx(self.Position, p, 0.1, 4, True)) > 0 then
+        OW.Walker.WebWalk(p);
 
     Inc(fails);
   end;
   if fails <= 3 then
-    WriteLn('Succesfully reached startingpoint');
+    WriteLn('Succesfully reached starting point');
 end;
 
 procedure TRSMap.GetToGE();
 begin
   Self.GetToOverworldPoint([8560, 36490]);
 end;
+
 
 
