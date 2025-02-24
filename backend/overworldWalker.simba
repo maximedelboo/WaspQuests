@@ -427,9 +427,7 @@ end;
 
 procedure TRSOverworldWalker.InitWalker();
 var
-  cbitmap: TMufasaBitmap;
   j: String;
-  gray, white: TPointArray;
   a: T2DPointArray;
   i: Int32;
   offset: TPoint;

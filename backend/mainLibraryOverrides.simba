@@ -679,7 +679,7 @@ begin
   ArcExe := IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe';
 
   Writeln('Creating ARC archive: ', ArcPath);
-  ExitCode := RunCommand(ArcExe, ['a', '-mx4', '-ep1', ArcPath, FilePath], s);
+  ExitCode := RunCommand(ArcExe, ['a', '-m4', '-ep1', ArcPath, FilePath], s);
 
   if ExitCode = 0 then
   begin
@@ -710,7 +710,7 @@ begin
     ForceDirectories(OutputFolder);
 
   //Writeln('Extracting ', ArcFile, ' to ', OutputFolder);
-  ExitCode := RunCommand(ArcExe, ['x', ArcFile, '-o+', '-dp' + OutputFolder], s);
+  ExitCode := RunCommand(ArcExe, ['x', ArcFile, '-o+', '-dp'+ OutputFolder], s);
 
   if ExitCode = 0 then
     //Writeln('Extraction successful!')
@@ -1100,6 +1100,44 @@ begin
 
   Result := [0,0];
 
+end;
+
+function TRSWalkerV2._HardSolveDoor(door: TRSDoor): Boolean; override;
+var
+  middleBottom, me: TPoint;
+  angle: Single;
+  rect: TRectangle;
+  tpa: TPointArray;
+begin
+  if door.DoorType = ERSDoorType.UNKNOWN then
+    Exit;
+
+  angle := door.GetVisibleAngle(Minimap.GetCompassAngle() , 0 , False);
+  Minimap.SetCompassAngleEx(angle, 15);
+  WaitUntil(not minimap.IsPlayerMoving, 50,5000);
+
+  me := Self.Position();
+  rect := Self.GetRectMS(me, door.After, 0, [0,0], Minimap.GetCompassAngle(False));
+  if not Mainscreen.IsVisible(rect.mean) then Exit(False);
+
+  //move mouse slightly below the mean of the rectangle
+  tpa := rect.ToTPA();
+  tpa.SortByY(False);
+  middleBottom := [(tpa[0].X + tpa[1].X) div 2, (tpa[0].Y + tpa[1].Y) div 2];
+
+  with rect.Mean() do
+    Mouse.Move([(X + middleBottom.X) div 2, (Y + middleBottom.Y) div 2]);
+
+  if Mainscreen.IsUpText(['Open', 'Squeeze']) then
+  begin
+    Mouse.Click(MOUSE_LEFT);
+    if not WaitUntil(not Mainscreen.IsUpText(['Open', 'Close']), 100, 2000) then
+      Exit;
+  end;
+
+  Self.WalkBlind(door.After, 0);
+
+  Result := WaitUntil(Self.WebGraph^.WalkableClusters.InSameTPA(Self.Position, Door.After), 200, 5000);
 end;
 
 function TRSWalkerV2.WebWalkEx(me: TPoint; destination: TPoint; waitUntilDistance: Int32 = 0; pathRandomness: Double = 0; debug: Boolean = False): Boolean; override;
