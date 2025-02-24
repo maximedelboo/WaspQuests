@@ -1,3 +1,10 @@
+## [0.5.4](https://github.com/maximedelboo/WaspQuests/compare/v0.5.3...v0.5.4) (2025-02-24)
+
+
+### Bug Fixes
+
+* force bump ([cf57511](https://github.com/maximedelboo/WaspQuests/commit/cf57511ca8f7a5569dfa2c6f632d2e57289df9d5))
+
 ## [0.5.3](https://github.com/maximedelboo/WaspQuests/compare/v0.5.2...v0.5.3) (2025-02-17)
 
 
