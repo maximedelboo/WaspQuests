@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/maximedelboo/WaspQuests/compare/v0.5.4...v0.6.0) (2025-02-25)
+
+
+### Features
+
+* add chat handling and conversation saving functionality ([d342a46](https://github.com/maximedelboo/WaspQuests/commit/d342a46b92ff9e95313c6a7bb97c8bcd8a830b7b))
+
 ## [0.5.4](https://github.com/maximedelboo/WaspQuests/compare/v0.5.3...v0.5.4) (2025-02-24)
 
 
