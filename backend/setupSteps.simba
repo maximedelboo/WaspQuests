@@ -253,6 +253,11 @@ begin
   self[high(self)].prayers := prayerArray;
 end;
 
+procedure TStepArray.SaveConversation();
+begin
+  self[high(self)].savedConversation := ['save'];
+end;
+
 function CreateNPC(name: String; coordinate: TPoint; colorArray: TCTS2ColorArray = [[3504679, 17, 2.17, 2.93]]): TRSNPCV2;
 begin
   Result.SetupCoordinates([28],[coordinate]);

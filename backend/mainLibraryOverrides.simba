@@ -3,6 +3,13 @@
   {$I WaspLib/osr.simba}
 {$ENDIF}
 
+function TRSChatboxOptionArray.ToStringArray(): TStringArray; constref;
+var
+  option: TRSChatboxOption;
+begin
+  for option in Self do
+    Result += option.Text;
+end;
 
 function TRSChat.HasContinue(): Boolean; override;
 begin
@@ -32,6 +39,27 @@ begin
   Result := True;
 end;
 
+function TRSChat.ChatToNumber(Number: Integer; var saveArray: TStringArray): Boolean; overload;
+var
+  Timeout: TCountdown;
+  prev, current: TStringArray;
+begin
+  Timeout.Init(30000);
+
+  prev := Chat.GetOptions([$000000]).ToStringArray;
+  SaveArray.Extend(prev);
+  while (not Timeout.IsFinished) and self.HasContinue and Self.ClickContinue(True) do
+  begin
+    WaitUntil(Chat.GetOptions([$000000]).ToStringArray <> prev, 100, 5000);
+    prev := Chat.GetOptions([$000000]).ToStringArray;
+    SaveArray.Extend(prev);
+  end;
+
+  Keyboard.PressKey(VK_1 + Number);
+  Wait(600,800);
+  Result := True;
+end;
+
 function TRSChat.ChatToNumberOrQuery(Number: Integer; query, answer: String): Boolean;
 var
   Timeout: TCountdown;
@@ -48,14 +76,6 @@ begin
   Keyboard.PressKey(VK_1 + Number);
   Wait(600,800);
   Result := False;
-end;
-
-function TRSChatboxOptionArray.ToStringArray(): TStringArray;
-var
-  option: TRSChatboxOption;
-begin
-  for option in Self do
-    Result += option.Text;
 end;
 
 function TRSInventory.ContainsAll(bankitems: TRSBankItemArray): Boolean; overload;

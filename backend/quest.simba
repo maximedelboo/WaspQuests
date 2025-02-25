@@ -20,6 +20,7 @@ type
     NPC_target: TRSNPCV2;
     objectTarget: TRSObjectV2;
     action, name, answer, NPC_name, objName: String;
+    savedConversation: TStringArray;
     item1, item2, waitItem: TRSItem;
     coordinate, waitCoord: TPoint;
     height: Double;

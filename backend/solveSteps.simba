@@ -67,7 +67,7 @@ begin
     step.actionSucceeded := step.NPC_target.SelectOption([step.action],5);
 
   if step.actionSucceeded then
-    if not WaitUntil(Chat.HasContinue(), 20, 3000) then
+    if not WaitUntil(Chat.HasContinue() or (Chat.GetChatTitle = 'Select an option'), 20, 5000) then
       step.actionSucceeded := False;
 
   if @step.SpecialEvent <> nil then
@@ -212,20 +212,40 @@ begin
   step.actionSucceeded := False;
   WaitUntil(chat.HasContinue,10,5000);
   Writeln('Starting conversation');
-  for i in step.conversation do
+  if step.savedConversation.Contains('save') then
   begin
-    try
-      chatIndex := StrToInt(i);
-      Chat.ChatToNumber(chatIndex-1);
-    except
-      o := Chat.GetOptions();
-      options := o.ToStringArray();
-      str := ToStr(i);
-      match := options.FindBestMatch(str, sim);
-      ChatIndex := options.Find(match);
-      Chat.ChatToNumber(ChatIndex-1);
+    step.savedConversation := [];
+    for i in step.conversation do
+    begin
+      try
+        chatIndex := StrToInt(i);
+        Chat.ChatToNumber(chatIndex-1, step.savedConversation);
+      except
+        o := Chat.GetOptions();
+        options := o.ToStringArray();
+        str := ToStr(i);
+        match := options.FindBestMatch(str, sim);
+        ChatIndex := options.Find(match);
+        Chat.ChatToNumber(ChatIndex-1, step.savedConversation);
+      end;
     end;
-  end;
+  end
+  else
+    for i in step.conversation do
+    begin
+      try
+        chatIndex := StrToInt(i);
+        Chat.ChatToNumber(chatIndex-1);
+      except
+        o := Chat.GetOptions();
+        options := o.ToStringArray();
+        str := ToStr(i);
+        match := options.FindBestMatch(str, sim);
+        ChatIndex := options.Find(match);
+        Chat.ChatToNumber(ChatIndex-1);
+      end;
+    end;
+
   while chat.HasContinue() do
   begin
     chat.ClickContinue(False);

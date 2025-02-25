@@ -161,6 +161,22 @@ begin
   end;
 end;
 
+function TQuest.FindStepByName(stepName: String): PStep;
+var
+  i: Integer;
+  s, MaxSim: Single;
+begin
+  for i := 0 to high(Self.steps) do
+  begin
+    s := StringMatch(Self.steps[i].name, stepName);
+    if s > MaxSim then
+    begin
+      MaxSim := s;
+      Result := @Self.steps[i];
+    end;
+  end;
+end;
+
 procedure TQuest.Solve(startStep: Integer = 1);
 var
   attempts: Integer;
