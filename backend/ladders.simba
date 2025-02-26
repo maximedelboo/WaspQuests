@@ -33,6 +33,35 @@ end;
 Record responsible for positioning.
 *)
 
+function T2DPointArray.CountContains(p: TPoint; out filteredATPA: T2DPointArray): Integer;
+var
+  i: Integer;
+begin
+  filteredATPA := [];
+  for i := 0 to high(Self) do
+    if Length(Self[i].Intersection([p])) > 0 then
+    begin
+      Result += 1;
+      filteredATPA += Self[i];
+    end;
+end;
+
+function TRSObjectJSONParser.GetAllByAction(action: String): TRSObjectV2Array; override;
+var
+  i, j: Int32;
+begin
+  action := LowerCase(action);
+
+  for i := 0 to Self.Data.High() do
+    for j := 0 to Self.Data.getJSONObject(i).getJSONArray('actions').High() do
+    begin
+      if LowerCase(Self.Data.getJSONObject(i).getJSONArray('actions').getString(j)) <> action then
+        Continue;
+      Result += TRSObjectV2.Setup(Self.Walker, Self.Data.getJSONObject(i));
+      Break;
+    end;
+end;
+
 
 function TRSObjectV2Array.FindNearestSingle(point:TPoint; actions: TStringArray = []; maxDist: Integer = $FFFFFF): TRSObjectV2;
 var
@@ -48,7 +77,7 @@ begin
   for obj in self do
   begin
     actionFound := False;
-    if actions <> [] then
+    if not (actions.Len = 0) then
     begin
       for action in obj.Actions do
         for j := 0 to High(actions) do
@@ -79,8 +108,6 @@ var
   obj: TRSObjectV2;
   i, j, len: Integer;
 begin
-  len := 0;
-  j := 0;
   for obj in self do
   begin
     len += length(obj.Coordinates);
@@ -97,20 +124,19 @@ end;
 
 procedure TRSMap.AddLadders();
 var
-  arr1, arr2, ladderMeans, newNodes, ladderPoints: TPointArray;
+  arr1, arr2, ladderMeans, newNodes, ladderPoints, nearNodes: TPointArray;
   bmp: TMufasaBitmap;
-  ladderDTM, i, oldLen, ladderIndex, nodeIndex1, nodeIndex2, imgTar, maxLevel: Int32;
+  ladderDTM, i, j, oldLen, ladderIndex, nodeIndex1, nodeIndex2, imgTar, maxLevel: Int32;
   bool: Boolean;
   bmpbox: TBox;
-  p, above, below: TPoint;
-  laddersATPA: T2DPointArray;
+  p, above, below, newNode, usePoint: TPoint;
+  laddersATPA, atpa: T2DPointArray;
   objArr, usedLadders: TRSObjectV2Array;
   potentialLadder: TRSObjectV2;
   Timerr: TStopwatch;
   objs: TRSObjectJSONParser;
   ladderArray: TRSLadderArray;
   actions: String;
-  nearestNodes: TIntegerArray;
   ladderTree: TSlackTree;
 begin
 
@@ -131,12 +157,13 @@ begin
   Bool := FindDTMs(ladderDTM, arr1, bmpbox.X1, bmpbox.Y1, bmpbox.X2, bmpbox.Y2);
   FreeTarget(i);
   FreeDTM(ladderDTM);
-  bmp.Free();
+
+  //for p in arr1 do
+  //  bmp.DrawCross(p, 3, $FF00FF);
 
   SetImageTarget(imgTar);
 
-
-  objs.Setup(Self.Objects,@Self.Walker);
+  objs.Setup(Self.Objects, @Self.Walker);
 
   for i := 0 to High(Self.Loader.Regions) do
     maxLevel := Max(maxLevel,Self.Loader.Regions[i].Plane);
@@ -145,6 +172,8 @@ begin
   laddersATPA := arr1.NRCluster(1);
   for arr2 in laddersATPA do
     ladderMeans += Self.Loader.GetGlobal(arr2.Mean());
+
+  //bmp.Debug();
 
   objArr += objs.GetAllByAction('Climb');
   objArr += objs.GetAllByAction('Climb-up');
@@ -174,16 +203,25 @@ begin
 
 
     actions := ladderArray[ladderIndex].obj.Actions.Merge().ToLower();
+
     if 'up' in actions then ladderArray[ladderIndex].goesUp := True;
     if 'down' in actions then ladderArray[ladderIndex].goesDown := True;
 
 
     usedLadders += potentialLadder;
     ladderPoints += ladderArray[ladderIndex].coord;
+
+//    if ladderArray[ladderIndex].goesUp and ladderArray[ladderIndex].goesDown then
+//      bmp.DrawCross(Self.Loader.GetLocal(ladderArray[ladderIndex].coord), 3, clPink)
+//    else if ladderArray[ladderIndex].goesUp then
+//      bmp.DrawCross(Self.Loader.GetLocal(ladderArray[ladderIndex].coord), 3, clBlue)
+//    else if ladderArray[ladderIndex].goesDown then
+//      bmp.DrawCross(Self.Loader.GetLocal(ladderArray[ladderIndex].coord), 3, clRed)
+//    else bmp.DrawCross(Self.Loader.GetLocal(ladderArray[ladderIndex].coord), 3, clGreen);
+
     ladderIndex += 1;
   end;
   Timerr.Reset();
-
   if length(Ladderpoints) = 0 then Exit();
 
   ladderTree.Init(System.Copy(ladderPoints));
@@ -247,25 +285,35 @@ begin
 
   ladderTree.Free();
   ladderTree.Init(System.Copy(ladderPoints));
+
+  Self.Walker.WebGraph^.Tree.Free();
+  Self.Walker.WebGraph^.Tree.Init(System.Copy(Self.Walker.WebGraph^.Nodes));
+
   oldLen := Length(Self.Walker.WebGraph^.Nodes);
   for i := 0 to high(ladderPoints) do
   begin
-    try
-      p := Self.Walker.WebGraph^.NearestWalkablePoint(ladderPoints[i]);
-      nearestNodes := Self.Walker.WebGraph^.FindNearestNodes(p, 5);
-      if Self.Walker.WebGraph^.Nodes[nearestNodes[0]].distanceTo(ladderPoints[i]) > 30 then
-      begin
-        nearestNodes := [Self.Walker.WebGraph^.Nodes.Find(Self.Walker.WebGraph^.Tree.Nearest(ladderPoints[i]))];
-      end;
-       Self.Walker.WebGraph^.Nodes += ladderPoints[i];
-      Self.Walker.WebGraph^.Paths += [nearestNodes[0]];
-      Self.Walker.WebGraph^.Paths[nearestNodes[0]] += high(Self.Walker.WebGraph^.Nodes);
-    except
-      Self.Walker.WebGraph^.Nodes += ladderPoints[i];
-      Self.Walker.WebGraph^.Paths += [high(Self.Walker.WebGraph^.Nodes)];
+    nearNodes := Self.Walker.WebGraph^.Tree.KNearest(ladderPoints[i], 5, True);
+    nearNodes.Sort(ladderPoints[i]);
+    j := Self.Walker.WebGraph^.WalkableClusters.CountContains(ladderPoints[i], atpa);
+    if j = 0 then
+    begin
+      usePoint := Self.Walker.WebGraph^.NearestWalkablePoint(ladderPoints[i]);
+      j := Self.Walker.WebGraph^.WalkableClusters.CountContains(usePoint, atpa);
+    end else usePoint := ladderPoints[i];
+
+    Self.Walker.WebGraph^.Nodes += ladderPoints[i];
+    SetLength(Self.Walker.WebGraph^.Paths, Length(Self.Walker.WebGraph^.Nodes));
+    for arr1 in atpa do
+    begin
+      arr2 := nearNodes.Intersection(arr1);
+      if length(arr2) = 0 then Continue;
+      newNode := arr2.sorted(usePoint)[0];
+      nodeIndex1 := Self.Walker.WebGraph^.nodes.find(newNode);
+
+      Self.Walker.WebGraph^.Paths[high(Self.Walker.WebGraph^.Paths)] += nodeIndex1;
+      Self.Walker.WebGraph^.Paths[nodeIndex1] += high(Self.Walker.WebGraph^.Nodes);
     end;
   end;
-  //Wait(10000);
 
   Timerr.Reset();
 
@@ -302,6 +350,7 @@ begin
     end;
   end;
   Timerr.Reset();
+  bmp.Free();
 
   Ladders := usedLadders;
 end;

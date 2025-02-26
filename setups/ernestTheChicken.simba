@@ -8,106 +8,6 @@ begin
 end;
 
 procedure SetupErnestTCIron();
-  function customCompletion1(): Boolean;
-  begin
-    Result := WaitUntil(Inventory.containsItem('Poisoned fish food'),50,2000);
-  end;
-
-  function customCompletion2(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8288, 36990], 5),50,5000);
-  end;
-  
-  function customCompletion3(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8372, 11418], 5),50,5000);
-  end;
-
-  function customCompletion4(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8336, 11394], 5),50,5000);
-  end;
-
-  function customCompletion5(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8336, 11402], 5),50,5000);
-  end;
-
-  function customCompletion6(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8312, 11394], 5),50,5000);
-  end;
-
-  function customCompletion7(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8300, 11390], 5),50,5000);
-  end;
-
-  function customCompletion8(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8292, 11374], 5),50,5000);
-  end;
-
-  function customCompletion9(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8308, 11370], 5),50,5000);
-  end;
-
-  function customCompletion10(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8328, 11370], 5),50,5000);
-  end;
-
-  function customCompletion11(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8320, 11370], 5),50,5000);
-  end;
-
-  function customCompletion12(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8300, 11370], 5),50,5000);
-  end;
-
-  function customCompletion13(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8312, 11382], 5),50,5000);
-  end;
-
-  function customCompletion14(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8312, 11402], 5),50,5000);
-  end;
-
-  function customCompletion15(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8300, 11410], 5),50,5000);
-  end;
-
-  function customCompletion16(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8308, 11410], 5),50,5000);
-  end;
-
-  function customCompletion17(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8272, 36986], 5),50,10000);
-  end;
-
-  function customCompletion18(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8296, 36998], 5),50,5000);
-  end;
-
-  function customCompletion19(): Boolean;
-  begin
-    Result := WaitUntil(Map.Position.InRange([8396, 36986], 5),50,5000);
-  end;
-
-  function customCompletion20(): Boolean;
-  begin
-    Result := WaitUntil(Inventory.ContainsItem('Key'),50,5000);
-  end;
-
   procedure customAction1();
   begin
     Minimap.SetCompassAngle(90);
@@ -121,145 +21,28 @@ procedure SetupErnestTCIron();
 var
   leverA,leverB,leverC,leverD,leverE,leverF,leverG, door1, door2, door3, door4, door5, door6, door7, door8, door9, door10: TRSObjectV2;
 begin
-  Quest.region := [[[47,53,49,51],[0,1,2]], [[48,152,48,152],[0]]]; // sample region
+  Quest.region := [[[47,53,49,51],[0,1,2]], [[48,152,48,152],[0]]];
   Quest.StartingConditions := @ernestStart; // use @emptyStart for always true starting condition
   Quest.startTile := [8344,37114];
 
-  LeverA.size := Vec3(1.6,1.6,5);
-  LeverA.SetupCoordinates([[8336, 11450]]);
-  LeverA.setupuptext('Pull Lever A');
-  LeverA.finder.colors := [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)];
-  LeverA.Rotations := [0];
-  LeverA.offset := [0,1.2, 4];
-  LeverA.walker:=@Map.Walker;
+  LeverA := CreateObject('Pull', [8336, 11450], [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)], Vec3(1.6,1.6,5), [0,1.2, 4]);
+  LeverB := CreateObject('Pull', [8376, 11422], [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)], Vec3(1.6,1.6,5), [1.2,0, 4]);
+  LeverC := CreateObject('Pull', [8352, 11390], [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)], Vec3(1.6,1.6,5), [1.2,0, 4]);
+  LeverD := CreateObject('Pull', [8336, 11362], [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)], Vec3(1.6,1.6,5), [0,-1.2, 4]);
+  LeverE := CreateObject('Pull', [8292, 11362], [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)], Vec3(1.6,1.6,5), [0,-1.2, 4]);
+  LeverF := CreateObject('Pull', [8288, 11370], [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)], Vec3(1.6,1.6,5), [-1.2,0, 4]);
+  LeverG := CreateObject('Pull', [8288, 37002], [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)], Vec3(0.8,0.8,5), [1.2,0, 4]);
 
-  LeverB.size := Vec3(1.6,1.6,5);
-  LeverB.SetupCoordinates([[8376, 11422]]);
-  LeverB.setupuptext('Pull Lever B');
-  LeverB.finder.colors := [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)];
-  LeverB.Rotations := [0];
-  LeverB.offset := [1.2,0, 4];
-  LeverB.walker:=@Map.Walker;
-
-  LeverC.size := Vec3(1.6,1.6,5);
-  LeverC.SetupCoordinates([[8352, 11390]]);
-  LeverC.setupuptext('Pull Lever C');
-  LeverC.finder.colors := [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)];
-  LeverC.Rotations := [0];
-  LeverC.offset := [1.2,0, 4];
-  LeverC.walker:=@Map.Walker;
-
-  LeverD.size := Vec3(1.6,1.6,5);
-  LeverD.SetupCoordinates([[8336, 11362]]);
-  LeverD.setupuptext('Pull Lever D');
-  LeverD.finder.colors := [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)];
-  LeverD.Rotations := [0];
-  LeverD.offset := [0,-1.2, 4];
-  LeverD.walker:=@Map.Walker;
-
-  LeverE.size := Vec3(1.6,1.6,5);
-  LeverE.SetupCoordinates([[8292, 11362]]);
-  LeverE.setupuptext('Pull Lever E');
-  LeverE.finder.colors := [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)];
-  LeverE.Rotations := [0];
-  LeverE.offset := [0,-1.2, 4];
-  LeverE.walker:=@Map.Walker;
-
-  LeverF.size := Vec3(1.6,1.6,5);
-  LeverF.SetupCoordinates([[8288, 11370]]);
-  LeverF.setupuptext('Pull Lever F');
-  LeverF.finder.colors := [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)];
-  LeverF.Rotations := [0];
-  LeverF.offset := [-1.2,0, 4];
-  LeverF.walker:=@Map.Walker;
-
-  LeverG.size := Vec3(0.8,0.8,5);
-  LeverG.SetupCoordinates([[8288, 37002]]);
-  LeverG.setupuptext('Pull');
-  LeverG.finder.colors := [CTS2(1848006, 9, 0.04, 0.56), CTS2(1781698, 11, 0.03, 0.59)];
-  LeverG.Rotations := [0];
-  LeverG.offset := [1.2,0, 4];
-  LeverG.walker:=@Map.Walker;
-
-  door1.size := Vec3(0.9,0.2,5);
-  door1.SetupCoordinates([[8336, 11402]]);
-  door1.setupuptext('Open');
-  door1.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
-  door1.Rotations := [0];
-  door1.offset := [0,-2, 0];
-  door1.walker:=@Map.Walker;
-
-  door2.size := Vec3(0.2,0.9,5);
-  door2.SetupCoordinates([[8320, 11390]]);
-  door2.setupuptext('Open');
-  door2.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
-  door2.Rotations := [0];
-  door2.offset := [2,0, 0];
-  door2.walker:=@Map.Walker;
-
-  door3.size := Vec3(0.9,0.2,5);
-  door3.SetupCoordinates([[8312, 11402]]);
-  door3.setupuptext('Open');
-  door3.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
-  door3.Rotations := [0];
-  door3.offset := [0,-2, 0];
-  door3.walker:=@Map.Walker;
-
-  door4.size := Vec3(0.2,0.9,5);
-  door4.SetupCoordinates([[8300, 11390]]);
-  door4.setupuptext('Open');
-  door4.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
-  door4.Rotations := [0];
-  door4.offset := [2,0, 0];
-  door4.walker:=@Map.Walker;
-
-  door5.size := Vec3(0.9,0.2,5);
-  door5.SetupCoordinates([[8292, 11382]]);
-  door5.setupuptext('Open');
-  door5.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
-  door5.Rotations := [0];
-  door5.offset := [0,-2, 0];
-  door5.walker:=@Map.Walker;
-
-  door6.size := Vec3(0.2,0.9,5);
-  door6.SetupCoordinates([[8300, 11370]]);
-  door6.setupuptext('Open');
-  door6.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
-  door6.Rotations := [0];
-  door6.offset := [2,0, 0];
-  door6.walker:=@Map.Walker;
-
-  door7.size := Vec3(0.2,0.9,5);
-  door7.SetupCoordinates([[8320, 11370]]);
-  door7.setupuptext('Open');
-  door7.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
-  door7.Rotations := [0];
-  door7.offset := [2,0, 0];
-  door7.walker:=@Map.Walker;
-
-  door8.size := Vec3(0.9,0.2,5);
-  door8.SetupCoordinates([[8312, 11382]]);
-  door8.setupuptext('Open');
-  door8.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
-  door8.Rotations := [0];
-  door8.offset := [0,-2, 0];
-  door8.walker:=@Map.Walker;
-
-  door9.size := Vec3(0.2,0.9,5);
-  door9.SetupCoordinates([[8300, 11410]]);
-  door9.setupuptext('Open');
-  door9.finder.colors := [CTS2(6776942, 7, 0.37, 0.08)];
-  door9.Rotations := [0];
-  door9.offset := [2,0, 0];
-  door9.walker:=@Map.Walker;
-
-  door10.size := Vec3(0.9,0.2,5);
-  door10.SetupCoordinates([[8396, 36990]]);
-  door10.setupuptext('Open');
-  door10.finder.colors := [CTS2(9002, 1, 0.01, 0.01)];
-  door10.Rotations := [0];
-  door10.offset := [0,-2, 0];
-  door10.walker:=@Map.Walker;
+  Door1 := CreateObject('Open', [8336, 11402], [CTS2(6776942, 7, 0.37, 0.08)], [0.9,0.2,5], [0,-2, 0]);
+  Door2 := CreateObject('Open', [8320, 11390], [CTS2(6776942, 7, 0.37, 0.08)], [0.2,0.9,5], [2,0, 0]);
+  Door3 := CreateObject('Open', [8312, 11402], [CTS2(6776942, 7, 0.37, 0.08)], [0.9,0.2,5], [0,-2, 0]);
+  Door4 := CreateObject('Open', [8300, 11390], [CTS2(6776942, 7, 0.37, 0.08)], [0.2,0.9,5], [2,0, 0]);
+  Door5 := CreateObject('Open', [8292, 11382], [CTS2(6776942, 7, 0.37, 0.08)], [0.9,0.2,5], [0,-2, 0]);
+  Door6 := CreateObject('Open', [8300, 11370], [CTS2(6776942, 7, 0.37, 0.08)], [0.2,0.9,5], [2,0, 0]);
+  Door7 := CreateObject('Open', [8320, 11370], [CTS2(6776942, 7, 0.37, 0.08)], [0.2,0.9,5], [2,0, 0]);
+  Door8 := CreateObject('Open', [8312, 11382], [CTS2(6776942, 7, 0.37, 0.08)], [0.9,0.2,5], [0,-2, 0]);
+  Door9 := CreateObject('Open', [8300, 11410], [CTS2(6776942, 7, 0.37, 0.08)], [0.2,0.9,5], [2,0, 0]);
+  Door10 := CreateObject('Open', [8396, 36990], [CTS2(9002, 1, 0.01, 0.01)], [0.9,0.2,5], [0,-2, 0]);
 
   Quest.questInfo += 'Start anywhere around Draynor manor';
   Quest.questInfo += 'Have at least 5 free inventory spaces';
@@ -272,32 +55,32 @@ begin
   Quest.steps.AddWalkStep('Walk to poison', [8296, 36970]);
   Quest.steps.CustomWaitTile([8296, 36970], 5);
   Quest.steps.AddLootStep('loot poison', 'Poison', 0 , nil, @customAction2);
-  Quest.steps.AddInteractObjectStep('Click stairs', 'Staircase', 'Climb-up', True, [8340, 36986]);
-  Quest.steps.CustomWaitTile([21396, 36966], 9);
   Quest.steps.AddWalkStep('Walk to fish food', [21392, 36998]);
   Quest.steps.CustomWaitTile([21392, 36998], 5);
   Quest.steps.AddLootStep('loot fish food', 'Fish food', 0 , nil, @customAction2);
-  Quest.steps.AddInteractObjectStep('Click stairs', 'Staircase', 'Climb-down', True, [21396, 36966]);
-  Quest.steps.CustomWaitTile([8340, 36986], 9);
-  Quest.steps.AddCombineStep('add poison to fish food', 'Fish food', 'Poison', @customCompletion1);
+  Quest.steps.AddCombineStep('add poison to fish food', 'Fish food', 'Poison');
+  Quest.steps.CustomWaitItem('Poisoned fish food');
   Quest.steps.AddWalkStep('Walk to bookcases', [8296, 36994], nil, @customAction1);
   Quest.steps.AddClickTileStep('Click bookcase', [8288, 36994], 'Search');
   Quest.steps.CustomWaitTile([8288, 36990], 5);
-  Quest.steps.AddInteractObjectStep('Climb down ladder', 'Ladder', 'Climb-down', False, [8276, 36982], @customCompletion3); //[8360, 11418]
+  Quest.steps.AddInteractObjectStep('Climb down ladder', 'Ladder', 'Climb-down', False, [8276, 36982]); //[8360, 11418]
+  Quest.steps.CustomWaitTile([8372, 11418], 5);
   Quest.steps.AddInteractObjectStep('Pull leverB', 'Lever B', 'Pull Lever B'); //8372, 11422
   Quest.steps.CustomizeObject(LeverB);
   Quest.steps.AddWalkStep('Walk to lever A', [8332, 11446]);
   Quest.steps.AddInteractObjectStep('Pull leverA', 'Lever A', 'Pull Lever A'); //
   Quest.steps.CustomizeObject(LeverA);
   Quest.steps.AddWalkStep('Walk to door1', [8336, 11406]);
-  Quest.steps.AddInteractObjectStep('Go through door1', 'Door', 'Open', True, [8336, 11406], @customCompletion4); //waituntil 8336, 11394
+  Quest.steps.AddInteractObjectStep('Go through door1', 'Door', 'Open', True, [8336, 11406]); //waituntil 8336, 11394
+  Quest.steps.CustomWaitTile([8336, 11394], 5);
   Quest.steps.CustomizeObject(door1);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
   Quest.steps.AddWalkStep('Walk to lever D', [8336, 11366]);
   Quest.steps.AddInteractObjectStep('Pull leverD', 'Lever D', 'Pull'); //
   Quest.steps.CustomizeObject(LeverD);
   Quest.steps.AddWalkStep('Walk to door1', [8336, 11394]);
-  Quest.steps.AddInteractObjectStep('Go through door1', 'Door', 'Open', False, [8336, 11406], @customCompletion5); //waituntil 8336, 11402
+  Quest.steps.AddInteractObjectStep('Go through door1', 'Door', 'Open', False, [8336, 11406]); //waituntil 8336, 11402
+  Quest.steps.CustomWaitTile([8336, 11402], 5);
   Quest.steps.CustomizeObject(door1);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
   Quest.steps.AddWalkStep('Walk to lever A', [8332, 11446]);
@@ -309,13 +92,16 @@ begin
   Quest.steps.CustomizeObject(LeverB);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
   Quest.steps.AddWalkStep('Walk to door3', [8312, 11406]);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8312, 11394], @customCompletion6);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8312, 11394]);
+  Quest.steps.CustomWaitTile([8312, 11394], 5);
   Quest.steps.CustomizeObject(door3);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8300, 11390], @customCompletion7);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8300, 11390]);
+  Quest.steps.CustomWaitTile([8300, 11390], 5);
   Quest.steps.CustomizeObject(door4);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8292, 11374], @customCompletion8);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8292, 11374]);
+  Quest.steps.CustomWaitTile([8292, 11374], 5);
   Quest.steps.CustomizeObject(door5);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
   Quest.steps.AddWalkStep('Walk to lever E', [8292, 11370]);
@@ -326,10 +112,12 @@ begin
   Quest.steps.AddInteractObjectStep('Pull leverF', 'Lever F', 'Pull Lever F'); //
   Quest.steps.CustomizeObject(LeverF); 
   Quest.steps.AddWaitStep('Wait a sec', 1000);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8308, 11370], @customCompletion9);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8308, 11370]);
+  Quest.steps.CustomWaitTile([8308, 11370], 5);
   Quest.steps.CustomizeObject(door6);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8328, 11370], @customCompletion10);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8328, 11370]);
+  Quest.steps.CustomWaitTile([8328, 11370], 5);
   Quest.steps.CustomizeObject(door7);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
   Quest.steps.AddWalkStep('Walk to lever C', [8348, 11390]);
@@ -337,42 +125,52 @@ begin
   Quest.steps.CustomizeObject(LeverC); 
   Quest.steps.AddWaitStep('Wait a sec', 1000);
   Quest.steps.AddWalkStep('Walk to door', [8328, 11374]);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8320, 11370], @customCompletion11);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8320, 11370]);
+  Quest.steps.CustomWaitTile([8320, 11370], 5);
   Quest.steps.CustomizeObject(door7);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8300, 11370], @customCompletion12);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8300, 11370]);
+  Quest.steps.CustomWaitTile([8300, 11370], 5);
   Quest.steps.CustomizeObject(door6);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
   Quest.steps.AddWalkStep('Walk to lever E', [8292, 11370]);
   Quest.steps.AddInteractObjectStep('Pull leverE', 'Lever E', 'Pull Lever E'); //
   Quest.steps.CustomizeObject(LeverE);
   Quest.steps.AddWaitStep('Wait a sec', 1000);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8308, 11370], @customCompletion9);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8308, 11370]);
+  Quest.steps.CustomWaitTile([8308, 11370], 5);
   Quest.steps.CustomizeObject(door6);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8312, 11382], @customCompletion13);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8312, 11382]);
+  Quest.steps.CustomWaitTile([8312, 11382], 5);
   Quest.steps.CustomizeObject(door8);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8312, 11402], @customCompletion14);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8312, 11402]);
+  Quest.steps.CustomWaitTile([8312, 11402], 5);
   Quest.steps.CustomizeObject(door3);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8300, 11410], @customCompletion15);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8300, 11410]);
+  Quest.steps.CustomWaitTile([8300, 11410], 5);
   Quest.steps.CustomizeObject(door9);
   Quest.steps.AddWalkStep('Walk to oil can', [8276, 11410]);
   Quest.steps.AddLootStep('Loot oil can', 'Oil can', 0 , nil, @customAction2);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8308, 11410], @customCompletion16);
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8308, 11410]);
+  Quest.steps.CustomWaitTile([8308, 11410], 5);
   Quest.steps.CustomizeObject(door9);
-  Quest.steps.AddInteractObjectStep('Climb up ladder', 'Ladder', 'Climb-up', True, [8368, 11414], @customCompletion17); //8272, 36986
-  Quest.steps.CustomWaitTile([8272, 36986 ], 25);
+  Quest.steps.AddInteractObjectStep('Climb up ladder', 'Ladder', 'Climb-up', True, [8368, 11414]); //8272, 36986
+  Quest.steps.CustomWaitTile([8272, 36986], 25);
   Quest.steps.AddWalkStep('Walk to lever G', [8284, 37002]);
-  Quest.steps.AddInteractObjectStep('Pull leverG', 'Lever', 'Pull', False, [0,0], @customCompletion18); //8296, 36998
-  Quest.steps.CustomizeObject(LeverG); 
+  Quest.steps.AddInteractObjectStep('Pull leverG', 'Lever', 'Pull', False); //8296, 36998
+  Quest.steps.CustomWaitTile([8296, 36998], 5);
+  Quest.steps.CustomizeObject(LeverG);
   Quest.steps.AddWaitStep('Wait a sec', 2000);
   Quest.steps.AddWalkStep('Walk to spade', [8388, 36998]);
   Quest.steps.AddLootStep('Loot spade', 'Spade', 0 , nil, @customAction2);
-  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8396, 36986], @customCompletion19); //8396, 36986
+  Quest.steps.AddInteractObjectStep('Go through door', 'Door', 'Open', False, [8396, 36986]); //8396, 36986
+  Quest.steps.CustomWaitTile([8396, 36986], 5);
   Quest.steps.CustomizeObject(door10);
   Quest.steps.AddWalkStep('Run around manor', [8404, 36958]);
   Quest.steps.AddClickTileStep('click behind fungi', [8400, 36942], 'Walk here');
   Quest.steps.AddWalkStep('Run to compost', [8256, 36990]);
-  Quest.steps.AddInteractObjectStep('Click compost heap', 'Compost heap', 'Search', False, [8248, 36990], @customCompletion20);
+  Quest.steps.AddInteractObjectStep('Click compost heap', 'Compost heap', 'Search', False, [8248, 36990]);
+  Quest.Steps.CustomWaitItem('Key');
   Quest.steps.AddWaitStep('Wait a sec', 3000);
   Quest.steps.AddWalkStep('Walk to fungi', [8256, 37018]);
   Quest.steps.AddClickTileStep('click behind fungi 2', [8264, 37030], 'Walk here');
@@ -384,10 +182,6 @@ begin
   Quest.steps.AddWalkStep('Walk to rubber tube', [8338, 36962], nil, @customAction1);
   Quest.steps.AddLootStep('Loot rubber tube', 'Rubber tube');
   Quest.steps.AddWalkStep('Run from skele', [8328, 36978]);
-  Quest.steps.AddInteractObjectStep('Click stairs', 'Staircase', 'Climb-up', True, [8340, 36986]);
-  Quest.steps.CustomWaitTile([21396, 36966], 9);
-  Quest.steps.AddInteractObjectStep('Click stairs', 'Staircase', 'Climb-up', True, [21376, 36974]);
-  Quest.steps.CustomWaitTile([34436, 36974], 9);
   Quest.steps.AddWalkStep('Walk to Oddenstein', [34456, 36966]);
   Quest.steps.AddTalkToStep('Talk to Oddenstein', 'Professor Oddenstein', False, [34456, 36966]);
   Quest.steps.AddConversationStep('Conversation Oddenstein', [1,2]);

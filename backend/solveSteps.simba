@@ -152,6 +152,8 @@ begin
       step.objectTarget.Finder.Colors := step.colors;
   end;
 
+  //Debug(step.objectTarget);
+
   try
     if step.webwalk then
       step.actionSucceeded := step.objectTarget.WalkSelectOption([step.action],5)
