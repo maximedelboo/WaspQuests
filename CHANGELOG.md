@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/maximedelboo/WaspQuests/compare/v0.6.0...v0.6.1) (2025-02-26)
+
+
+### Bug Fixes
+
+* ladders fix and ernest tc cleanup ([bc80773](https://github.com/maximedelboo/WaspQuests/commit/bc80773db4ddf3ae6763f7ac36ad49b9164e6059))
+
 # [0.6.0](https://github.com/maximedelboo/WaspQuests/compare/v0.5.4...v0.6.0) (2025-02-25)
 
 
