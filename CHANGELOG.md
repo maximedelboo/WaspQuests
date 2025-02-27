@@ -1,3 +1,10 @@
+## [0.6.3](https://github.com/maximedelboo/WaspQuests/compare/v0.6.2...v0.6.3) (2025-02-27)
+
+
+### Bug Fixes
+
+* extracting archives now works all the time ([12fcf1d](https://github.com/maximedelboo/WaspQuests/commit/12fcf1d6b48af6173e10c9b2acae65fe61e227f7))
+
 ## [0.6.2](https://github.com/maximedelboo/WaspQuests/compare/v0.6.1...v0.6.2) (2025-02-27)
 
 
