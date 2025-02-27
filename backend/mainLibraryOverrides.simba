@@ -697,10 +697,10 @@ var
   ArcExe, s: string;
   ExitCode: LongInt;
 begin
-  ArcExe := IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe';
+  ArcExe := '"' + IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe' +'"';
 
   Writeln('Creating ARC archive: ', ArcPath);
-  ExitCode := RunCommand(ArcExe, ['a', '-m4', '-ep1', ArcPath, FilePath], s);
+  ExitCode := RunCommand(ArcExe, ['a', '-m4', '-ep1', '"' + ArcPath + '"', '"' + FilePath + '"'], s);
 
   if ExitCode = 0 then
   begin
@@ -714,12 +714,12 @@ begin
     Writeln('Error during compression. Exit Code: ', ExitCode);
 end;
 
-procedure ExtractARC(const ArcFile, OutputFolder: string);
+procedure ExtractARC(const ArcFile: String; OutputFolder: string);
 var
   ArcExe, s: string;
   ExitCode: LongInt;
 begin
-  ArcExe := IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe';
+  ArcExe := '"' + IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe' +  '"';
 
   if not FileExists(ArcFile) then
   begin
@@ -730,8 +730,10 @@ begin
   if not DirectoryExists(OutputFolder) then
     ForceDirectories(OutputFolder);
 
+  OutputFolder := OutputFolder.Trim(DirectorySeparator);
+
   //Writeln('Extracting ', ArcFile, ' to ', OutputFolder);
-  ExitCode := RunCommand(ArcExe, ['x', ArcFile, '-o+', '-dp'+ OutputFolder], s);
+  ExitCode := RunCommand(ArcExe, ['x', '"' + ArcFile + '"', '-o+', '-dp'+ '"' + OutputFolder + '"'], s);
 
   if ExitCode = 0 then
     //Writeln('Extraction successful!')
