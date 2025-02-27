@@ -1,3 +1,10 @@
+## [0.6.4](https://github.com/maximedelboo/WaspQuests/compare/v0.6.3...v0.6.4) (2025-02-27)
+
+
+### Bug Fixes
+
+* overworldWlaker graph fix ([39d8d85](https://github.com/maximedelboo/WaspQuests/commit/39d8d85c78b4f331ae8757eb8b6938dd832819ec))
+
 ## [0.6.3](https://github.com/maximedelboo/WaspQuests/compare/v0.6.2...v0.6.3) (2025-02-27)
 
 
