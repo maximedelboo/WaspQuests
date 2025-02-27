@@ -1,3 +1,10 @@
+## [0.6.2](https://github.com/maximedelboo/WaspQuests/compare/v0.6.1...v0.6.2) (2025-02-27)
+
+
+### Bug Fixes
+
+* webgraph improvements ([2b0d797](https://github.com/maximedelboo/WaspQuests/commit/2b0d797f763f3a6cfafa7b9d3c26a1711e06843a))
+
 ## [0.6.1](https://github.com/maximedelboo/WaspQuests/compare/v0.6.0...v0.6.1) (2025-02-26)
 
 
