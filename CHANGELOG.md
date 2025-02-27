@@ -1,3 +1,10 @@
+## [0.6.5](https://github.com/maximedelboo/WaspQuests/compare/v0.6.4...v0.6.5) (2025-02-27)
+
+
+### Bug Fixes
+
+* actual working webgraph for the overworld walker ([be69469](https://github.com/maximedelboo/WaspQuests/commit/be694698c40f60c4db518cfc2b1cd702aeb017db))
+
 ## [0.6.4](https://github.com/maximedelboo/WaspQuests/compare/v0.6.3...v0.6.4) (2025-02-27)
 
 
