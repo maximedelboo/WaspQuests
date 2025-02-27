@@ -46,22 +46,15 @@ begin
     end;
 end;
 
-function TRSObjectJSONParser.GetAllByAction(action: String): TRSObjectV2Array; override;
-var
-  i, j: Int32;
+procedure TRSObjectV2Array.Reduce(); override;
 begin
-  action := LowerCase(action);
-
-  for i := 0 to Self.Data.High() do
-    for j := 0 to Self.Data.getJSONObject(i).getJSONArray('actions').High() do
-    begin
-      if LowerCase(Self.Data.getJSONObject(i).getJSONArray('actions').getString(j)) <> action then
-        Continue;
-      Result += TRSObjectV2.Setup(Self.Walker, Self.Data.getJSONObject(i));
-      Break;
-    end;
+  Exit();
 end;
 
+procedure TRSNPCV2Array.Reduce(); override;
+begin
+  Exit();
+end;
 
 function TRSObjectV2Array.FindNearestSingle(point:TPoint; actions: TStringArray = []; maxDist: Integer = $FFFFFF): TRSObjectV2;
 var
@@ -167,6 +160,7 @@ begin
 
   for i := 0 to High(Self.Loader.Regions) do
     maxLevel := Max(maxLevel,Self.Loader.Regions[i].Plane);
+  if maxLevel = 0 then Exit();
 
 
   laddersATPA := arr1.NRCluster(1);

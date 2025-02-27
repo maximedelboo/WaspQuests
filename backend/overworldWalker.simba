@@ -26,6 +26,8 @@ begin
   if not DirectoryExists(WQCacheDir) then
     CreateDirectory(WQCacheDir);
 
+  if (PositionFile.Len = 0) then PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
+
   time := GetTickCount();
 
   JSON.init();

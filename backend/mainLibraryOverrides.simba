@@ -42,7 +42,7 @@ end;
 function TRSChat.ChatToNumber(Number: Integer; var saveArray: TStringArray): Boolean; overload;
 var
   Timeout: TCountdown;
-  prev, current: TStringArray;
+  prev: TStringArray;
 begin
   Timeout.Init(30000);
 
@@ -91,7 +91,9 @@ begin
     quantities += bankitem.Quantity;
     noted += bankitem.Noted;
     if bankitem.Noted then
-      items += 'noted ' + bankitem.Item;
+      items += 'noted ' + bankitem.Item
+    else
+      items += bankitem.Item;
   end;
 
   for i := 0 to high(items) do
@@ -289,9 +291,6 @@ var
 
 begin
   WQCacheDir := Cache_dir + 'WaspQuests' + DirectorySeparator;
-  if not RSClient.IsLoggedIn() then
-    Login.LoginPlayer();
-  PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
   OverworldChunk := [[16,64,61,39],[0]];
   WQWebGraphDir := IncludePath + 'WaspQuests' + DirectorySeparator + 'webgraph' + DirectorySeparator;
   PositionTimer.Init(1);
@@ -371,6 +370,8 @@ begin
     WriteLn('Unziping ', cachetype);
     cacheroot := Self.Cache + cachetype + DirectorySeparator;
     zipPath := RSMAP_PATH + 'files' + DirectorySeparator + cachetype + '.zip';
+    if cachetype = 'collision' then
+      zipPath := WQWebgraphDir + DirectorySeparator + 'collision.zip';
 
     if not ForceDirectories(cacheroot) then
       begin
@@ -408,7 +409,7 @@ begin
     begin
       cacheroot := Self.Cache + 'collision' + DirectorySeparator;
       cachename := cacheroot + ToStr(plane) + DirectorySeparator + chunk;
-      zipPath := RSMAP_PATH + 'files' + DirectorySeparator + 'collision.zip';
+      zipPath := WQWebgraphDir + DirectorySeparator + 'collision.zip';
       zipFile := ToStr(plane) + '/' + chunk + '.png';
     end;
   end;
@@ -747,7 +748,7 @@ begin
     ExtractARC(cacheroot + name + '.arc', cacheroot);
     if not FileExists(cacheroot + name + '.txt') then
     begin
-      DebugLn('Something when wrong in walkableclusters cache, please contact Bootie');
+      DebugLn('Something when wrong in cache at ' +cacheroot + name + '.arc'+', please contact Bootie');
       Exit(False);
     end;
     s := ReadFileContents(cacheroot + name + '.txt');
@@ -758,36 +759,253 @@ begin
   end;
 end;
 
-//function TRSChunkLoader.GetMap(start, finish: TPoint; plane: UInt32; map: ERSMap): TMufasaBitmap; override;
-//var
-//  chunks: TPointArray;
-//  cacheroot, name: String;
-//  needCache: Boolean;
-//begin
-//  name :=  ToStr(start.X) + '-' + ToStr(start.Y) + '_' + ToStr(finish.X) + '-' + ToStr(finish.Y) + '.bmp';
-//
-//  case map of
-//    ERSMap.COLLISION: cacheroot := Self.Cache + 'collision' + DirectorySeparator + ToStr(plane) + DirectorySeparator;
-//    ERSMap.HEIGHT: cacheroot := Self.Cache + 'heightmap' + DirectorySeparator;
-//    ERSMap.NORMAL: cacheroot := Self.Cache + 'map' + DirectorySeparator + ToStr(plane) + DirectorySeparator;
-//  end;
-//
-//  if not FileExists(cacheroot + name) then
-//    needCache := True
-//  else
-//  begin
-//    Result.FromFile(cacheroot + name);
-//    Exit(Result);
-//  end;
-//
-//  chunks := TRSChunkLoader.GetChunks(start, finish);
-//  Result := Self.GetMap(chunks, plane, map);
-//
-//  if needCache then
-//    Result.SaveToFile(cacheroot + name);
-//
-//  DebugLn('Saved map to file ' + cacheroot + name);
-//end;
+function TRSChunkLoader._BuildGraph(map: TMufasaBitmap; white, red: TPointArray): TWebGraphV2; override;
+
+  function _FindDoors(doorATPA: T2DPointArray; white: TPointArray): TRSDoorArray;
+  var
+    direction, center: TPoint;
+    i: Integer;
+  begin
+    SetLength(Result, Length(doorATPA));
+
+    for i := 0 to High(doorATPA) do
+    begin
+      center := MiddleTPA(doorATPA[i]);
+      Result[i].Center := center;
+      direction := [0,0];
+
+      if PointInTPA(center + [1,0], doorATPA[i]) and PointInTPA(center + [-1,0], doorATPA[i]) then
+        direction := [0,1];
+
+      if PointInTPA(center + [0,1], doorATPA[i]) and PointInTPA(center + [0,-1], doorATPA[i]) then
+        direction := [1,0];
+
+      if PointInTPA(center + [1,1], doorATPA[i]) and PointInTPA(center + [-1,-1], doorATPA[i]) then
+        direction := [1,-1];
+
+      if PointInTPA(center + [1,-1], doorATPA[i]) and PointInTPA(center + [-1,1], doorATPA[i]) then
+        direction := [1,1];
+
+      if direction = [0,0] then Continue;
+
+      //check if pixels around the door are walkable to exclude weird objects colored red on the map as being doors
+      //also excludes open doors to be detected as doors needed to be passed through
+      if PointInTPA(center + direction, white) and PointInTPA(center + direction.Rotate(180, [0,0]), white) then
+      begin
+        Result[i].Direction := direction;
+        case Length(doorATPA[i]) of
+          4: Result[i].DoorType := ERSDoorType.NORMAL;
+          8: Result[i].DoorType := ERSDoorType.WIDE;
+        end;
+      end;
+
+      if Result[i].DoorType = ERSDoorType.WIDE then
+        case Result[i].Direction of
+          [0,1]: Result[i].Center.X -= 2;
+          [1,0]: Result[i].Center.Y -= 2;
+        end;
+
+      Result[i].Before += Result[i].Center + Result[i].Direction * 2;
+      Result[i].After  += Result[i].Center - Result[i].Direction * 2;
+    end;
+  end;
+
+var
+  a, b, i, j, n, len, hi, divider, nonSepDoors, connections: Int32;
+  atpa, parts: T2DPointArray;
+  skeleton, nodes, tpa, doorsInTpa, doorNodes: TPointArray;
+  bounds: TBox;
+  p, q: TPoint;
+  nodesTree, skeletonTree: TSlackTree;
+  connectionMap: array of array of TIntegerArray;
+  doors: TRSDoorArray;
+  door: TRSDoor;
+  doorPaths: T2DIntegerArray;
+begin
+  atpa := white.NRCluster(1);
+
+  doors := _FindDoors(red.NRCluster(1), white);
+
+  atpa.sortBySize(0, True);
+
+  hi := High(doors);
+  case hi of
+    0..50: divider := 50;
+    51..400: divider := 100;
+    else divider := 200;
+  end;
+
+  for i := 0 to high(doors) do
+  begin
+    if i mod divider = 0 then
+      Self.DebugLn('Adding doors to graph: '  + ToStr(i) + '/' + ToStr(hi));
+    door := doors[i];
+
+    if (door.DoorType = ERSDoorType.UNKNOWN) or atpa.InSameTPA(door.Before, door.After) then
+    begin
+      nonSepDoors += 1;
+      Continue;
+    end;
+
+    door.SEPARATING := True;
+
+    Result.Doors += door;
+    doorNodes += [door.Before, door.After];
+    SetLength(doorPaths, Length(doorNodes));
+    doorPaths[(i-nonSepDoors)*2] += (i-nonSepDoors)*2+1;
+    doorPaths[(i-nonSepDoors)*2+1] += (i-nonSepDoors)*2;
+  end;
+
+  hi := High(atpa);
+
+  case hi of
+    0..50: divider := 50;
+    51..400: divider := 100;
+    else divider := 200;
+  end;
+
+  for i := 0 to hi do
+  begin
+    if i mod divider = 0 then
+      Self.DebugLn('Creating webgraph connections for area '  + ToStr(i) + '/' + ToStr(hi));
+
+    if Length(atpa[i]) <= GENERATED_GRAPH.MinimumTiles * RSTranslator.TileArea then Continue; //remove very small spaces
+
+    bounds := atpa[i].Bounds();
+    if Max(bounds.Width(), bounds.Height()) < GENERATED_GRAPH.NodeRadius then //mark spaces less than NodeRadius with a single node and continue
+    begin
+      Result.Nodes += atpa[i].Median();
+      Continue;
+    end;
+
+    skeleton := atpa[i].Erode(1).Skeleton(2, 7);
+
+    //if i = high(atpa) then
+    //begin
+    //  Map.DrawTPA(Skeleton, clGreen);
+    //  Map.Debug();
+    //  TerminateScript;
+    //End;
+
+    if skeleton = [] then
+    begin
+      Result.Nodes += atpa[i].Median();
+      Continue;
+    end;
+
+    nodes := [];
+    for tpa in PartitionTPA(skeleton, GENERATED_GRAPH.Spacing, GENERATED_GRAPH.Spacing) do
+    begin
+      if tpa = [] then Continue;
+      for tpa in tpa.Cluster(1) do nodes += tpa.NearestPoint(MiddleTPA(tpa));
+    end;
+
+    SetLength(connectionMap, bounds.X2, bounds.Y2);
+
+    skeletonTree.Init(skeleton);
+    nodesTree.Init(nodes);
+    for j := 0 to High(nodesTree.Data) do
+    begin
+      p := nodesTree.Data[j].split;
+      tpa := nodesTree.RangeQuery(Box(p, round(GENERATED_GRAPH.Spacing*1.5), round(GENERATED_GRAPH.Spacing*1.5)));
+      tpa.Remove(p);
+
+      tpa.SortFrom(p);
+      connections := 0;
+      for q in tpa do
+      begin
+        if connections = GENERATED_GRAPH.MaxConnections then Break;
+        if GENERATED_GRAPH.WallCrossings and not map.ColorsInLineEx(p, q, [$0, $333333, $FF]) then
+        begin
+          connectionMap[q.X, q.Y] += j;
+          Inc(connections);
+          Continue;
+        end;
+
+        bounds := Box(p, q).Expand(GENERATED_GRAPH.Spacing div 2);
+        parts := skeletonTree.RangeQuery(bounds).Cluster(1);
+
+        for a := 0 to High(parts) do
+          if parts[a].ContainsAll([p,q]) then
+          begin
+            connectionMap[q.X, q.Y] += j;
+            Inc(connections);
+            Break;
+          end;
+      end;
+    end;
+
+    skeletonTree.Free();
+    len := Length(Result.Nodes);
+    SetLength(Result.Nodes, len + Length(nodes));
+    SetLength(Result.Paths, Length(Result.Nodes));
+
+    for j := 0 to High(nodesTree.Data) do
+    begin
+      p := nodesTree.Data[j].split;
+      Result.Nodes[j+len] := p;
+      for n in connectionMap[p.X, p.Y] do
+      begin
+        q := nodesTree.Data[n].split;
+        Result.Nodes[n+len] := q;
+
+        if not InIntArray(Result.Paths[j+len], n+len) then
+          Result.Paths[j+len] += n+len;
+        if not InIntArray(Result.Paths[n+len], j+len) then
+          Result.Paths[n+len] += j+len;
+      end;
+    end;
+
+    nodesTree.Free();
+  end;
+
+  SetLength(Result.Paths, Length(Result.Nodes));
+  SetLength(Result.Names, Length(Result.Nodes));
+
+  //Connect doornodes to nearest node
+  nodes := Copy(Result.Nodes);
+  nodesTree.Init(nodes);
+
+  len := Length(Result.Nodes);
+
+  for i := 0 to High(atpa) do
+  begin
+    doorsInTpa := atpa[i].Intersection(doorNodes);
+
+    for j := 0 to High(doorsInTpa) do
+    begin
+      for p in nodesTree.KNearest(doorsInTpa[j], 20) do
+      begin
+        if atpa[i].Contains(p) then
+        begin
+          n := Result.Nodes.Find(p);
+          Result.Nodes += doorsInTpa[j];
+          SetLength(result.Paths, Length(Result.Nodes));
+          Result.Paths[n] += High(Result.Nodes);
+          Result.Paths[High(Result.Nodes)] += n;
+          Break;
+        end;
+      end;
+
+      if not Result.Nodes.Contains(doorsInTpa[j]) then
+        Result.Nodes += doorsInTpa[j];
+    end;
+  end;
+
+  nodesTree.Free();
+
+  nodes := Copy(Result.Nodes, len, Length(Result.Nodes)-len);
+  for n := 0 to high(doorNodes) do
+  begin
+    i := nodes.Find(doorNodes[n]);
+    j := nodes.Find(doorNodes[doorPaths[n][0]]);
+    if (i < 0) or (j < 0) then Continue;
+    Result.Paths[len + i] += len + j;
+  end;
+
+  SetLength(Result.Paths, Length(Result.Nodes));
+  SetLength(Result.Names, Length(Result.Nodes));
+end;
 
 
 function TRSMapLoader.SetupGraph(name: String; idx, plane, padding: Int32; cbitmap: TMufasaBitmap): TWebGraphV2; override;
@@ -882,7 +1100,7 @@ begin
 
   Self.Padding := padding;
   idx := -1;
-
+  WriteLn('done 1');
   for i := 0 to High(chunks) do
     for j := 0 to High(chunks[i].Planes) do
     begin
@@ -925,7 +1143,7 @@ begin
       end;
     end;
   Self.Pack();
-
+  WriteLn('done 2');
 
   Self.Map        := Self.InternalLoad(bitmaps);
   Self.Heightmap  := Self._InternalLoad(hbitmaps);
@@ -940,15 +1158,21 @@ begin
     Self.NPCData    := Self.InternalJSONLoad(npcs, 'mapnpcs');
 
   Self.UsingChunks := True;
+  WriteLn('done 3');
 end;
 
 procedure TRSMap.SetupChunks(chunks: array of TRSMapChunk; downscale: UInt32; addLadders: Boolean); overload;
 begin
+  WriteLn('done 0.000');
   Self.Loader.Load(chunks, downscale);
+  WriteLn('done 4');
   Self.InternalSetup();
+  WriteLn('done 5');
   if addLadders then
     Self.AddLadders();
+  WriteLn('done 4');
   Self.InternalSetup();
+  WriteLn('done 5');
 end;
 
 procedure TRSMap.SetupChunksEx(boxes: TBoxArray; planes: TIntegerArray = [0]; downscale: UInt32 = 8; addLadders: Boolean); overload;
@@ -964,11 +1188,14 @@ begin
     chunk.Chunk := boxes[i];
     chunks += chunk;
   end;
-
+  WriteLn('done 0');
   Self.Loader.Load(chunks, downscale);
+  WriteLn('done 4');
   Self.InternalSetup();
+  WriteLn('done 5');
   if addLadders then
     Self.AddLadders();
+  WriteLn('done 6');
   Self.InternalSetup();
 end;
 
@@ -1063,6 +1290,8 @@ var
 begin
   if not DirectoryExists(WQCacheDir) then
     CreateDirectory(WQCacheDir);
+
+  if (PositionFile.Len = 0) then PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
 
   time := GetTickCount();
 
@@ -1463,38 +1692,34 @@ end;
 
 function PRSMapObjectArray.GetClosest(): PRSMapObject; override
 var
-  meObj, meNPC: TPoint = [0,0];
+  me: TPoint = [0,0];
   tmp: PRSMapObject;
-  i: Int32;
-  closest: Integer;
-  current: Integer;
+  i, j, bestIndex: Int32;
+  bestDist, dist: Double;
 begin
-  closest := $FFFFFF;
+  bestDist := $FFFFFF;
+
 
   for i := High(Self) downto 0 do
   begin
     tmp := Self[i];
+    if (me = [0,0]) then me := tmp^.Walker^.Position();
 
-    case tmp^.MapObjectType of
-      ERSMapObjectType.OBJ:
-      begin
-        if meObj = [0,0] then meObj := tmp^.Walker^.Position();
-        tmp^.Walker^.GetClosestPointEx(meObj,tmp^.Coordinates,current);
-      end;
-
-      ERSMapObjectType.NPC:
-      begin
-        if meNPC = [0,0] then meNPC := tmp^.Walker^.Position();
-        tmp^.Walker^.GetClosestPointEx(meNPC,tmp^.Coordinates,current);
-      end;
-    end;
-
-    if current < closest then
+    for j := 0 to high(tmp^.Coordinates) do
     begin
-      closest := current;
-      Result := tmp;
+      if (tmp^.Coordinates[j].X div RSTranslator.MapWidth) > 0 then
+        dist := me.DistanceTo([(tmp^.Coordinates[j].X mod RSTranslator.MapWidth), tmp^.Coordinates[j].Y])  + (tmp^.Coordinates[j].X div RSTranslator.MapWidth)*50
+      else
+        dist := me.DistanceTo(tmp^.Coordinates[j]);
+
+      if bestDist > dist then
+      begin
+        bestIndex := i;
+        bestDist := dist;
+      end;
     end;
   end;
+  Result := Self[bestIndex];
 end;
 
 
