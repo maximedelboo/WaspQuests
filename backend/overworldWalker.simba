@@ -26,7 +26,7 @@ begin
   if not DirectoryExists(WQCacheDir) then
     CreateDirectory(WQCacheDir);
 
-  if (PositionFile.Len = 0) then PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
+  PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
 
   time := GetTickCount();
 
@@ -484,10 +484,10 @@ begin
   version := SHA1String(
      SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'map.zip') +
      SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'heightmap.zip') +
-     SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'collision.zip') +
+     SHA1File(WQWebgraphDir + 'collision.zip') +
      SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'objects.zip') +
      SHA1File(RSMAP_PATH + 'files' + DirectorySeparator + 'npcs.zip') +
-     SHA1File(IncludePath + 'WaspQuests' + DirectorySeparator + 'CHANGELOG.md')
+     SHA1File(WQWebgraphDir + 'webgraph.txt')
   );
 
   version := version.SubString(6);
