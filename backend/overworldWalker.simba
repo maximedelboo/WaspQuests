@@ -231,7 +231,13 @@ begin
 
   Result.SetName(cachename);
 
-  Result.LoadFromFile(cachename + '.png');
+  if not FileExists(cachename + '.png') then
+  begin
+    Result.SetSize(RSTranslator.Map.ChunkSide, RSTranslator.Map.ChunkSide);
+    Exit(Result);
+  end;
+
+  Result.LoadFromFile(cachename + '.bmp');
 end;
 
 function TRSOverworldWalker.GetChunkBitmap(b: TBox): TMufasaBitmap;
