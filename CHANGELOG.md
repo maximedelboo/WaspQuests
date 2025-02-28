@@ -1,3 +1,10 @@
+## [0.6.7](https://github.com/maximedelboo/WaspQuests/compare/v0.6.6...v0.6.7) (2025-02-28)
+
+
+### Bug Fixes
+
+* OWwalker bug when starting underground ([7b0eb87](https://github.com/maximedelboo/WaspQuests/commit/7b0eb87f5f0ae5ae656428943c9431ff85887ade))
+
 ## [0.6.6](https://github.com/maximedelboo/WaspQuests/compare/v0.6.5...v0.6.6) (2025-02-28)
 
 
