@@ -205,7 +205,7 @@ end;
 procedure SolveConversationStep(var step: TStep);
 var
   i: Variant;
-  options: TStringArray;
+  options, prev: TStringArray;
   o: TRSChatBoxOptionArray;
   str, match: String;
   sim: Single;
@@ -213,8 +213,11 @@ var
 begin
   step.actionSucceeded := False;
   WaitUntil(chat.HasContinue,10,5000);
+
+  step.conversation += 0;
+
   Writeln('Starting conversation');
-  if step.savedConversation.Contains('save') then
+  if step.savedConversation.len > 0 then
   begin
     step.savedConversation := [];
     for i in step.conversation do
@@ -223,6 +226,15 @@ begin
         chatIndex := StrToInt(i);
         Chat.ChatToNumber(chatIndex-1, step.savedConversation);
       except
+        prev := Chat.GetOptions([$000000]).ToStringArray;
+        step.savedConversation.Extend(prev);
+        while chat.HasContinue() do
+        begin
+          chat.ClickContinue(False);
+          WaitUntil(Chat.GetOptions([$000000]).ToStringArray <> prev, 100, 5000);
+          prev := Chat.GetOptions([$000000]).ToStringArray;
+          step.savedConversation.Extend(prev);
+        end;
         o := Chat.GetOptions();
         options := o.ToStringArray();
         str := ToStr(i);
@@ -239,6 +251,11 @@ begin
         chatIndex := StrToInt(i);
         Chat.ChatToNumber(chatIndex-1);
       except
+        while chat.HasContinue() do
+        begin
+          chat.ClickContinue(False);
+          Wait(0,700,wdLeft);
+        end;
         o := Chat.GetOptions();
         options := o.ToStringArray();
         str := ToStr(i);
@@ -247,12 +264,6 @@ begin
         Chat.ChatToNumber(ChatIndex-1);
       end;
     end;
-
-  while chat.HasContinue() do
-  begin
-    chat.ClickContinue(False);
-    Wait(0,700,wdLeft);
-  end;
 
   step.actionSucceeded := True;
   if step.actionSucceeded and (step.waitCoord <> [0,0]) then
@@ -272,28 +283,87 @@ end;
 
 procedure SolveQueryStep(var step: TStep);
 var
-  i: Integer;
+  i: Variant;
+  options, prev: TStringArray;
+  o: TRSChatBoxOptionArray;
+  str, match: String;
+  sim: Single;
+  chatIndex: Integer;
 begin
   step.actionSucceeded := False;
   WaitUntil(chat.HasContinue,10,2000);
-  Writeln('Starting conversation');
-  for i in step.conversation do
-    if Chat.ChatToNumberOrQuery(i-1, step.action, step.answer) then Chat.ChatToNumber(i-1);
-  while chat.HasContinue() do
-  begin
-    chat.ClickContinue(False);
-    Wait(0,700,wdLeft);
-  end;
 
-  if step.action in Chat.GetQuery then
+  step.conversation += 0;
+
+  Writeln('Starting conversation');
+  if step.savedConversation.len > 0 then
   begin
-    Chat.AnswerQuery(step.action, step.answer, 1500);
-    while chat.HasContinue() do
+    step.savedConversation := [];
+    for i in step.conversation do
     begin
-      chat.ClickContinue(False);
-      Wait(0,700,wdLeft);
+      try
+        chatIndex := StrToInt(i);
+        if Chat.ChatToNumberOrQuery(chatIndex-1, step.action, step.answer ,step.savedConversation) then
+          Chat.ChatToNumber(chatIndex-1, step.savedConversation);
+      except
+        prev := Chat.GetOptions([$000000]).ToStringArray;
+        step.savedConversation.Extend(prev);
+        while chat.HasContinue() do
+        begin
+          chat.ClickContinue(False);
+          WaitUntil(Chat.GetOptions([$000000]).ToStringArray <> prev, 100, 5000);
+          prev := Chat.GetOptions([$000000]).ToStringArray;
+          step.savedConversation.Extend(prev);
+        end;
+        if step.action in Chat.GetQuery then
+          begin
+          if Chat.ChatToNumberOrQuery(chatIndex-1, step.action, step.answer ,step.savedConversation) then
+            Chat.ChatToNumber(chatIndex-1, step.savedConversation);
+          end
+        else
+        begin
+          o := Chat.GetOptions();
+          options := o.ToStringArray();
+          str := ToStr(i);
+          match := options.FindBestMatch(str, sim);
+          ChatIndex := options.Find(match);
+          if Chat.ChatToNumberOrQuery(chatIndex-1, step.action, step.answer ,step.savedConversation) then
+            Chat.ChatToNumber(chatIndex-1, step.savedConversation);
+        end;
+      end;
     end;
-  end;
+  end
+  else
+    for i in step.conversation do
+    begin
+      try
+        chatIndex := StrToInt(i);
+        if Chat.ChatToNumberOrQuery(chatIndex-1, step.action, step.answer) then
+          Chat.ChatToNumber(chatIndex-1);
+      except
+        while chat.HasContinue() do
+        begin
+          chat.ClickContinue(False);
+          Wait(0,700,wdLeft);
+        end;
+        if step.action in Chat.GetQuery then
+          begin
+          if Chat.ChatToNumberOrQuery(chatIndex-1, step.action, step.answer) then
+            Chat.ChatToNumber(chatIndex-1);
+          end
+        else
+        begin
+          o := Chat.GetOptions();
+          options := o.ToStringArray();
+          str := ToStr(i);
+          match := options.FindBestMatch(str, sim);
+          ChatIndex := options.Find(match);
+          if Chat.ChatToNumberOrQuery(chatIndex-1, step.action, step.answer) then
+            Chat.ChatToNumber(chatIndex-1);
+        end;
+      end;
+    end;
+
   step.actionSucceeded := True;
   if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
 

@@ -34,7 +34,8 @@ begin
   while (not Timeout.IsFinished) and self.HasContinue and Self.ClickContinue(True) do
     Wait(800, 1500, wdLeft);
 
-  Keyboard.PressKey(VK_1 + Number);
+  if number > -1 then
+    Keyboard.PressKey(VK_1 + Number);
   Wait(600,800);
   Result := True;
 end;
@@ -55,7 +56,8 @@ begin
     SaveArray.Extend(prev);
   end;
 
-  Keyboard.PressKey(VK_1 + Number);
+  if number > -1 then
+    Keyboard.PressKey(VK_1 + Number);
   Wait(600,800);
   Result := True;
 end;
@@ -74,6 +76,33 @@ begin
     Exit(True);
   end;
   Keyboard.PressKey(VK_1 + Number);
+  Wait(600,800);
+  Result := False;
+end;
+
+function TRSChat.ChatToNumberOrQuery(Number: Integer; query, answer: String; var saveArray: TStringArray): Boolean; overload;
+var
+  Timeout: TCountdown;
+  prev: TStringArray;
+begin
+  Timeout.Init(15000);
+
+  prev := Chat.GetOptions([$000000]).ToStringArray;
+  SaveArray.Extend(prev);
+  while (not Timeout.IsFinished) and self.HasContinue and Self.ClickContinue(True) do
+  begin
+    WaitUntil(Chat.GetOptions([$000000]).ToStringArray <> prev, 100, 5000);
+    prev := Chat.GetOptions([$000000]).ToStringArray;
+    SaveArray.Extend(prev);
+  end;
+
+  if query in Self.GetQuery then
+  begin
+    Self.AnswerQuery(query,answer,1500);
+    Exit(True);
+  end;
+  if number > -1 then
+    Keyboard.PressKey(VK_1 + Number);
   Wait(600,800);
   Result := False;
 end;
@@ -813,7 +842,7 @@ function TRSChunkLoader._BuildGraph(map: TMufasaBitmap; white, red: TPointArray)
   end;
 
 var
-  a, b, i, j, n, len, hi, divider, nonSepDoors, connections: Int32;
+  a, i, j, n, len, hi, divider, nonSepDoors, connections: Int32;
   atpa, parts: T2DPointArray;
   skeleton, nodes, tpa, doorsInTpa, doorNodes: TPointArray;
   bounds: TBox;
