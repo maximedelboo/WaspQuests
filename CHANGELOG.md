@@ -1,3 +1,10 @@
+## [0.6.6](https://github.com/maximedelboo/WaspQuests/compare/v0.6.5...v0.6.6) (2025-02-28)
+
+
+### Bug Fixes
+
+* conversation saving fix ([83a6048](https://github.com/maximedelboo/WaspQuests/commit/83a60486d3429cca5b213014ad10b14ccd233dd7))
+
 ## [0.6.5](https://github.com/maximedelboo/WaspQuests/compare/v0.6.4...v0.6.5) (2025-02-27)
 
 
