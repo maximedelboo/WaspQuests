@@ -237,7 +237,7 @@ begin
     Exit(Result);
   end;
 
-  Result.LoadFromFile(cachename + '.bmp');
+  Result.LoadFromFile(cachename + '.png');
 end;
 
 function TRSOverworldWalker.GetChunkBitmap(b: TBox): TMufasaBitmap;
