@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/maximedelboo/WaspQuests/compare/v0.6.9...v0.7.0) (2025-03-04)
+
+
+### Features
+
+* now supports diagonal door handling! ([7d47511](https://github.com/maximedelboo/WaspQuests/commit/7d47511c3b3bf988433eefcc70d858576c0cc196))
+
 ## [0.6.9](https://github.com/maximedelboo/WaspQuests/compare/v0.6.8...v0.6.9) (2025-03-04)
 
 
