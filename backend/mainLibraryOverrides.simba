@@ -795,7 +795,7 @@ function TRSChunkLoader._BuildGraph(map: TMufasaBitmap; white, red: TPointArray)
   function _FindDoors(doorATPA: T2DPointArray; white: TPointArray): TRSDoorArray;
   var
     direction, center: TPoint;
-    i: Integer;
+    i, factor: Integer;
   begin
     SetLength(Result, Length(doorATPA));
 
@@ -836,8 +836,12 @@ function TRSChunkLoader._BuildGraph(map: TMufasaBitmap; white, red: TPointArray)
           [1,0]: Result[i].Center.Y -= 2;
         end;
 
-      Result[i].Before += Result[i].Center + Result[i].Direction * 2;
-      Result[i].After  += Result[i].Center - Result[i].Direction * 2;
+      factor := 2;
+      if (result[i].Direction = [1,1]) or (result[i].Direction = [1,-1]) then
+        factor := 3;
+
+      Result[i].Before += Result[i].Center + Result[i].Direction * factor;
+      Result[i].After  += Result[i].Center - Result[i].Direction * factor;
     end;
   end;
 
@@ -855,7 +859,15 @@ var
 begin
   atpa := white.NRCluster(1);
 
-  doors := _FindDoors(red.NRCluster(1), white);
+  doors := _FindDoors(red.Cluster(1), white);
+
+  //for door in doors do
+  //begin
+  //  map.DrawCross(door.Before, 3, $FF);
+  //  map.DrawCross(door.After, 3, $FF000FF);
+  //end;
+  //map.Debug();
+  //Terminatescript();
 
   atpa.sortBySize(0, True);
 
@@ -1382,9 +1394,54 @@ begin
 
 end;
 
+function TRSDoor.GetDoorAngle(): Single; override;
+const
+  NORTH:  TPoint = [0,-1];
+  EAST:   TPoint = [1,0];
+  SOUTH:  TPoint = [0,1];
+  WEST:   TPoint = [-1,0];
+  UR:     TPoint = [1,-1];
+  UL:     TPoint = [-1,-1];
+  DL:     TPoint = [-1,1];
+  DR:     TPoint = [1,1];
+  CARDINALS: TPointArray = [NORTH,EAST,SOUTH,WEST,UR,UL,DL,DR];
+var
+  best: Double;
+  cardinal, doorDirection, tmp: TPoint;
+begin
+  tmp := Self.After - Self.Before;
+  WriteLn(tmp);
+  for cardinal in CARDINALS do
+  begin
+    if cardinal.Dot(tmp) > best then
+    begin
+      doorDirection := cardinal;
+      best := cardinal.Dot(tmp);
+    end;
+  end;
+
+  case doorDirection of
+    NORTH: Result := 0;
+    WEST: Result := 90;
+    SOUTH: Result := 180;
+    EAST: Result := 270;
+    UR: Result := 315;
+    UL: Result := 45;
+    DL: Result := 135;
+    DR: Result := 225;
+  end;
+end;
+
+function TRSDoor.IsDiagonal(): Boolean;
+const diag: TPointArray = [[1,1],[1,-1]];
+begin
+  Result := diag.find(self.Direction) >= 0;
+end;
+
 function TRSWalkerV2._HardSolveDoor(door: TRSDoor): Boolean; override;
 var
-  middleBottom, me: TPoint;
+  middleBottom, me, targetPoint: TPoint;
+  moveDir: Vector2;
   angle: Single;
   rect: TRectangle;
   tpa: TPointArray;
@@ -1397,7 +1454,11 @@ begin
   WaitUntil(not minimap.IsPlayerMoving, 50,5000);
 
   me := Self.Position();
-  rect := Self.GetRectMS(me, door.After, 0, [0,0], Minimap.GetCompassAngle(False));
+  if Door.IsDiagonal then
+    rect := Self.GetRectMS(me, door.Center, 0, [0,0], Minimap.GetCompassAngle(False))
+  else
+    rect := Self.GetRectMS(me, door.After, 0, [0,0], Minimap.GetCompassAngle(False));
+
   if not Mainscreen.IsVisible(rect.mean) then Exit(False);
 
   //move mouse slightly below the mean of the rectangle
@@ -1406,7 +1467,12 @@ begin
   middleBottom := [(tpa[0].X + tpa[1].X) div 2, (tpa[0].Y + tpa[1].Y) div 2];
 
   with rect.Mean() do
-    Mouse.Move([(X + middleBottom.X) div 2, (Y + middleBottom.Y) div 2]);
+    targetPoint := [(X + middleBottom.X) div 2, (Y + middleBottom.Y) div 2];
+
+  if door.IsDiagonal then
+    targetPoint := rect.Mean() + [0,-5];
+
+  Mouse.Move(targetPoint);
 
   if Mainscreen.IsUpText(['Open', 'Squeeze']) then
   begin
@@ -1449,6 +1515,9 @@ function TRSWalkerV2.WebWalkEx(me: TPoint; destination: TPoint; waitUntilDistanc
     end;
   end;
 
+const
+  diagonal: TPointArray = [[1,1], [1,-1]];
+
 var
   path: TPointArray;
   tries: Int32;
@@ -1476,20 +1545,27 @@ begin
 
     Self.DebugLn('Attempting to solve door, attempt ' + ToStr(tries + 1));
 
-    if not Self.WalkDoorway(path, 0, debug) then
+    WriteLn(doors[0]);
+    WriteLn(doors[0].IsDiagonal);
+
+    if not Self._DoorHandler.Door.IsDiagonal then
     begin
-      Inc(tries);
+      if not Self.WalkDoorway(path, 0, debug) then
+      begin
+        Inc(tries);
+      end else
+      begin
+        WriteLn('Door Solved!');
+        tries := 0;
+        Continue;
+      end;
     end else
-    begin
-      WriteLn('Door Solved!');
-      tries := 0;
-      Continue;
-    end;
+      Self.WebWalk(Self._DoorHandler.Door.Before);
 
     Self._DoorHandler.SettingUp := False;
     Self._DoorHandler.Handling := False;
 
-    if tries <= 2 then Continue;
+    if (tries <= 2) and not Self._DoorHandler.Door.IsDiagonal then Continue;
     Self.DebugLn('Hard solving door.');
     if Self.WalkStep(Self.Position(), Self._DoorHandler.Door.Before) then
       if Self._HardSolveDoor(Self._DoorHandler.Door) then tries := 0;
@@ -1529,10 +1605,14 @@ begin
       end;
 
       obj := Ladders.FindNearestSingle(ladderPoint);
-      //Debug(obj);
+      Debug(obj);
       obj.Finder.Colors := [CTS2(3504679, 17, 2.17, 2.93)];
+      WriteLn(obj.Coordinates);
+      writeLn(obj.Actions);
+      writeLn(obj.UpText);
+      WriteLn(ladderpoint);
 
-      if obj.Coordinates[0].InRange(Self.Position, 8) then
+      if obj.Coordinates[0].InRange(Self.Position, 20) then
       begin
         if p.X - ladderPoint.X > 0 then
           obj.SelectOption(['-up'])
