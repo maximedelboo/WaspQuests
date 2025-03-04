@@ -167,7 +167,8 @@ begin
   for arr2 in laddersATPA do
     ladderMeans += Self.Loader.GetGlobal(arr2.Mean());
 
-  //bmp.Debug();
+//  bmp.Debug();
+//  TerminateScript;
 
   objArr += objs.GetAllByAction('Climb');
   objArr += objs.GetAllByAction('Climb-up');
@@ -252,6 +253,7 @@ begin
           ladderArray[high(ladderArray)].obj.Actions := ['Climb', 'Climb-down', 'Walk-down'];
         end;
         ladderArray[high(ladderArray)].coord := ladderArray[high(ladderArray)].obj.Coordinates[0];
+        usedLadders += ladderArray[high(ladderArray)].obj;
         ladderPoints += ladderArray[high(ladderArray)].coord;
       end;
 
@@ -272,6 +274,7 @@ begin
           ladderArray[high(ladderArray)].obj.Actions := ['Climb', 'Climb-up', 'Walk-up'];
         end;
         ladderArray[high(ladderArray)].coord := ladderArray[high(ladderArray)].obj.Coordinates[0];
+        usedLadders += ladderArray[high(ladderArray)].obj;
         ladderPoints += ladderArray[high(ladderArray)].coord;
       end;
   end;
