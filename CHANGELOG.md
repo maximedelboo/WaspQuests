@@ -1,3 +1,10 @@
+## [0.6.8](https://github.com/maximedelboo/WaspQuests/compare/v0.6.7...v0.6.8) (2025-03-03)
+
+
+### Bug Fixes
+
+* small typo fix ([b8ec5de](https://github.com/maximedelboo/WaspQuests/commit/b8ec5de793636a99d4e21c59dea19ba1f293013b))
+
 ## [0.6.7](https://github.com/maximedelboo/WaspQuests/compare/v0.6.6...v0.6.7) (2025-02-28)
 
 
