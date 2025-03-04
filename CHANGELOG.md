@@ -1,3 +1,10 @@
+## [0.6.9](https://github.com/maximedelboo/WaspQuests/compare/v0.6.8...v0.6.9) (2025-03-04)
+
+
+### Bug Fixes
+
+* ladders now work if their icon was obscured on minimap ([7b6597b](https://github.com/maximedelboo/WaspQuests/commit/7b6597b6250b3c18b143850266d0992c74bd321a))
+
 ## [0.6.8](https://github.com/maximedelboo/WaspQuests/compare/v0.6.7...v0.6.8) (2025-03-03)
 
 
