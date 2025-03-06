@@ -37,6 +37,8 @@ type
     interfaceHotkey: String;
   end;
 
+  TTeleportArray = array of TTeleportLocation;
+
   TTeleportJewellery = record
     unchargedName: TRSItem;
     chargedNames: TRSItemArray;

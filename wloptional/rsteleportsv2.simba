@@ -4,7 +4,7 @@
 {$ENDIF}
 
 {$IFNDEF SKUNK_TELEPORT_UTILS}
-  {$I WaspLib/optional/handlers/teleports/rsteleportutils.simba}
+  {$I rsteleportutils.simba}
 {$ENDIF}
 
 type RSTeleportsV2 = record(TSRLBaseRecord) class var
