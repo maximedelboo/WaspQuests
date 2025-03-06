@@ -1,3 +1,10 @@
+## [0.8.2](https://github.com/maximedelboo/WaspQuests/compare/v0.8.1...v0.8.2) (2025-03-06)
+
+
+### Bug Fixes
+
+* didnt compile ([fe96d0c](https://github.com/maximedelboo/WaspQuests/commit/fe96d0c980dc5dd7cb6876c46723ca6feef0eb02))
+
 ## [0.8.1](https://github.com/maximedelboo/WaspQuests/compare/v0.8.0...v0.8.1) (2025-03-06)
 
 
