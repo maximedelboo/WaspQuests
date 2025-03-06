@@ -1,3 +1,10 @@
+## [0.8.1](https://github.com/maximedelboo/WaspQuests/compare/v0.8.0...v0.8.1) (2025-03-06)
+
+
+### Bug Fixes
+
+* removed botched tree gnome village ([e1fe65c](https://github.com/maximedelboo/WaspQuests/commit/e1fe65c241232495fae7b52b790113d425500ceb))
+
 # [0.8.0](https://github.com/maximedelboo/WaspQuests/compare/v0.7.0...v0.8.0) (2025-03-06)
 
 
