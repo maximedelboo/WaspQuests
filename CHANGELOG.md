@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/maximedelboo/WaspQuests/compare/v0.7.0...v0.8.0) (2025-03-06)
+
+
+### Features
+
+* bugfix for linux, new webgraph, accountstaus first version ([477d648](https://github.com/maximedelboo/WaspQuests/commit/477d64842b4d0a5df6950de1ae1eb204652067c7))
+
 # [0.7.0](https://github.com/maximedelboo/WaspQuests/compare/v0.6.9...v0.7.0) (2025-03-04)
 
 
