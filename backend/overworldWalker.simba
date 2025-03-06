@@ -28,7 +28,7 @@ begin
 
   PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
 
-  time := GetTickCount();
+  time := Unixtime();
 
   JSON.init();
   JSON.put('x', coord.X);
@@ -388,7 +388,7 @@ var
 begin
   tp := Self.CachedTimePos;
   Self.newMap := True;
-  if (GetTickCount() - tp.Time) < 2*ONE_MINUTE then
+  if (UnixTime() - tp.Time) < 120 then
   begin
     Self.LastPos := tp.pos;
     if (Self.LastPos <> [0,0]) then

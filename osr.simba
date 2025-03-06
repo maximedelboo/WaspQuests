@@ -1,6 +1,11 @@
 {$IFNDEF SRL_OSR} {$I SRL-T/osr.simba}{$ENDIF}
 {$IFNDEF WL_OSR} {$I WaspLib/osr.simba}{$ENDIF}
-{$IFNDEF WL_QUESTS_INCLUDED} {$I WaspLib/optional/interfaces/gametabs/quests.simba} {$ENDIF}
+{$IFNDEF WL_QUESTS_INCLUDED} {$I wloptional/quests.simba} {$ENDIF}
+{$IFNDEF WL_ACCOUNT_STATUS} {$I wloptional/accountstatus.simba} {$ENDIF}
+{$IFNDEF WL_HOUSE_INCLUDED} {$I wloptional/house.simba} {$ENDIF}
+{$IFNDEF WL_POH_HANDLER_INCLUDED} {$I WaspLib/optional/handlers/poh.simba} {$ENDIF}
+{$IFNDEF SKUNK_UNIVERSAL_TRANSPORTV2} {$I wloptional/transportv2.simba} {$ENDIF}
+
 
 {$DEFINE WQ_OSR}
 

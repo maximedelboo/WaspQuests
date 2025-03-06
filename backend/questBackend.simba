@@ -147,7 +147,7 @@ begin
   begin
     WriteLn('Walking to quest start');
     tp := Self.CachedTimePos;
-    if (tp.Time - GetTickCount()) > 2*ONE_MINUTE then
+    if (tp.Time - UnixTime()) > 120 then
     begin
       if map.CheckPointOnMap(tp.pos) then
         if Map.OnMap() then

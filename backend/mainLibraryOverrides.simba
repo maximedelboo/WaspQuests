@@ -727,7 +727,9 @@ var
   ExitCode: LongInt;
 begin
   ArcExe := '"' + IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe' +'"';
-
+  {$IFNDEF WINDOWS}
+  ArcExe := '"' + IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc' +'"';
+  {$ENDIF}
   Writeln('Creating ARC archive: ', ArcPath);
   ExitCode := RunCommand(ArcExe, ['a', '-m4', '-ep1', '"' + ArcPath + '"', '"' + FilePath + '"'], s);
 
@@ -748,8 +750,10 @@ var
   ArcExe, s: string;
   ExitCode: LongInt;
 begin
-  ArcExe := '"' + IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe' +  '"';
-
+  ArcExe := '"' + IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc.exe' +'"';
+  {$IFNDEF WINDOWS}
+  ArcExe := '"' + IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + 'arc' +'"';
+  {$ENDIF}
   if not FileExists(ArcFile) then
   begin
     Writeln('Error: ARC file not found -> ', ArcFile);
@@ -1336,7 +1340,7 @@ begin
 
   PositionFile := WQcachedir + 'position' + Chat.GetDisplayName + '.json';
 
-  time := GetTickCount();
+  time := UnixTime();
 
   JSON.init();
   JSON.put('x', coord.X);
@@ -1441,7 +1445,6 @@ end;
 function TRSWalkerV2._HardSolveDoor(door: TRSDoor): Boolean; override;
 var
   middleBottom, me, targetPoint: TPoint;
-  moveDir: Vector2;
   angle: Single;
   rect: TRectangle;
   tpa: TPointArray;
@@ -1832,5 +1835,6 @@ begin
   end;
   Result := Self[bestIndex];
 end;
+
 
 
