@@ -1,3 +1,10 @@
+## [0.8.3](https://github.com/maximedelboo/WaspQuests/compare/v0.8.2...v0.8.3) (2025-03-06)
+
+
+### Bug Fixes
+
+* now uses 7z instead of arc ([708320f](https://github.com/maximedelboo/WaspQuests/commit/708320faf25d78f6c00a0f0bdeaae801677fae84))
+
 ## [0.8.2](https://github.com/maximedelboo/WaspQuests/compare/v0.8.1...v0.8.2) (2025-03-06)
 
 
