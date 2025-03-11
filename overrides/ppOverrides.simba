@@ -2,6 +2,49 @@
   {$I WaspQuests/osr.simba}
 {$ENDIF}
 
+procedure SolveInteractObjectStep(var step: TStep); override;
+var
+  objArr: TRSObjectV2Array;
+begin
+  step.actionSucceeded := False;
+
+  if step.coordinate = [0,0] then step.coordinate := Map.Walker.Position();
+
+  if step.objectTarget.Coordinates = [] then
+  begin
+    objArr := Objects.GetAll(step.objName);
+    step.objectTarget := objArr.findNearestSingle(step.coordinate);
+    if step.colors = [] then
+      step.objectTarget.Finder.Colors := [CTS2(3504679, 17, 2.17, 2.93)]
+    else
+      step.objectTarget.Finder.Colors := step.colors;
+  end;
+
+  //Debug(step.objectTarget);
+
+  try
+    if step.webwalk then
+      step.actionSucceeded := step.objectTarget.WalkSelectOption([step.action],2)
+    else
+      step.actionSucceeded := step.objectTarget.SelectOption([step.action],2);
+  except WriteLn('Error has occured');
+  end;
+
+  if step.waitCoord <> [0,0] then
+  begin
+    step.actionSucceeded := WaitUntil(map.Position.InRange(step.waitCoord,step.waitRange),50,step.time);
+    Wait(1200);
+  end;
+  if not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
+
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
+end;
+
 function TRSMapObject._UpTextCheck(out shouldExit: Boolean): Boolean; override;
 var
   text: String;

@@ -434,7 +434,7 @@ var
   bankItem: TRSBankItem;
 begin
   step.actionSucceeded := False;
-  if inventory.ContainsAll(step.bankItems) and (step.withdrawItems = []) then
+  if inventory.ContainsAll(step.withdrawItems) and (step.Bankitems = []) then
   begin
     step.actionSucceeded := True;
     Exit();
