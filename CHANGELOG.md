@@ -1,3 +1,10 @@
+## [0.8.6](https://github.com/maximedelboo/WaspQuests/compare/v0.8.5...v0.8.6) (2025-03-11)
+
+
+### Bug Fixes
+
+* pp small override fix ([690356b](https://github.com/maximedelboo/WaspQuests/commit/690356b6095771ba4751aacd262602273a929fb7))
+
 ## [0.8.5](https://github.com/maximedelboo/WaspQuests/compare/v0.8.4...v0.8.5) (2025-03-11)
 
 
