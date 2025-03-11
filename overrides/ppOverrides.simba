@@ -1,0 +1,94 @@
+{$IFNDEF WQ_OSR}
+  {$I WaspQuests/osr.simba}
+{$ENDIF}
+
+function TRSMapObject._UpTextCheck(out shouldExit: Boolean): Boolean; override;
+var
+  text: String;
+begin
+  shouldExit := True;
+
+  if (RSClient.DetectClientMode() = ERSClientMode.FIXED) and RSInterface.IsOpen() then
+    Exit;
+
+  if Self.Filter.UpText and Self.Filter.Walker then
+    Self.Walker^.TargetUpText := Copy(Self.UpText);
+
+  text := MainScreen.GetUpText();
+
+  if text.ContainsAny(['Use', '>']) and not Self.UpText.ContainsAny(['Use', '>']) then
+  begin
+    ChooseOption.Select('Cancel');
+    Exit;
+  end;
+
+  if Self.Filter.UpText and Text.ContainsAny(Self.UpText) and Self.GetCuboidArray[0].Fill.contains(Mouse.Position) then Exit(True);
+  Self.TrackTarget := False;
+  shouldExit := False;
+end;
+
+procedure TMufasabitmap.ReplaceColorsToColor(colors: TIntegerArray; color: Integer = 1466756);
+var area: TPointArray; col: Integer;
+begin
+  for col in colors do
+  begin
+    self.FindColors(area, col);
+    self.DrawTPA(area, color);
+  end;
+end;
+
+function TRSMinimap.GetCleanMinimap(angle: Double = $FFFF): TMufasaBitmap; override;
+var
+  bitmap: TMufasaBitmap;
+begin
+  bitmap := GetMufasaBitmap(BitmapFromClient(Self.Bounds));
+  bitmap.ReplaceColorsToColor([$70969B], clFuchsia);
+  bitmap.ReplaceColor(0, 1);
+
+  Self.CleanMinimap(bitmap);
+
+  Result.Init();
+  if angle = $FFFF then
+    angle := Self.GetCompassAngle(False);
+  bitmap.RotateBitmapEx(angle, False, True, Result);
+  bitmap.Free();
+end;
+
+function TRSMap.FullSearch(template, map: TMufasaBitmap; position: TPoint; out match: Single): TPoint; override;
+const
+  TEMPL_SIZE = 25;
+  SLICE_SIZE = TEMPL_SIZE + 45;
+  SCALING = 1;
+var
+  slice, downscaledSlice, downscaledTemplate: TMufasaBitmap;
+  matrix: TSingleMatrix;
+  area: TBox;
+begin
+  area := [
+    Max(0, position.X - SLICE_SIZE),
+    Max(0, position.Y - SLICE_SIZE),
+    Min(map.GetWidth()  - 1, position.X + SLICE_SIZE),
+    Min(map.GetHeight() - 1, position.Y + SLICE_SIZE)
+  ];
+
+  slice := map.Copy(area);
+  downscaledSlice := slice.Downsample(SCALING);
+
+  downscaledTemplate := template.Downsample(SCALING);
+  with downscaledTemplate.GetCenter() do
+    downscaledTemplate.Crop(X - TEMPL_SIZE, Y - TEMPL_SIZE, X + TEMPL_SIZE, Y + TEMPL_SIZE);
+
+  matrix := downscaledSlice.MatchTemplate(downscaledTemplate, TM_CCOEFF_NORMED);
+  with matrix.ArgMax() do
+  begin
+    match := matrix[Y, X];
+
+    Result.X := area.X1 + (X + TEMPL_SIZE) * SCALING;
+    Result.Y := area.Y1 + (Y + TEMPL_SIZE) * SCALING;
+  end;
+
+  downscaledTemplate.Free();
+  downscaledSlice.Free();
+  slice.Free();
+end;
+
