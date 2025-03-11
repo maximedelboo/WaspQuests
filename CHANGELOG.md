@@ -1,3 +1,10 @@
+## [0.8.4](https://github.com/maximedelboo/WaspQuests/compare/v0.8.3...v0.8.4) (2025-03-11)
+
+
+### Bug Fixes
+
+* WaspQuests sync for PP ([94050af](https://github.com/maximedelboo/WaspQuests/commit/94050afe4041c59bb5978073c310b297cb02d76a))
+
 ## [0.8.3](https://github.com/maximedelboo/WaspQuests/compare/v0.8.2...v0.8.3) (2025-03-06)
 
 
