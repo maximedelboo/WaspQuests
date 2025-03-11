@@ -340,7 +340,7 @@ begin
      SHA1File(WQWebgraphDir + 'webgraph.txt')
   );
 
-  version := version.SubString(6);
+  version := version.SubString(7);
   Self.Cache := CACHE_DIR + 'map' + DirectorySeparator +
                 version + DirectorySeparator;
 
@@ -537,7 +537,7 @@ var
 begin
   cacheroot := Self.Cache + 'graphs' + DirectorySeparator;
   cachename := cacheroot + ToStr(plane) + DirectorySeparator + name + '-' + GENERATED_GRAPH.Hash();
-
+  Self.DebugLn('name: ' + name);
   if (Loader._GetChunk(OverworldChunk.Chunk, s, f) = name) and (plane = 0) then
   begin
     overworldName := Loader._GetChunk(OverworldChunk.Chunk, s, f) + '-' + GENERATED_GRAPH.Hash();
@@ -600,11 +600,6 @@ begin
 end;
 
 //Thanks to Torwent and Slacky for the following two functions
-function TPointArray.Str(): string;
-begin
-  SetLength(Result, Length(Self)*8);
-  Move(Self[0], Result[1], Length(Self)*8);
-end;
 
 function StrToTPA(str: string): TPointArray;
 begin
@@ -612,26 +607,96 @@ begin
   Move(str[1], Result[0], Length(str));
 end;
 
-
-function T2DPointArray.Str(): String;
-var
-  i: Integer;
+function TPointArray.Str(): string;
 begin
-  Result += 'sep';
-  for i := 0 to high(Self) do
-    Result += self[i].Str() + 'sep';
+  SetLength(Result, Length(Self)*8);
+  Move(Self[0], Result[1], Length(Self)*8);
+end;
+
+function T2DPointArray.Str(): string;
+var
+  totalBytes, offset, i: Integer;
+  rowCount, rowLen: Integer;
+begin
+  // Number of rows.
+  rowCount := Length(Self);
+  // Header: one Int32 for rowCount plus one Int32 per row for its length.
+  totalBytes := (1 + rowCount) * SizeOf(Int32);
+  // Then add the data size for each row (each TPoint is 8 bytes).
+  for i := 0 to rowCount - 1 do
+    totalBytes := totalBytes + (Length(Self[i]) * SizeOf(TPoint));
+
+  // Allocate the string.
+  SetLength(Result, totalBytes);
+  offset := 1;
+
+  // Write rowCount.
+  Move(rowCount, Result[offset], SizeOf(Int32));
+  Inc(offset, SizeOf(Int32));
+
+  // Write each row's length.
+  for i := 0 to rowCount - 1 do
+  begin
+    rowLen := Length(Self[i]);
+    Move(rowLen, Result[offset], SizeOf(Int32));
+    Inc(offset, SizeOf(Int32));
+  end;
+
+  // Write each row's data.
+  for i := 0 to rowCount - 1 do
+  begin
+    if Length(Self[i]) > 0 then
+    begin
+      Move(Self[i][0], Result[offset], Length(Self[i]) * SizeOf(TPoint));
+      Inc(offset, Length(Self[i]) * SizeOf(TPoint));
+    end;
+  end;
 end;
 
 function String.toATPA(): T2DPointArray;
 var
-  i: Integer;
-  s: TStringArray;
+  offset, rowCount, i, rowLen, dataBytes: Integer;
 begin
-  s := self.Split('sep');
-  for i := 1 to high(s) do
+  offset := 1;
+  // Check that there is enough data for the row count.
+  if Length(Self) < SizeOf(Int32) then
+    raiseException('Data too short to contain row count.');
+
+  // Read row count.
+  Move(Self[offset], rowCount, SizeOf(Int32));
+  Inc(offset, SizeOf(Int32));
+
+  // Allocate the outer array.
+  SetLength(Result, rowCount);
+
+  // Read each row's length.
+  for i := 0 to rowCount - 1 do
   begin
-    Result += StrToTPA(s[i]);
+    if (offset + SizeOf(Int32) - 1) > Length(Self) then
+      raiseException('Data too short for row ');
+
+    Move(Self[offset], rowLen, SizeOf(Int32));
+    Inc(offset, SizeOf(Int32));
+    SetLength(Result[i], rowLen);
   end;
+
+  // Read each row's data.
+  for i := 0 to rowCount - 1 do
+  begin
+    dataBytes := Length(Result[i]) * SizeOf(TPoint);
+    if (offset + dataBytes - 1) > Length(Self) then
+      raiseException('Data too short for row.');
+
+    if dataBytes > 0 then
+    begin
+      Move(Self[offset], Result[i][0], dataBytes);
+      Inc(offset, dataBytes);
+    end;
+  end;
+
+  // Optionally, verify that all data was consumed.
+  if (offset - 1) <> Length(Self) then
+    raiseException('Extra data found in the string.');
 end;
 
 function T2DIntegerArrayToString(const Arr: T2DIntArray): string;
@@ -729,6 +794,9 @@ begin
   ArcExe := '"' + IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + '7za.exe' +'"';
   {$IFNDEF WINDOWS}
   ArcExe := '7z';
+  ExitCode := RunCommand(ArcExe, ['a', '-mx5', '-m0=lzma2', ArcPath, FilePath], s);
+  Writeln('Compression Exit Code: ', ExitCode);
+  Exit();
   {$ENDIF}
   Writeln('Creating ARC archive: ', ArcPath);
   ExitCode := RunCommand(ArcExe, ['a', '-mx5', '-m0=lzma2', '"' + ArcPath + '"', '"' + FilePath + '"'], s);
@@ -753,6 +821,10 @@ begin
   ArcExe := '"' + IncludePath + 'WaspQuests' + DirectorySeparator + 'resources' + DirectorySeparator + '7za.exe' +'"';
   {$IFNDEF WINDOWS}
   ArcExe := '7z';
+  OutputFolder := OutputFolder.Trim(DirectorySeparator);
+  ExitCode := RunCommand(ArcExe, ['x', ArcFile, '-o/' + OutputFolder], s);
+  Writeln('Exctraction Exit Code: ', ExitCode);
+  Exit();
   {$ENDIF}
   if not FileExists(ArcFile) then
   begin
@@ -864,7 +936,6 @@ begin
   atpa := white.NRCluster(1);
 
   doors := _FindDoors(red.Cluster(1), white);
-
   //for door in doors do
   //begin
   //  map.DrawCross(door.Before, 3, $FF);
@@ -1059,7 +1130,7 @@ function TRSMapLoader.SetupGraph(name: String; idx, plane, padding: Int32; cbitm
 var
   gray, white, merged, graySubset: TPointArray;
   whiteClusters, grayClusters, mergedClusters: T2DPointArray;
-  i, j: Int32;
+  i, j, hi: Int32;
   wcs, cacheroot, cachename: String;
 begin
   Result := Self.Loader.GetGraph(name, plane, cbitmap);
@@ -1080,12 +1151,15 @@ begin
     Self.DebugLn('Caching Walkable Clusters');
     whiteClusters := white.NRCluster(1);
 
+    hi := High(whiteClusters);
     for i := 0 to High(whiteClusters) do
     begin
       if Length(whiteClusters[i]) <= 6 then
         Continue;
 
-      graySubset := whiteclusters[i].Bounds.Expand(80).Filter(gray);
+      if (i mod 200) = 0 then WriteLn(i,'/',hi);
+
+      graySubset := whiteclusters[i].Bounds.Expand(40).Filter(gray);
       merged := whiteclusters[i] + graySubset;
       mergedClusters := merged.NRCluster(1);
 
@@ -1104,7 +1178,7 @@ begin
       Self.Fatal('Failed to create walkable cluster cache directories.');
     end;
     WriteFileContents(cachename + '.txt', wcs, False);
-
+    Self.DebugLn('Zipping up result..');
     if FileExists(cachename + '.txt') then
       CompressFile(cachename + '.7z',cachename + '.txt');
     Self.DebugLn('Done caching Walkable Clusters');
@@ -1140,14 +1214,13 @@ begin
       name += ToStr(k) + '_' + Self._GetChunk(chunks[i].Chunk, s, f);
   end;
 
-
+  WriteLn(name);
   objectsDone := Self.GetCache('mapobjects', name, Self.ObjectData);
   npcsDone := Self.GetCache('mapnpcs', name, Self.NPCData);
   SetLength(Self.Regions, j);
 
   Self.Padding := padding;
   idx := -1;
-  WriteLn('done 1');
   for i := 0 to High(chunks) do
     for j := 0 to High(chunks[i].Planes) do
     begin
@@ -1190,7 +1263,6 @@ begin
       end;
     end;
   Self.Pack();
-  WriteLn('done 2');
 
   Self.Map        := Self.InternalLoad(bitmaps);
   Self.Heightmap  := Self._InternalLoad(hbitmaps);
@@ -1205,21 +1277,15 @@ begin
     Self.NPCData    := Self.InternalJSONLoad(npcs, 'mapnpcs');
 
   Self.UsingChunks := True;
-  WriteLn('done 3');
 end;
 
 procedure TRSMap.SetupChunks(chunks: array of TRSMapChunk; downscale: UInt32; addLadders: Boolean); overload;
 begin
-  WriteLn('done 0.000');
   Self.Loader.Load(chunks, downscale);
-  WriteLn('done 4');
   Self.InternalSetup();
-  WriteLn('done 5');
   if addLadders then
     Self.AddLadders();
-  WriteLn('done 4');
   Self.InternalSetup();
-  WriteLn('done 5');
 end;
 
 procedure TRSMap.SetupChunksEx(boxes: TBoxArray; planes: TIntegerArray = [0]; downscale: UInt32 = 8; addLadders: Boolean); overload;
@@ -1235,14 +1301,10 @@ begin
     chunk.Chunk := boxes[i];
     chunks += chunk;
   end;
-  WriteLn('done 0');
   Self.Loader.Load(chunks, downscale);
-  WriteLn('done 4');
   Self.InternalSetup();
-  WriteLn('done 5');
   if addLadders then
     Self.AddLadders();
-  WriteLn('done 6');
   Self.InternalSetup();
 end;
 
@@ -1531,6 +1593,8 @@ begin
 
   while tries <= 4 do
   begin
+    if not Self._DoorHandler.Enabled then Break;
+
     path := _GetPath(Self.Position(), False);
     WriteLn('Found path: ', path);
     doors := Self.GetDoorsOnPath(path);

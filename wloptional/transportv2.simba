@@ -468,6 +468,16 @@ begin
   end;
 
   Magic.CastSpell(spell);
+  if ToStr(spell).lower.Contains('home') then
+  begin
+    AccountStatus.lastHomeTeleport := UnixTime();
+    Exit(WaitUntil(not Walker^.position.inrange(startPosition, 10), 200, 20000));
+  end;
+  if ToStr(teleportLocation).lower.Contains('minigame') then
+  begin
+    AccountStatus.lastMinigameTeleport := UnixTime();
+    Exit(WaitUntil(not Walker^.position.inrange(startPosition, 10), 200, 20000));
+  end;
   Exit(WaitUntil(not Walker^.position.inrange(startPosition, 10), 200, 10000));
 end;
 
@@ -751,6 +761,14 @@ begin
         if teledest.Upper.Replace(' ', '').Replace('''', '') in ToStr(spell).Replace('_', '').Replace('''', '') then
           Exit(spell);
   end;
+end;
+
+function TUniversalTransportV2.FilterCanDo(teles: TTeleportArray): TTeleportArray;
+var
+  tele: TTeleportLocation;
+begin
+  for tele in teles do
+    if tele.CanDo() then Result += tele;
 end;
 
 function TUniversalTransportV2.TeleportScan(): TTeleportArray;

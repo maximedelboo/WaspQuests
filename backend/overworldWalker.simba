@@ -13,10 +13,119 @@ type
     AreaBox: TBox;
     Graph: TWebGraphV2;
     Walker: TRSWalkerV2;
+    Objs: TRSObjectJSONParser;
+    NPCs: TRSNPCJSONParser;
   end;
 
 var
   OW: TRSOverworldWalker;
+
+
+function TWebGraphV2.Filter(box: TBox): TWebGraphV2;
+var
+  i, j, newIndex, nodeCount: Int32;
+  NewGraph: TWebGraphV2;
+  FilteredNodes, sub: TPointArray;
+  FilteredPaths: T2DIntArray;
+  FilteredBlocking, tempConnections, OldToNewIndex: TIntegerArray;
+
+
+begin
+  // Step 1: Filter Nodes and Keep Track of Old->New Mapping
+  nodeCount := 0;
+  SetLength(OldToNewIndex, Length(Nodes));
+  for i := 0 to High(Nodes) do
+  begin
+    if box.Contains(Nodes[i]) then
+    begin
+      Inc(nodeCount);
+      SetLength(FilteredNodes, nodeCount);
+      FilteredNodes[nodeCount - 1] := Nodes[i];
+      OldToNewIndex[i] := nodeCount - 1;  // Store new index
+    end
+    else
+      OldToNewIndex[i] := -1;  // Mark as removed
+  end;
+  NewGraph.Nodes := FilteredNodes;
+  WriteLn performanceTImer;
+
+    // Step 2: Filter Paths (Adjust Indices)
+
+  SetLength(FilteredPaths, nodeCount);
+
+  for i := 0 to High(Paths) do
+  begin
+    // Only process nodes that are inside the box
+    if OldToNewIndex[i] <> -1 then
+    begin
+      newIndex := OldToNewIndex[i]; // This is the new index for node i
+
+      // Prepare a temporary dynamic array to hold valid connections for this node.
+      SetLength(tempConnections, 0);
+
+      // Iterate over each connection in the original paths for node i
+      for j := 0 to High(Paths[i]) do
+      begin
+        // Check that the connection is within valid bounds, and then that the target node is kept.
+        if (Paths[i][j] >= 0) and (Paths[i][j] <= High(OldToNewIndex)) then
+        begin
+          if OldToNewIndex[Paths[i][j]] <> -1 then
+          begin
+            // The target node is still in the filtered graph.
+            SetLength(tempConnections, Length(tempConnections) + 1);
+            tempConnections[High(tempConnections)] := OldToNewIndex[Paths[i][j]];
+          end;
+        end;
+      end;
+
+      // Assign the built list of valid connections to the correct position.
+      FilteredPaths[newIndex] := tempConnections;
+    end;
+  end;
+  NewGraph.Paths := FilteredPaths;
+  WriteLn performanceTImer;
+
+  // Step 3: Filter Blocking Nodes
+  SetLength(FilteredBlocking, 0);
+  for i := 0 to High(Blocking) do
+  begin
+    newIndex := OldToNewIndex[Blocking[i]];
+    if newIndex <> -1 then
+    begin
+      SetLength(FilteredBlocking, Length(FilteredBlocking) + 1);
+      FilteredBlocking[High(FilteredBlocking)] := newIndex;
+    end;
+  end;
+  NewGraph.Blocking := FilteredBlocking;
+
+  WriteLn performanceTImer;
+
+  // Step 4: Filter Walkable Space
+
+  NewGraph.WalkableSpace := WalkableSpace.FilterBox(box);
+  WriteLn performanceTImer;
+
+  // Step 5: Filter Clusters
+  for i := 0 to High(WalkableClusters) do
+  begin
+    sub := WalkableClusters[i].FilterBox(box);
+    if sub.len > 0 then NewGraph.WalkableClusters += sub;
+  end;
+
+  for i := 0 to High(ObjectClusters) do
+  begin
+    sub := ObjectClusters[i].FilterBox(box);
+    if sub.len > 0 then NewGraph.ObjectClusters += sub;
+  end;
+  WriteLn performanceTImer;
+
+  // Step 7: Copy Doors (Assuming they are static and should not be filtered)
+  NewGraph.Doors := Doors;
+  SetLength(NewGraph.Names, Length(NewGraph.Nodes));
+
+  NewGraph.UseCollisionData := True;
+  Result := NewGraph;
+end;
 
 procedure TRSOverworldWalker.CachePosition(coord: TPoint);
 var
@@ -217,7 +326,7 @@ begin
   WriteFileContents(Self.Cache + 'cached.txt', 'yay', False);
 end;
 
-function TRSOverworldWalker.GetBitmap(chunk: TPoint): TMufasaBitmap;
+function TRSOverworldWalker.GetBitmap(chunk: TPoint; plane: Integer = 0): TMufasaBitmap;
 var
   cacheroot, cachename: String;
 begin
@@ -227,7 +336,7 @@ begin
     Self.StoreFullCache;
 
   cacheroot := Self.Cache + 'map' + DirectorySeparator;
-  cachename := cacheroot + '0' + DirectorySeparator + ToStr(chunk.X) + '-' + ToStr(chunk.Y);
+  cachename := cacheroot + ToStr(plane) + DirectorySeparator + ToStr(chunk.X) + '-' + ToStr(chunk.Y);
 
   Result.SetName(cachename);
 
@@ -240,7 +349,7 @@ begin
   Result.LoadFromFile(cachename + '.png');
 end;
 
-function TRSOverworldWalker.GetChunkBitmap(b: TBox): TMufasaBitmap;
+function TRSOverworldWalker.GetChunkBitmap(b: TBox; plane: Integer = 0): TMufasaBitmap;
 var
   i, x, y, n: Int32;
   lo, hi: TPoint;
@@ -259,7 +368,7 @@ begin
 
   for i := 0 to High(chunks) do
   begin
-    chunkMaps[i].Image := Self.GetBitmap(chunks[i]);
+    chunkMaps[i].Image := Self.GetBitmap(chunks[i], plane);
 
     x := chunks[i].X;
     y := 199 - chunks[i].Y;
@@ -293,6 +402,20 @@ begin
   b := Self.GetNearChunk(p);
   Self.Area := Self.GetChunkBitmap(b);
   Self.AreaBox := b;
+end;
+
+function TRSOverworldWalker.GetLaddergraph(target: TPoint): TWebgraphV2;
+var
+  topLevel, i: Integer;
+  bitmaps: TMufasaBitmapArray;
+  sg: TWebGraph;
+  off: TPoint;
+begin
+  topLevel := target.X div RSTranslator.MapWidth();
+  for i := 0 to topLevel do
+    bitmaps += Self.GetChunkBitmap(Self.GetNearChunk(target), i);
+  off := RSTranslator.Chunk2Coordinate([16,64]);
+  //Self.Graph.AddLadders(bitmaps,
 end;
 
 function TRSOverworldWalker.Position(): TPoint;

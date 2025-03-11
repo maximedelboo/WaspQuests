@@ -3,6 +3,9 @@
   {$I WaspLib/osr.simba}
 {$ENDIF}
 
+{$IFNDEF WL_ACCOUNT_STATUS} {$I accountstatus.simba} {$ENDIF}
+
+
 type
 {$SCOPEDENUMS ON}
   ETeleportType = (
@@ -33,8 +36,8 @@ type
     item: TRSItem;
     items: TRSItemArray;
     destination: String;
-    dispatcherRing: Boolean;
     interfaceHotkey: String;
+    CanDo: function (): Boolean of object;
   end;
 
   TTeleportArray = array of TTeleportLocation;
@@ -52,6 +55,25 @@ type
 var
   TeleportJewellery: array of TTeleportJewellery;
 
+{%codetools off}
+
+function StandardCanDo(): Boolean;
+begin
+  Result := True;
+end;
+
+function StandardCanDoFairy(): Boolean;
+begin
+  Result := not (AccountStatus.GetQuestStatus('Fairytale II - Cure a Queen') = ERSQuestStatus.NOT_STARTED);
+end;
+
+function StandardCanDoMinigame(): Boolean;
+begin
+  Result := Abs(UnixTime() - AccountStatus.lastMinigameTeleport) > 1800;
+end;
+
+{%codetools on}
+
 function setupTeleportJewellery(unchargedName: TRSItem; chargedName: TRSItem): TTeleportJewellery;
 begin
   result.unchargedName := unchargedName;
@@ -67,24 +89,92 @@ begin
     result.numberedItems += baseItem + " " + ToString(i);
 end;
 
-function setupTeleportLocation(teleportType: ETeleportType; destination: String; level: Int32; worldPoint: TPoint; interfaceKey: String = ''): TTeleportLocation;
+function setupTeleportLocation(teleportType: ETeleportType; destination: String; level: Int32; worldPoint: TPoint; interfaceKey: String = ''; canDo: function (): Boolean of object = nil): TTeleportLocation;
 begin
-  Result := [worldPoint, teleportType, level, '', [], destination, False, interfaceKey];
+  Result.worldPoint := worldPoint;
+  Result.teleportType := teleportType;
+  Result.magicLevel := level;
+  Result.item := '';
+  Result.items := [];
+  Result.destination := destination;
+  Result.interfaceHotkey := interfaceKey;
+
+  if @canDo = nil then
+  begin
+    case teleportType of
+      ETeleportType.MINIGAME: Result.CanDo := @StandardCanDoMinigame;
+      ETeleportType.FAIRY_RING: Result.CanDo := @StandardCanDoFairy;
+    else
+      Result.CanDo := @StandardCanDo;
+    end;
+  end else
+    Result.CanDo := @CanDo;
 end;
 
-function setupTeleportLocation(teleportType: ETeleportType; item: TRSItem; destination: String; worldPoint: TPoint; interfaceKey: String = ''): TTeleportLocation; overload;
+function setupTeleportLocation(teleportType: ETeleportType; item: TRSItem; destination: String; worldPoint: TPoint; interfaceKey: String = ''; canDo: function (): Boolean of object = nil): TTeleportLocation; overload;
 begin
-  Result := [worldPoint, teleportType, 0, item, [], destination, False, interfaceKey];
+  Result.worldPoint := worldPoint;
+  Result.teleportType := teleportType;
+  Result.magicLevel := 0;
+  Result.item := item;
+  Result.items := [];
+  Result.destination := destination;
+  Result.interfaceHotkey := interfaceKey;
+
+  if @canDo = nil then
+  begin
+    case teleportType of
+      ETeleportType.MINIGAME: Result.CanDo := @StandardCanDoMinigame;
+      ETeleportType.FAIRY_RING: Result.CanDo := @StandardCanDoFairy;
+    else
+      Result.CanDo := @StandardCanDo;
+    end;
+  end else
+    Result.CanDo := @CanDo;
 end;
 
-function setupTeleportLocation(teleportType: ETeleportType; destination: String; worldPoint: TPoint; dispatcherRing: Boolean = True): TTeleportLocation; overload;
+function setupTeleportLocation(teleportType: ETeleportType; destination: String; worldPoint: TPoint; canDo: function (): Boolean of object = nil): TTeleportLocation; overload;
 begin
-  Result := [worldPoint, teleportType, 0, '', [], destination, dispatcherRing, ''];
+  Result.worldPoint := worldPoint;
+  Result.teleportType := teleportType;
+  Result.magicLevel := 0;
+  Result.item := '';
+  Result.items := [];
+  Result.destination := destination;
+  Result.interfaceHotkey := '';
+
+  if @canDo = nil then
+  begin
+    case teleportType of
+      ETeleportType.MINIGAME: Result.CanDo := @StandardCanDoMinigame;
+      ETeleportType.FAIRY_RING: Result.CanDo := @StandardCanDoFairy;
+    else
+      Result.CanDo := @StandardCanDo;
+    end;
+  end else
+    Result.CanDo := @CanDo;
 end;
 
-function setupTeleportLocation(teleportType: ETeleportType; items: TRSItemArray; destination: String; worldPoint: TPoint): TTeleportLocation; overload;
+function setupTeleportLocation(teleportType: ETeleportType; items: TRSItemArray; destination: String; worldPoint: TPoint; canDo: function (): Boolean of object = nil): TTeleportLocation; overload;
 begin
-  Result := [worldPoint, teleportType, 0, '', items, destination, False, ''];
+  Result.worldPoint := worldPoint;
+  Result.teleportType := teleportType;
+  Result.magicLevel := 0;
+  Result.item := '';
+  Result.items := items;
+  Result.destination := destination;
+  Result.interfaceHotkey := '';
+
+  if @canDo = nil then
+  begin
+    case teleportType of
+      ETeleportType.MINIGAME: Result.CanDo := @StandardCanDoMinigame;
+      ETeleportType.FAIRY_RING: Result.CanDo := @StandardCanDoFairy;
+    else
+      Result.CanDo := @StandardCanDo;
+    end;
+  end else
+    Result.CanDo := @CanDo;
 end;
 
 procedure QuickSortTele(var AI: array of TTeleportLocation; ALo, AHi: Integer; closestPoint: TPoint);
