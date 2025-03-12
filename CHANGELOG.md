@@ -1,3 +1,10 @@
+## [0.8.9](https://github.com/maximedelboo/WaspQuests/compare/v0.8.8...v0.8.9) (2025-03-12)
+
+
+### Bug Fixes
+
+* pp interact ovject override ([b641ee4](https://github.com/maximedelboo/WaspQuests/commit/b641ee4264bf1d6a1c5af2abb8895b5d5902d324))
+
 ## [0.8.8](https://github.com/maximedelboo/WaspQuests/compare/v0.8.7...v0.8.8) (2025-03-12)
 
 
