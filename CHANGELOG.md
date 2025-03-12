@@ -1,3 +1,10 @@
+## [0.8.7](https://github.com/maximedelboo/WaspQuests/compare/v0.8.6...v0.8.7) (2025-03-12)
+
+
+### Bug Fixes
+
+* Bankstep fix ([40b644e](https://github.com/maximedelboo/WaspQuests/commit/40b644e0b3fc2f929ae70583ccf1196032b3553d))
+
 ## [0.8.6](https://github.com/maximedelboo/WaspQuests/compare/v0.8.5...v0.8.6) (2025-03-11)
 
 
