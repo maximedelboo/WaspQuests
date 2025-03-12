@@ -1,3 +1,10 @@
+## [0.8.8](https://github.com/maximedelboo/WaspQuests/compare/v0.8.7...v0.8.8) (2025-03-12)
+
+
+### Bug Fixes
+
+* hotfix ([be43d58](https://github.com/maximedelboo/WaspQuests/commit/be43d58c98e991976faf7bd44caf179e1a09459b))
+
 ## [0.8.7](https://github.com/maximedelboo/WaspQuests/compare/v0.8.6...v0.8.7) (2025-03-12)
 
 
