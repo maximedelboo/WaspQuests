@@ -1,13 +1,18 @@
-{$IFNDEF SRL_OSR} {$I SRL-T/osr.simba}{$ENDIF}
-{$IFNDEF WL_OSR} {$I WaspLib/osr.simba}{$ENDIF}
-{$IFNDEF WL_QUESTS_INCLUDED} {$I wloptional/quests.simba} {$ENDIF}
-{$IFNDEF WL_ACCOUNT_STATUS} {$I wloptional/accountstatus.simba} {$ENDIF}
-{$IFNDEF WL_HOUSE_INCLUDED} {$I wloptional/house.simba} {$ENDIF}
-{$IFNDEF WL_POH_HANDLER_INCLUDED} {$I WaspLib/optional/handlers/poh.simba} {$ENDIF}
-{$IFNDEF SKUNK_UNIVERSAL_TRANSPORTV2} {$I wloptional/transportv2.simba} {$ENDIF}
-
+{$IFNDEF SRL_OSR} {$I SRL-T/osr.simba}
+{$IFNDEF WL_OSR} {$I WaspLib/osr.simba}
 
 {$DEFINE WQ_OSR}
+
+{$IFNDEF WL_QUESTS_INCLUDED} {$I wloptional/quests.simba}
+{$IFNDEF WL_ACCOUNT_STATUS} {$I wloptional/accountstatus.simba}
+{$IFNDEF WL_HOUSE_INCLUDED} {$I wloptional/house.simba}
+{$IFNDEF WL_POH_HANDLER_INCLUDED} {$I WaspLib/optional/handlers/poh.simba}
+{$IFNDEF SKUNK_TELEPORT_UTILS} {$I wloptional/rsteleportutils.simba}
+{$IFNDEF SKUNK_TELEPORTSV2} {$I wloptional/rsteleportsv2.simba}
+{$IFNDEF SKUNK_UNIVERSAL_TRANSPORTV2} {$I wloptional/transportv2.simba}
+
+
+
 
 {$IFNDEF WQ_LADDERS} {$I backend/ladders.simba}
 {$IFNDEF WQ_OVERRIDES} {$I backend/mainLibraryOverrides.simba}
@@ -18,11 +23,20 @@
 {$IFNDEF WQ_BACKEND} {$I backend/questBackend.simba}
 
 
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
+{$ELSE}{$ENDIF}
 

@@ -1,6 +1,6 @@
 {$DEFINE SKUNK_TELEPORTSV2}
-{$IFNDEF WL_OSR}
-  {$I WaspLib/osr.simba}
+{$IFNDEF WQ_OSR}
+  {$I WaspQuests/osr.simba}
 {$ENDIF}
 
 {$IFNDEF SKUNK_TELEPORT_UTILS}

@@ -1,15 +1,21 @@
 {$DEFINE SKUNK_UNIVERSAL_TRANSPORTV2}
-{$IFNDEF WL_OSR}
-  {$I WaspLib/osr.simba}
+{$IFNDEF WQ_OSR}
+  {$I WaspQuests/osr.simba}
 {$ENDIF}
 
 {$SCOPEDENUMS ON}
 {$IFNDEF WL_FAIRYRING_INCLUDED}
   {$I WaspLib/optional/interfaces/mainscreen/fairyring.simba}
 {$ENDIF}
+
+{$IFNDEF SKUNK_TELEPORT_UTILS}
+  {$I rsteleportutils.simba}
+{$ENDIF}
+
 {$IFNDEF SKUNK_TELEPORTSV2}
   {$I rsteleportsv2.simba}
 {$ENDIF}
+
 {$IFNDEF WL_GROUPING_INCLUDED}
   {$I WaspLib/optional/interfaces/gametabs/grouping.simba}
 {$ENDIF}

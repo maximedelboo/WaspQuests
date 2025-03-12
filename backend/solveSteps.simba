@@ -434,11 +434,11 @@ var
   bankItem: TRSBankItem;
 begin
   step.actionSucceeded := False;
-  if inventory.ContainsAll(step.withdrawItems) and (step.Bankitems = []) then
-  begin
-    step.actionSucceeded := True;
-    Exit();
-  end;
+  //if inventory.ContainsAll(step.withdrawItems) and (step.Bankitems = []) then
+  //begin
+  //  step.actionSucceeded := True;
+  //  Exit();
+  //end;
 
   banks.WalkOpen();
   if not WaitUntil(Bank.IsOpen,100,10000) then Exit();
