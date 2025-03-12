@@ -20,7 +20,7 @@ begin
     end;
   end;
   Result := False;
-  //Antiban.RandomRotate();
+  if SRL.Dice(35) then Antiban.RandomRotate();
 end;
 
 procedure SolveInteractObjectStep(var step: TStep); override;
