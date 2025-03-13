@@ -11,6 +11,11 @@ begin
   for i := 0 to attempts do
   begin
     Self.find(atpa);
+    if atpa.len = 0 then
+    begin
+      Antiban.RandomRotate();
+      Self.find(atpa);
+    end;
     Mouse.move(atpa.Biggest().mean(), 10, True);
     Wait(20,50);
     if Mainscreen.IsUpText(action) then

@@ -434,11 +434,11 @@ var
   bankItem: TRSBankItem;
 begin
   step.actionSucceeded := False;
-  //if inventory.ContainsAll(step.withdrawItems) and (step.Bankitems = []) then
-  //begin
-  //  step.actionSucceeded := True;
-  //  Exit();
-  //end;
+  if inventory.ContainsAll(step.withdrawItems) and ((step.Bankitems = []) or not step.depositAll) then
+  begin
+    step.actionSucceeded := True;
+    Exit();
+  end;
 
   banks.WalkOpen();
   if not WaitUntil(Bank.IsOpen,100,10000) then Exit();
@@ -641,6 +641,93 @@ begin
     Wait(1200);
   end;
   if step.actionSucceeded and not step.waitItem.IsNull then step.actionSucceeded := WaitUntil(inventory.ContainsItem(step.waitItem), 50, step.time);
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
+end;
+
+procedure SolveGESellStep(var step: TStep);
+var
+  i, emptySlots: Integer;
+  bankItem: TRSBankItem;
+begin
+  step.actionSucceeded := False;
+  if Step.depositAll then
+  begin
+    RSInterface.Close();
+    if not WaitUntil(GrandExchange.OpenBank(),10,10000) then Exit();
+    Bank.DepositAll();
+    for i := 0 to high(Step.GEItems) do
+    begin
+      bankItem := Step.GEItems[i].ToBankItem();
+      Bank.WithdrawItem(bankItem, True);
+    end;
+  end;
+
+  RSInterface.Close();
+  GrandExchange.Open();
+
+  emptySlots := 7 - GrandExchange.CountOfferSlots();
+  if emptySlots = -1 then Exit();
+  for i := 0 to high(Step.GEItems) do
+  begin
+    GrandExchange.CreateSellOffer(Step.GEItems[i].item, Step.GEItems[i].price, Step.GEItems[i].quantity);
+    if (i = emptySlots) then
+    begin
+      Wait(2000,5000);
+      GrandExchange.CollectOffer();
+    end;
+  end;
+
+  Wait(2000,5000);
+  GrandExchange.CollectOffer();
+  Wait(1000);
+
+  step.actionSucceeded := (emptySlots <= (7 - GrandExchange.CountOfferSlots()));
+  RSInterface.Close();
+
+  if @step.SpecialEvent <> nil then
+    step.SpecialEvent();
+  if @step.CompletionCondition <> nil then
+    step.completed := step.CompletionCondition()
+  else
+    step.completed := step.StandardCompletion();
+end;
+
+procedure SolveGEBuyStep(var step: TStep);
+var
+  i, emptySlots: Integer;
+begin
+  step.actionSucceeded := False;
+  if not WaitUntil(GrandExchange.Open(),10,10000) then Exit();
+
+  emptySlots := 7 - GrandExchange.CountOfferSlots();
+  if emptySlots = -1 then Exit();
+  for i := 0 to high(Step.GEItems) do
+  begin
+    GrandExchange.CreateBuyOffer(Step.GEItems[i].item, Step.GEItems[i].price, Step.GEItems[i].quantity);
+    if (i = emptySlots) then
+    begin
+      if not Step.depositAll then Exit();
+      Wait(2000,5000);
+      GrandExchange.CollectOffer();
+      GrandExchange.DepositAllInBank();
+    end;
+  end;
+
+  Wait(2000,5000);
+  GrandExchange.CollectOffer();
+  Wait(1000,2000);
+
+  RSInterFace.Close();
+
+  step.withdrawItems := Step.GEItems.ToBankItem();
+  step.actionSucceeded := Inventory.ContainsAll(step.withdrawItems);
+  if Step.depositAll then step.actionSucceeded := GrandExchange.DepositAllInBank(False);
+
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
   if @step.CompletionCondition <> nil then

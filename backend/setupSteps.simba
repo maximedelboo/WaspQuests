@@ -210,6 +210,30 @@ begin
   Self += Step;
 end;
 
+procedure TStepArray.AddGEBuyStep(stepName: String; BuyItems: TGEOfferArray; depositAfter: Boolean = True; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
+begin
+  Step.step_type := STEP_TYPE.GE_BUY;
+  Step.name := stepName;
+  Step.GEItems := BuyItems;
+  Step.depositAll := depositAfter;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
+end;
+
+procedure TStepArray.AddGESellStep(stepName: String; SellItems: TGEOfferArray; WithdrawFirst: Boolean = True; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
+var step: TStep;
+begin
+  Step.step_type := STEP_TYPE.GE_SELL;
+  Step.name := stepName;
+  Step.GEItems := SellItems;
+  Step.depositAll := WithdrawFirst;
+  Step.CompletionCondition := @CompletionCondition;
+  Step.SpecialEvent := @SpecialEvent;
+  Self += Step;
+end;
+
 procedure TStepArray.AddCustomStep(stepName: String; CompletionCondition: TStepCompletion = nil; SpecialEvent: TStepEvent = nil);
 var step: TStep;
 begin

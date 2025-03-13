@@ -11,9 +11,7 @@
 {$IFNDEF SKUNK_TELEPORTSV2} {$I wloptional/rsteleportsv2.simba}
 {$IFNDEF SKUNK_UNIVERSAL_TRANSPORTV2} {$I wloptional/transportv2.simba}
 
-
-
-
+{$IFNDEF WQ_GE}{$I WaspQuests/backend/grandExchange.simba}
 {$IFNDEF WQ_LADDERS} {$I backend/ladders.simba}
 {$IFNDEF WQ_OVERRIDES} {$I backend/mainLibraryOverrides.simba}
 {$IFNDEF WQ_QUEST} {$I backend/quest.simba}
@@ -23,7 +21,7 @@
 {$IFNDEF WQ_BACKEND} {$I backend/questBackend.simba}
 
 
-
+{$ELSE}{$ENDIF}
 {$ELSE}{$ENDIF}
 {$ELSE}{$ENDIF}
 {$ELSE}{$ENDIF}

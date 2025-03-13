@@ -7,7 +7,7 @@
 type
   STEP_TYPE = (INTERACT_NPC, TALKTO, KILL, INTERACT_OBJECT, INTERACT_INVENTORY, CONVERSATION,
                QUERY, COMBINE, LOOT, WALK, WAIT, CUTSCENE, BANK, CLICK_TILE,
-               USE_ON_NPC, USE_ON_OBJECT, CUSTOM);
+               USE_ON_NPC, USE_ON_OBJECT, GE_BUY, GE_SELL, CUSTOM);
 
   PStep = ^TStep;
   PQuest = ^TQuest;
@@ -24,6 +24,7 @@ type
     item1, item2, waitItem: TRSItem;
     coordinate, waitCoord: TPoint;
     height: Double;
+    GEItems: TGEOfferArray;
     colors: TCTS2ColorArray;
     prayers: ERSPrayerArray;
     time, waitRange, combatTime: Integer;

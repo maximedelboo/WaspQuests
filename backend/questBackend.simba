@@ -206,6 +206,8 @@ begin
       STEP_TYPE.CLICK_TILE: SolveClickTileStep(self.steps[index]);
       STEP_TYPE.USE_ON_NPC: SolveUseOnNPCStep(self.steps[index]);
       STEP_TYPE.USE_ON_OBJECT: SolveUseOnObjectStep(self.steps[index]);
+      STEP_TYPE.GE_BUY: SolveGEBuyStep(self.steps[index]);
+      STEP_TYPE.GE_SELL: SolveGESellStep(self.steps[index]);
       STEP_TYPE.CUSTOM: SolveCustomStep(self.steps[index]);
     end;
 

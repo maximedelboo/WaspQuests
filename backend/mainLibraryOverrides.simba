@@ -117,7 +117,7 @@ var
 begin
   for bankitem in bankitems do
   begin
-    quantities += bankitem.Quantity;
+    quantities += Abs(bankitem.Quantity);
     noted += bankitem.Noted;
     if bankitem.Noted then
       items += 'noted ' + bankitem.Item
