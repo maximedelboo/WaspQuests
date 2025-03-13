@@ -1,3 +1,10 @@
+# [0.9.0](https://github.com/maximedelboo/WaspQuests/compare/v0.8.10...v0.9.0) (2025-03-13)
+
+
+### Features
+
+* added GE step ([67734ad](https://github.com/maximedelboo/WaspQuests/commit/67734adad70ca4ef170f2ff26eb31bd14c80b10e))
+
 ## [0.8.10](https://github.com/maximedelboo/WaspQuests/compare/v0.8.9...v0.8.10) (2025-03-12)
 
 
