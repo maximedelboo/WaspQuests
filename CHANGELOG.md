@@ -1,3 +1,10 @@
+## [0.9.1](https://github.com/maximedelboo/WaspQuests/compare/v0.9.0...v0.9.1) (2025-03-13)
+
+
+### Bug Fixes
+
+* forgot to upload ifle ([df389ed](https://github.com/maximedelboo/WaspQuests/commit/df389ed433d1b2d6afb8a098e0422832ea811f67))
+
 # [0.9.0](https://github.com/maximedelboo/WaspQuests/compare/v0.8.10...v0.9.0) (2025-03-13)
 
 
