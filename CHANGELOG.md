@@ -1,3 +1,10 @@
+## [0.9.2](https://github.com/maximedelboo/WaspQuests/compare/v0.9.1...v0.9.2) (2025-03-14)
+
+
+### Bug Fixes
+
+* overworld walker done goof no more ([7cb2666](https://github.com/maximedelboo/WaspQuests/commit/7cb2666f556d9227046590b7e32f487dff7a0e29))
+
 ## [0.9.1](https://github.com/maximedelboo/WaspQuests/compare/v0.9.0...v0.9.1) (2025-03-13)
 
 
