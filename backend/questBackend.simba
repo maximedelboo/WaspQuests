@@ -111,7 +111,9 @@ begin
   options.SetNPCAttackOption(ERSAttackOption.ALWAYS_LEFT_CLICK);
 
   Map.SetupChunks(Quest.region, 8, not Quest.DisableLadders);
+  Map.Walker._DoorHandler.Enabled := True;
   Map.Walker.WebGraph^.UseCollisionData := True;
+  Map.Debug();
 
   NPCs.Setup(Map.NPCs(), @Map.Walker);
   Objects.Setup(Map.Objects(), @Map.Walker);
