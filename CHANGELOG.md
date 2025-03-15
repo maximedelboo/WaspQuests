@@ -1,3 +1,11 @@
+## [0.9.4](https://github.com/maximedelboo/WaspQuests/compare/v0.9.3...v0.9.4) (2025-03-15)
+
+
+### Bug Fixes
+
+* enabled doorhandler for quests ([d5f6348](https://github.com/maximedelboo/WaspQuests/commit/d5f6348402110b6e592b02e8ed46fd58e03a2410))
+* enabled doorhandler for quests2 ([6a443b3](https://github.com/maximedelboo/WaspQuests/commit/6a443b3b005bdf16858dba11be9bd7adc9e7ded4))
+
 ## [0.9.3](https://github.com/maximedelboo/WaspQuests/compare/v0.9.2...v0.9.3) (2025-03-14)
 
 
