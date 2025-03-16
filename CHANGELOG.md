@@ -1,3 +1,10 @@
+## [0.9.5](https://github.com/maximedelboo/WaspQuests/compare/v0.9.4...v0.9.5) (2025-03-16)
+
+
+### Bug Fixes
+
+* pp banking fix ([afc4f85](https://github.com/maximedelboo/WaspQuests/commit/afc4f85025ae0c77c7dadfd59432937a8c4f55bb))
+
 ## [0.9.4](https://github.com/maximedelboo/WaspQuests/compare/v0.9.3...v0.9.4) (2025-03-15)
 
 
