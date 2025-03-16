@@ -437,24 +437,27 @@ begin
   if inventory.ContainsAll(step.withdrawItems) and ((step.Bankitems = []) or not step.depositAll) then
   begin
     step.actionSucceeded := True;
-    Exit();
+    WriteLn('Inventory already correct!');
+  end else
+  begin
+    banks.WalkOpen();
+    if not WaitUntil(Bank.IsOpen,100,10000) then Exit();
+
+    if step.depositAll then Bank.DepositAll() else Bank.DepositItems(Step.bankItems, True);
+    Wait(1200,3000,wdLeft);
+    for bankItem in step.withdrawItems do
+      Bank.WithdrawItem(bankItem, False);
+
+    Wait(600,900,wdRight);
+
+
+    step.actionSucceeded := Inventory.ContainsAll(step.withdrawItems);
   end;
-
-  banks.WalkOpen();
-  if not WaitUntil(Bank.IsOpen,100,10000) then Exit();
-
-  if step.depositAll then Bank.DepositAll() else Bank.DepositItems(Step.bankItems, True);
-  Wait(1200,3000,wdLeft);
-  for bankItem in step.withdrawItems do
-    Bank.WithdrawItem(bankItem, False);
-
-  Wait(600,900,wdRight);
-  bank.Close;
-
-  step.actionSucceeded := Inventory.ContainsAll(step.withdrawItems);
 
   if @step.SpecialEvent <> nil then
     step.SpecialEvent();
+
+  bank.Close;
   if @step.CompletionCondition <> nil then
     step.completed := step.CompletionCondition()
   else
