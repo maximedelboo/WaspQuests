@@ -1,3 +1,10 @@
+## [0.9.6](https://github.com/maximedelboo/WaspQuests/compare/v0.9.5...v0.9.6) (2025-03-26)
+
+
+### Bug Fixes
+
+* small uptext read increase ([9acee13](https://github.com/maximedelboo/WaspQuests/commit/9acee13c25c8e4c81ccc0b2410cd37c0516b196d))
+
 ## [0.9.5](https://github.com/maximedelboo/WaspQuests/compare/v0.9.4...v0.9.5) (2025-03-16)
 
 
