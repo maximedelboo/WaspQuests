@@ -17,7 +17,7 @@ begin
       Self.find(atpa);
     end;
     Mouse.move(atpa.Biggest().mean(), 10, True);
-    Wait(20,50);
+    Wait(50,70);
     if Mainscreen.IsUpText(action) then
     begin
       Mouse.Click(MOUSE_LEFT);
