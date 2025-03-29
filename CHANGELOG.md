@@ -1,3 +1,10 @@
+## [0.9.7](https://github.com/maximedelboo/WaspQuests/compare/v0.9.6...v0.9.7) (2025-03-29)
+
+
+### Bug Fixes
+
+* pp object improvements ([a1b5694](https://github.com/maximedelboo/WaspQuests/commit/a1b5694cf84930fd718fd644aa4fc85d4a3d9025))
+
 ## [0.9.6](https://github.com/maximedelboo/WaspQuests/compare/v0.9.5...v0.9.6) (2025-03-26)
 
 
