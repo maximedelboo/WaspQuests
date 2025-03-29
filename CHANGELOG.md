@@ -1,3 +1,10 @@
+## [0.9.8](https://github.com/maximedelboo/WaspQuests/compare/v0.9.7...v0.9.8) (2025-03-29)
+
+
+### Bug Fixes
+
+* pp object clicking improvement ([5d40fb1](https://github.com/maximedelboo/WaspQuests/commit/5d40fb1e2dd495a79c6438a5ad56996fefa43d2f))
+
 ## [0.9.7](https://github.com/maximedelboo/WaspQuests/compare/v0.9.6...v0.9.7) (2025-03-29)
 
 
