@@ -24,7 +24,7 @@ begin
       Exit(True);
     end;
   end;
-  if Antiban.BioDice() then Antiban.RandomRotate();
+  //if Antiban.BioDice() then Antiban.RandomRotate();
 end;
 
 procedure SolveInteractObjectStep(var step: TStep); override;
@@ -49,9 +49,9 @@ begin
 
   try
     if step.webwalk then
-      step.actionSucceeded := step.objectTarget.WalkSelectOption([step.action],1)
+      step.actionSucceeded := step.objectTarget.WalkSelectOption([step.action],0)
     else
-      step.actionSucceeded := step.objectTarget.SelectOption([step.action],1);
+      step.actionSucceeded := step.objectTarget.SelectOption([step.action],0);
   except WriteLn('Error has occured');
   end;
 
