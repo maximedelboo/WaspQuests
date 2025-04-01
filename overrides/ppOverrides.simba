@@ -22,7 +22,7 @@ begin
     begin
       Mouse.Click(MOUSE_LEFT);
       Exit(True);
-    end;
+    end else if SRL.Dice(20) then Antiban.RandomRotate();
   end;
   //if Antiban.BioDice() then Antiban.RandomRotate();
 end;
