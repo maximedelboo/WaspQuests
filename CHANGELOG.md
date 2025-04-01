@@ -1,3 +1,10 @@
+## [0.9.9](https://github.com/maximedelboo/WaspQuests/compare/v0.9.8...v0.9.9) (2025-04-01)
+
+
+### Bug Fixes
+
+* rotate after failed object ([8e39b4f](https://github.com/maximedelboo/WaspQuests/commit/8e39b4f7695896bb0f464cb105eefc6ab6b1e08e))
+
 ## [0.9.8](https://github.com/maximedelboo/WaspQuests/compare/v0.9.7...v0.9.8) (2025-03-29)
 
 
