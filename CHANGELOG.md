@@ -1,3 +1,10 @@
+## [0.9.10](https://github.com/maximedelboo/WaspQuests/compare/v0.9.9...v0.9.10) (2025-04-11)
+
+
+### Bug Fixes
+
+* pp overrides raiseException ([782488e](https://github.com/maximedelboo/WaspQuests/commit/782488e8ed72ae21eddc86464f1d58cd6a2c30ef))
+
 ## [0.9.9](https://github.com/maximedelboo/WaspQuests/compare/v0.9.8...v0.9.9) (2025-04-01)
 
 
