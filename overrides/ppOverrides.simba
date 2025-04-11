@@ -160,3 +160,59 @@ begin
   slice.Free();
 end;
 
+procedure TQuest.Solve(startStep: Integer = 1); override;
+var
+  attempts: Integer;
+begin
+  attempts := 0;
+  self.index := startStep - 1;
+  while self.index <= high(self.steps) do
+  begin
+    self.DebugLn('Executing step ' + IntToStr(index + 1) + ': ' + self.steps[index].name);
+
+    WaitUntil(not Minimap.IsPlayerMoving,50,5000);
+
+    case self.steps[index].step_type of
+      STEP_TYPE.INTERACT_NPC: SolveInteractNPCStep(self.steps[index]);
+      STEP_TYPE.TALKTO: SolveTalkToStep(self.steps[index]);
+      STEP_TYPE.KILL: SolveKillStep(self.steps[index]);
+      STEP_TYPE.INTERACT_OBJECT: SolveInteractObjectStep(self.steps[index]);
+      STEP_TYPE.INTERACT_INVENTORY: SolveInteractInventoryStep(self.steps[index]);
+      STEP_TYPE.CONVERSATION: SolveConversationStep(self.steps[index]);
+      STEP_TYPE.QUERY: SolveQueryStep(self.steps[index]);
+      STEP_TYPE.COMBINE: SolveCombineStep(self.steps[index]);
+      STEP_TYPE.LOOT: SolveLootStep(self.steps[index]);
+      STEP_TYPE.BANK: SolveBankStep(self.steps[index]);
+      STEP_TYPE.WALK: SolveWalkStep(self.steps[index]);
+      STEP_TYPE.WAIT: SolveWaitStep(self.steps[index]);
+      STEP_TYPE.CUTSCENE: SolveCutsceneStep(self.steps[index]);
+      STEP_TYPE.CLICK_TILE: SolveClickTileStep(self.steps[index]);
+      STEP_TYPE.USE_ON_NPC: SolveUseOnNPCStep(self.steps[index]);
+      STEP_TYPE.USE_ON_OBJECT: SolveUseOnObjectStep(self.steps[index]);
+      STEP_TYPE.GE_BUY: SolveGEBuyStep(self.steps[index]);
+      STEP_TYPE.GE_SELL: SolveGESellStep(self.steps[index]);
+      STEP_TYPE.CUSTOM: SolveCustomStep(self.steps[index]);
+    end;
+
+    if self.forceQuit then TerminateScript(self.Quitmessage);
+
+    if Self.completed then
+      Break;
+
+    if self.steps[index].completed then
+    begin
+      self.index += 1;
+      DebugLn('Step Solved, going to next step');
+      Wait(1000);
+      attempts := 0;
+      Continue;
+    end else
+      attempts += 1;
+    DebugLn('Step failed on try ' + IntToStr(attempts));
+    Antiban.RandomRotate();
+    if attempts > 5 then RaiseException('Failed to solve step: ' + self.steps[index].name + ' with index ' + IntToStr(self.index + 1));
+  end;
+  DebugLn('Quest solved');
+  Self.completed := True;
+end;
+
