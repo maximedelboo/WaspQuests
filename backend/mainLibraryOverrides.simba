@@ -391,7 +391,7 @@ procedure TRSChunkLoader.StoreFullCache();
 var
   cacheroot, zipPath: String;
   cachetype: String;
-  foldernames: TStringArray = ['map', 'npcs', 'objects', 'heightmap', 'collision'];
+  foldernames: TStringArray = ['map', 'npcs', 'objects1400', 'heightmap', 'collision'];
 begin
   Self.DebugLn('Unziping all cache. This takes around 1 minute');
   for cachetype in foldernames do
