@@ -1,3 +1,10 @@
+## [0.9.11](https://github.com/maximedelboo/WaspQuests/compare/v0.9.10...v0.9.11) (2025-12-15)
+
+
+### Bug Fixes
+
+* update folder name ([d331299](https://github.com/maximedelboo/WaspQuests/commit/d331299e528b15048534639b44dea36156c92abd))
+
 ## [0.9.10](https://github.com/maximedelboo/WaspQuests/compare/v0.9.9...v0.9.10) (2025-04-11)
 
 
