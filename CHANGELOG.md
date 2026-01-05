@@ -1,3 +1,10 @@
+## [0.9.12](https://github.com/maximedelboo/WaspQuests/compare/v0.9.11...v0.9.12) (2026-01-05)
+
+
+### Bug Fixes
+
+* update folder name in StoreFullCache procedure ([5a41cd9](https://github.com/maximedelboo/WaspQuests/commit/5a41cd94b9622d7cc307a084eda73b8ef5838811))
+
 ## [0.9.11](https://github.com/maximedelboo/WaspQuests/compare/v0.9.10...v0.9.11) (2025-12-15)
 
 
